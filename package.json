@@ -9,13 +9,17 @@
         "lint": "next lint"
     },
     "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
         "plugins": [
-            "prettier"
+            "prettier",
+            "import"
         ],
         "extends": [
             "eslint:recommended",
             "next/core-web-vitals",
-            "prettier"
+            "prettier",
+            "plugin:import/recommended",
+            "plugin:@typescript-eslint/recommended"
         ],
         "rules": {
             "no-case-declarations": "off",
@@ -51,11 +55,14 @@
         "@types/node": "18.11.17",
         "@types/react": "18.0.26",
         "@types/react-dom": "18.0.9",
+        "@typescript-eslint/eslint-plugin": "^5.47.0",
+        "@typescript-eslint/parser": "^5.47.0",
         "autoprefixer": "^10.4.13",
         "eslint": "8.30.0",
         "eslint-config-next": "13.0.7",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-prettier": "^4.2.1",
         "postcss": "^8.4.20",
         "prettier": "^2.8.1",
         "prisma": "^4.8.0",
