@@ -6,6 +6,203 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+// Flows: Organization -> User -> Project -> Board -> List -> Card -> Activity
+
+// ------------------------------
+// [Globals]
+// 1. This is a global models that are used in multiple places
+// ------------------------------
+
+// (1) Permissions
+// Instead of using roles, we use a table that lists all the permissions 
+// and map them to users and organizations
+model permissions {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  users_map                 user_permissions[]
+  organization_users_map    organization_user_permissions[]
+  project_users_map         project_user_permissions[]
+  project_organizations_map project_organization_permissions[]
+}
+
+// ------------------------------
+// [Organizations]
+// 1. Each organization has a list of users and projects
+// 2. If an organization is deleted, all users and projects are deleted
+// 3. If a project is assigned to an organization, all members within the organization are assigned to the project
+// ------------------------------
+
+model organizations {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  users_joined    organization_users[]
+  projects_joined project_organizations[]
+}
+
+model organization_users {
+  id              String @id @default(uuid())
+  user_id         String
+  organization_id String
+
+  user         users?                          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization organizations?                  @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permissions  organization_user_permissions[]
+}
+
+model organization_user_permissions {
+  id                   String @id @default(uuid())
+  organization_user_id String
+  permission_id        String
+
+  organization_user organization_users? @relation(fields: [organization_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission        permissions?        @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+// ------------------------------
+// Users
+// ------------------------------
+
+model users {
+  id       String @id @default(uuid())
+  name     String
+  username String @unique
+  email    String @unique
+  phone    String
+  password String
+
+  image_url            String
+  language             String
+  subscribe_by_default Boolean
+  subscribe_to_email   Boolean
+
+  projects_joined      project_users[]
+  organizations_joined organization_users[]
+  permissions          user_permissions[]
+}
+
+model user_permissions {
+  id            String @id @default(uuid())
+  user_id       String
+  permission_id String
+
+  user       users?       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission permissions? @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+// ------------------------------
+// Projects
+// ------------------------------
+
+model projects {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  users_joined         project_users[]
+  organizations_joined project_organizations[]
+  boards               boards[]
+}
+
+model project_organizations {
+  id              String @id @default(uuid())
+  project_id      String
+  organization_id String
+
+  project                          projects?                          @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization                     organizations?                     @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project_organization_permissions project_organization_permissions[]
+}
+
+model project_organization_permissions {
+  id                      String @id @default(uuid())
+  project_organization_id String
+  permission_id           String
+
+  project_organization project_organizations? @relation(fields: [project_organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission           permissions?           @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model project_users {
+  id         String @id @default(uuid())
+  user_id    String
+  project_id String
+
+  user        users?                     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project     projects?                  @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permissions project_user_permissions[]
+}
+
+model project_user_permissions {
+  id              String @id @default(uuid())
+  project_user_id String
+  permission_id   String
+
+  project_user project_users? @relation(fields: [project_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission   permissions?   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+// ------------------------------
+// Boards
+// ------------------------------
+
+model boards {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  project_id String
+  project    projects? @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  lists      lists[]
+}
+
+// ------------------------------
+// Lists
+// ------------------------------
+model lists {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  order Int
+
+  board_id String
+  board    boards? @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cards    cards[]
+}
+
+// ------------------------------
+// Cards
+// ------------------------------
+
+model cards {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  order Int
+
+  list_id    String
+  list       lists?       @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  activities activities[]
+}
+
+// ------------------------------
+// Activities
+// ------------------------------
+
+model activities {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  card_id String
+  card    cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
