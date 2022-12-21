@@ -10,14 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Flows: Organization -> User -> Project -> Board -> List -> Card -> Activity
+// Flows: User -> Organization (optional) -> Project -> Board -> List -> Card -> Activity
 
 // ------------------------------
 // [Globals]
 // 1. This is a global models that are used in multiple places
 // ------------------------------
 
-// (1) Permissions
 // Instead of using roles, we use a table that lists all the permissions 
 // and map them to users and organizations
 model permissions {
@@ -25,10 +24,25 @@ model permissions {
   name        String
   description String
 
+  created_at DateTime @default(now())
+
   users_map                 user_permissions[]
   organization_users_map    organization_user_permissions[]
   project_users_map         project_user_permissions[]
   project_organizations_map project_organization_permissions[]
+}
+
+model labels {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  color       String
+
+  user_created_id String
+  created_at      DateTime @default(now())
+
+  user_created users?        @relation(fields: [user_created_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cards        card_labels[]
 }
 
 // ------------------------------
@@ -43,6 +57,9 @@ model organizations {
   name        String
   description String
 
+  user_created_id String
+  created_at      DateTime @default(now())
+
   users_joined    organization_users[]
   projects_joined project_organizations[]
 }
@@ -51,6 +68,8 @@ model organization_users {
   id              String @id @default(uuid())
   user_id         String
   organization_id String
+
+  created_at DateTime @default(now())
 
   user         users?                          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organization organizations?                  @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -61,6 +80,8 @@ model organization_user_permissions {
   id                   String @id @default(uuid())
   organization_user_id String
   permission_id        String
+
+  created_at DateTime @default(now())
 
   organization_user organization_users? @relation(fields: [organization_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   permission        permissions?        @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -83,15 +104,21 @@ model users {
   subscribe_by_default Boolean
   subscribe_to_email   Boolean
 
+  created_at DateTime @default(now())
+
   projects_joined      project_users[]
   organizations_joined organization_users[]
   permissions          user_permissions[]
+  cards                card_users[]
+  labels_created       labels[]
 }
 
 model user_permissions {
   id            String @id @default(uuid())
   user_id       String
   permission_id String
+
+  created_at DateTime @default(now())
 
   user       users?       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   permission permissions? @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -187,11 +214,58 @@ model cards {
   name        String
   description String
 
-  order Int
+  list_id             String
+  order               Int
+  cover_attachment_id String
 
-  list_id    String
-  list       lists?       @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  activities activities[]
+  start_date DateTime
+  due_date   DateTime
+
+  created_at DateTime @default(now())
+
+  list lists? @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  activities  activities[]
+  users       card_users[]
+  labels      card_labels[]
+  attachments card_attachments[]
+}
+
+model card_labels {
+  id       String @id @default(uuid())
+  card_id  String
+  label_id String
+
+  created_at DateTime @default(now())
+
+  card  cards?  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  label labels? @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model card_users {
+  id      String @id @default(uuid())
+  user_id String
+  card_id String
+
+  subscribed Boolean @default(false)
+
+  created_at DateTime @default(now())
+
+  user users? @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  card cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model card_attachments {
+  id      String @id @default(uuid())
+  card_id String
+
+  name String
+  url  String
+
+  is_card_cover Boolean  @default(false)
+  created_at    DateTime @default(now())
+
+  card cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // ------------------------------
