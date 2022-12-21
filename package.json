@@ -27,7 +27,22 @@
             "prefer-const": "off",
             "prettier/prettier": "error",
             "@next/next/no-img-element": "off",
-            "react/no-unescaped-entities": "off"
+            "react/no-unescaped-entities": "off",
+            "import/order": [
+                "error",
+                {
+                    "groups": [
+                        "index",
+                        "sibling",
+                        "parent",
+                        "internal",
+                        "external",
+                        "builtin",
+                        "object",
+                        "type"
+                    ]
+                }
+            ]
         },
         "globals": {
             "JSX": true
