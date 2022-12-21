@@ -5,9 +5,18 @@ module.exports = {
         "./src/pages/**/*.{js,ts,jsx,tsx}", //
         "./src/components/**/*.{js,ts,jsx,tsx}", //
     ],
+    corePlugins: {
+        container: false,
+    },
     theme: {
-        colors: {},
-        extend: {},
+        extend: {
+            fontFamily: {
+                manrope: ["Manrope", "sans-serif"],
+            },
+            screens: {
+                "3xl": "1920px",
+            },
+        },
     },
     plugins: [],
 };
