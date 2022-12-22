@@ -12,7 +12,8 @@
         "parser": "@typescript-eslint/parser",
         "plugins": [
             "prettier",
-            "import"
+            "import",
+            "no-relative-import-paths"
         ],
         "extends": [
             "prettier",
@@ -47,6 +48,14 @@
                 }
             ],
             "import/no-duplicates": "error",
+            "no-relative-import-paths/no-relative-import-paths": [
+                "error",
+                {
+                    "allowSameFolder": false,
+                    "rootDir": "src",
+                    "prefix": "@"
+                }
+            ],
             "@typescript-eslint/consistent-type-imports": [
                 "error",
                 {
@@ -122,6 +131,7 @@
         "@next/font": "^13.0.7",
         "@prisma/client": "^4.8.0",
         "@szhsin/react-menu": "^3.3.1",
+        "eslint-plugin-no-relative-import-paths": "^1.5.2",
         "next": "13.0.7",
         "react": "18.2.0",
         "react-dom": "18.2.0"
