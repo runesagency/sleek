@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+const { fontFamily } = require("tailwindcss/defaultTheme");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     mode: "jit",
@@ -11,7 +15,7 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                manrope: ["Manrope", "sans-serif"],
+                manrope: ["var(--font-manrope)", ...fontFamily.sans],
             },
             screens: {
                 "3xl": "1920px",

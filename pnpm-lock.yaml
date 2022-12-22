@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@dnd-kit/core': ^6.0.6
   '@dnd-kit/sortable': ^7.0.1
+  '@next/font': ^13.0.7
   '@prisma/client': ^4.8.0
   '@szhsin/react-menu': ^3.3.1
   '@types/node': 18.11.17
@@ -31,6 +32,7 @@ specifiers:
 dependencies:
   '@dnd-kit/core': 6.0.6_biqbaboplfbrettd7655fr4n2y
   '@dnd-kit/sortable': 7.0.1_ighjjj6vulsdnb2lagbd2egmxy
+  '@next/font': 13.0.7
   '@prisma/client': 4.8.0_prisma@4.8.0
   '@szhsin/react-menu': 3.3.1_biqbaboplfbrettd7655fr4n2y
   next: 13.0.7_biqbaboplfbrettd7655fr4n2y
@@ -187,6 +189,10 @@ packages:
     dependencies:
       glob: 7.1.7
     dev: true
+
+  /@next/font/13.0.7:
+    resolution: {integrity: sha512-39SzuoMI6jbrIzPs3KtXdKX03OrVp6Y7kRHcoVmOg69spiBzruPJ5x5DQSfN+OXqznbvVBNZBXnmdnSqs3qXiA==}
+    dev: false
 
   /@next/swc-android-arm-eabi/13.0.7:
     resolution: {integrity: sha512-QTEamOK/LCwBf05GZ261rULMbZEpE3TYdjHlXfznV+nXwTztzkBNFXwP67gv2wW44BROzgi/vrR9H8oP+J5jxg==}
