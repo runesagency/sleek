@@ -363,28 +363,52 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
             if (current?.type === SortableType.List && target?.type === SortableType.List) {
                 const targetId = target.id;
                 const currentId = current.id;
-                const targetList = lists.find((list) => list.id === targetId);
+
                 const currentList = lists.find((list) => list.id === currentId);
-                if (!targetList || !currentList) return;
-                const updatedLists = lists.map((list) => {
-                    if (list.id === currentId) {
-                        return {
-                            ...list,
-                            order: targetList.order,
-                        };
-                    }
-                    if (list.id === targetId) {
-                        return {
-                            ...list,
-                            order: currentList.order,
-                        };
-                    }
-                    return list;
-                });
-                setLists(updatedLists);
+                const targetList = lists.find((list) => list.id === targetId);
+
+                if (!currentList || !targetList) return;
+
+                if (currentList.order < targetList.order) {
+                    setLists((lists) => {
+                        return lists.map((list) => {
+                            if (list.id === currentId) {
+                                return {
+                                    ...list,
+                                    order: targetList.order,
+                                };
+                            }
+                            if (list.order > currentList.order && list.order <= targetList.order) {
+                                return {
+                                    ...list,
+                                    order: list.order - 1,
+                                };
+                            }
+                            return list;
+                        });
+                    });
+                } else {
+                    setLists((lists) => {
+                        return lists.map((list) => {
+                            if (list.id === currentId) {
+                                return {
+                                    ...list,
+                                    order: targetList.order,
+                                };
+                            }
+                            if (list.order < currentList.order && list.order >= targetList.order) {
+                                return {
+                                    ...list,
+                                    order: list.order + 1,
+                                };
+                            }
+                            return list;
+                        });
+                    });
+                }
             }
         },
-        [lists]
+        [cardClickTimeout, draggedItem, isDragging, lists]
     );
 
     const onPopupClose = useCallback(() => {
