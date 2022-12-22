@@ -21,6 +21,7 @@
             "plugin:import/recommended",
             "plugin:@typescript-eslint/recommended",
             "plugin:tailwindcss/recommended"
+            "plugin:react/recommended"
         ],
         "rules": {
             "no-case-declarations": "off",
@@ -63,7 +64,23 @@
                     ]
                 }
             ],
-            "tailwindcss/no-arbitrary-value": "warn"
+            "tailwindcss/no-arbitrary-value": "warn",
+            "react/react-in-jsx-scope": "off",
+            "react/jsx-sort-props": [
+                "error",
+                {
+                    "callbacksLast": true,
+                    "shorthandLast": true,
+                    "multiline": "last",
+                    "ignoreCase": false,
+                    "noSortAlphabetically": true,
+                    "reservedFirst": [
+                        "key",
+                        "ref"
+                    ],
+                    "locale": "auto"
+                }
+            ]
         },
         "globals": {
             "JSX": true
@@ -103,6 +120,7 @@
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-prettier": "^4.2.1",
+        "eslint-plugin-react": "^7.31.11",
         "postcss": "^8.4.20",
         "prettier": "^2.8.1",
         "prisma": "^4.8.0",

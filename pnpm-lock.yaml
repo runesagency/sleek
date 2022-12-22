@@ -16,6 +16,7 @@ specifiers:
   eslint-config-prettier: ^8.5.0
   eslint-plugin-import: ^2.26.0
   eslint-plugin-prettier: ^4.2.1
+  eslint-plugin-react: ^7.31.11
   eslint-plugin-tailwindcss: ^3.7.1
   next: 13.0.7
   postcss: ^8.4.20
@@ -49,6 +50,7 @@ devDependencies:
   eslint-config-prettier: 8.5.0_eslint@8.30.0
   eslint-plugin-import: 2.26.0_tqyj5ytb5g6r5ett7xxedhk6eq
   eslint-plugin-prettier: 4.2.1_kl4pe43v5b43npmso5hoplpbyi
+  eslint-plugin-react: 7.31.11_eslint@8.30.0
   postcss: 8.4.20
   prettier: 2.8.1
   prisma: 4.8.0
