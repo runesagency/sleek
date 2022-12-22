@@ -416,22 +416,22 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
     }, []);
 
     return (
-        <main className="flex h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-slate-800 text-white">
-            <div className="flex w-full items-center justify-between bg-slate-900/75 px-20 py-5">
+        <main className="relative flex h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-slate-900 text-white">
+            <section className="flex w-full items-center justify-between bg-slate-800/75 px-20 py-5">
                 <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-8" />
 
                 <div className="flex items-center gap-8">
                     <span className="material-icons-outlined">people</span>
                     <span className="material-icons-outlined">notifications</span>
 
-                    <div className="flex items-center gap-4 rounded-md bg-gray-700 px-3 py-2">
+                    <div className="flex items-center gap-4 rounded-md bg-slate-700 px-3 py-2">
                         <img src="https://picsum.photos/200" alt="User Image" className="h-7 rounded-full" />
                         <p className="text-sm font-semibold">John Doe</p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div className="flex max-h-full w-full max-w-full flex-1 justify-start gap-8 overflow-auto py-5 px-20">
+            <section className="flex max-h-full w-full max-w-full flex-1 justify-start gap-8 overflow-auto py-5 px-20">
                 <DndContext onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
                     <SortableContext items={lists.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
                         {lists.map((list) => {
@@ -445,7 +445,8 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
                         </DragOverlay>
                     )}
                 </DndContext>
-            </div>
+            </section>
+
             {openedCard && <CardPopup {...openedCard} onClose={onPopupClose} />}
         </main>
     );
