@@ -1,6 +1,6 @@
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 import type { GetServerSideProps } from "next";
-import type { cards, lists } from "@prisma/client";
+import type { cards, card_labels, card_users, lists } from "@prisma/client";
 import type { CSSProperties } from "react";
 
 import { prisma } from "@/lib/prisma";
@@ -14,7 +14,6 @@ enum SortableType {
     Card = "card",
 }
 
-const Card = ({ name, order, isDragOverlay, isDragging }: cards & { isDragOverlay: boolean; isDragging: boolean }) => {
 const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClose: () => void }) => {
     return (
         <section className="fixed top-0 left-0 flex h-full w-full items-center justify-center bg-slate-900/75">
@@ -38,6 +37,7 @@ const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClose: () =
     );
 };
 
+const Card = ({ name, order, isDragOverlay, isDragging }: PageProps["cards"][0] & { isDragOverlay: boolean; isDragging: boolean }) => {
     return (
         <div
             className={`
@@ -70,8 +70,8 @@ const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClose: () =
     );
 };
 
-const CardContainer = (props: cards) => {
     const { setNodeRef, listeners, transform, transition, isDragging } = useSortable({
+const CardContainer = (props: PageProps["cards"][0]) => {
         id: props.id,
         data: {
             ...props,
@@ -91,7 +91,7 @@ const CardContainer = (props: cards) => {
     );
 };
 
-const List = ({ id, name, cards }: lists & { cards: cards[] }) => {
+const List = ({ id, name, cards }: PageProps["lists"][0] & { cards: PageProps["cards"] }) => {
     const { setNodeRef, listeners, transform, transition } = useSortable({
         id,
         data: {
@@ -175,12 +175,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
     };
 };
 
-export default function Home({ lists: originalLists, cards: originalCards }: { lists: lists[]; cards: cards[] }) {
-    const [draggedItem, setDraggedItem] = useState<cards | null>(null);
-    const [lists, setLists] = useState<lists[]>(originalLists);
-    const [cards, setCards] = useState<cards[]>(originalCards);
+export default function BoardPage({ lists: originalLists, cards: originalCards }: PageProps) {
+    const [draggedItem, setDraggedItem] = useState<PageProps["cards"][0] | null>(null);
+    const [openedCard, setOpenedCard] = useState<PageProps["cards"][0] | null>(originalCards[0]);
+
     const [isDragging, setIsDragging] = useState(false);
     const [cardClickTimeout, setCardClickTimeout] = useState<NodeJS.Timeout | null>(null);
+
+    const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
+    const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
 
     const onDragStart = useCallback(
         (event: DragStartEvent) => {
@@ -209,7 +212,7 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
             const target = event.over?.data.current;
 
             if (current?.type === SortableType.Card) {
-                let updatedCards: cards[] = cards;
+                let updatedCards: PageProps["cards"] = cards;
 
                 if (target?.type === SortableType.List) {
                     const targetId = target.id;
