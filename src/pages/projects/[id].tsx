@@ -15,6 +15,29 @@ enum SortableType {
 }
 
 const Card = ({ name, order, isDragOverlay, isDragging }: cards & { isDragOverlay: boolean; isDragging: boolean }) => {
+const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClose: () => void }) => {
+    return (
+        <section className="fixed top-0 left-0 flex h-full w-full items-center justify-center bg-slate-900/75">
+            <div className="absolute top-0 left-0 z-10 h-full w-full" onClick={onClose} />
+
+            <div className="relative z-20 flex w-full max-w-4xl flex-col gap-8 rounded-md bg-slate-700 p-10">
+                <h1 className="text-3xl font-bold">{card.name}</h1>
+
+                <div className="flex flex-col gap-4">
+                    <section className="flex gap-4">
+                        <div className="flex gap-2">
+                            <span className="material-icons-outlined">group</span>
+                            <p className="font-semibold">Users</p>
+                        </div>
+
+                        <p>{card.users?.length === 0 ? "No Person Assigned" : <div />}</p>
+                    </section>
+                </div>
+            </div>
+        </section>
+    );
+};
+
     return (
         <div
             className={`
@@ -156,13 +179,25 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
     const [draggedItem, setDraggedItem] = useState<cards | null>(null);
     const [lists, setLists] = useState<lists[]>(originalLists);
     const [cards, setCards] = useState<cards[]>(originalCards);
+    const [isDragging, setIsDragging] = useState(false);
+    const [cardClickTimeout, setCardClickTimeout] = useState<NodeJS.Timeout | null>(null);
 
     const onDragStart = useCallback(
         (event: DragStartEvent) => {
-            const activeCard = cards.find((card) => card.id === event.active.id);
+            const current = event.active.data.current;
 
-            if (activeCard) {
-                setDraggedItem(activeCard);
+            if (current?.type === SortableType.Card) {
+                const activeCard = cards.find((card) => card.id === event.active.id);
+
+                if (activeCard) {
+                    setDraggedItem(activeCard);
+
+                    const clickTimeout = setTimeout(() => {
+                        setIsDragging(true);
+                    }, 200);
+
+                    setCardClickTimeout(clickTimeout);
+                }
             }
         },
         [cards]
@@ -310,6 +345,15 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
 
     const onDragEnd = useCallback(
         (event: DragEndEvent) => {
+            if (cardClickTimeout) {
+                clearTimeout(cardClickTimeout);
+            }
+
+            if (!isDragging) {
+                setOpenedCard(draggedItem);
+            }
+
+            setIsDragging(false);
             setDraggedItem(null);
 
             const current = event.active.data.current;
@@ -343,6 +387,10 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
         [lists]
     );
 
+    const onPopupClose = useCallback(() => {
+        setOpenedCard(null);
+    }, []);
+
     return (
         <main className="flex h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-slate-800 text-white">
             <div className="flex w-full items-center justify-between bg-slate-900/75 px-20 py-5">
@@ -374,6 +422,7 @@ export default function Home({ lists: originalLists, cards: originalCards }: { l
                     )}
                 </DndContext>
             </div>
+            {openedCard && <CardPopup {...openedCard} onClose={onPopupClose} />}
         </main>
     );
 }
