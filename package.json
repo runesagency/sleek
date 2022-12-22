@@ -19,7 +19,8 @@
             "next/core-web-vitals",
             "prettier",
             "plugin:import/recommended",
-            "plugin:@typescript-eslint/recommended"
+            "plugin:@typescript-eslint/recommended",
+            "plugin:tailwindcss/recommended"
         ],
         "rules": {
             "no-case-declarations": "off",
@@ -52,7 +53,17 @@
                     "disallowTypeAnnotations": true,
                     "fixStyle": "separate-type-imports"
                 }
-            ]
+            ],
+            "tailwindcss/no-custom-classname": [
+                "error",
+                {
+                    "whitelist": [
+                        "group(/.*)?",
+                        "material-icons(-.*)?"
+                    ]
+                }
+            ],
+            "tailwindcss/no-arbitrary-value": "warn"
         },
         "globals": {
             "JSX": true
@@ -75,6 +86,7 @@
         "@dnd-kit/sortable": "^7.0.1",
         "@prisma/client": "^4.8.0",
         "@szhsin/react-menu": "^3.3.1",
+        "eslint-plugin-tailwindcss": "^3.7.1",
         "next": "13.0.7",
         "react": "18.2.0",
         "react-dom": "18.2.0"
