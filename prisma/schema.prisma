@@ -92,17 +92,17 @@ model organization_user_permissions {
 // ------------------------------
 
 model users {
-  id       String @id @default(uuid())
+  id       String  @id @default(uuid())
   name     String
-  username String @unique
-  email    String @unique
-  phone    String
+  username String? @unique
+  email    String  @unique
+  phone    String?
   password String
 
-  image_url            String
-  language             String
-  subscribe_by_default Boolean
-  subscribe_to_email   Boolean
+  image_url            String?
+  language             String  @default("en-US")
+  subscribe_by_default Boolean @default(true)
+  subscribe_to_email   Boolean @default(true)
 
   created_at DateTime @default(now())
 
@@ -181,9 +181,9 @@ model project_user_permissions {
 // ------------------------------
 
 model boards {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  description String
+  description String?
 
   project_id String
   project    projects? @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -194,11 +194,11 @@ model boards {
 // Lists
 // ------------------------------
 model lists {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  description String
+  description String?
 
-  order Int
+  order Int @default(0)
 
   board_id String
   board    boards? @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -210,16 +210,16 @@ model lists {
 // ------------------------------
 
 model cards {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  description String
+  description String?
 
   list_id             String
-  order               Int
-  cover_attachment_id String
+  order               Int     @default(0)
+  cover_attachment_id String?
 
-  start_date DateTime
-  due_date   DateTime
+  start_date DateTime?
+  due_date   DateTime?
 
   created_at DateTime @default(now())
 
