@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@dnd-kit/core': ^6.0.6
   '@dnd-kit/sortable': ^7.0.1
+  '@formkit/auto-animate': 1.0.0-beta.5
   '@next/font': ^13.0.7
   '@prisma/client': ^4.8.0
   '@szhsin/react-menu': ^3.3.1
@@ -32,6 +33,7 @@ specifiers:
 dependencies:
   '@dnd-kit/core': 6.0.6_biqbaboplfbrettd7655fr4n2y
   '@dnd-kit/sortable': 7.0.1_ighjjj6vulsdnb2lagbd2egmxy
+  '@formkit/auto-animate': 1.0.0-beta.5
   '@next/font': 13.0.7
   '@prisma/client': 4.8.0_prisma@4.8.0
   '@szhsin/react-menu': 3.3.1_biqbaboplfbrettd7655fr4n2y
@@ -143,6 +145,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@formkit/auto-animate/1.0.0-beta.5:
+    resolution: {integrity: sha512-WoSwyhAZPOe6RB/IgicOtCHtrWwEpfKIZ/H/nxpKfnZL9CB6hhhBGU5bCdMRw7YpAUF2CDlQa+WWh+gCqz5lDg==}
+    dev: false
 
   /@humanwhocodes/config-array/0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
