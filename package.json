@@ -31,6 +31,9 @@
             "prettier/prettier": "error",
             "@next/next/no-img-element": "off",
             "react/no-unescaped-entities": "off",
+            "import/no-duplicates": "error",
+            "import/no-absolute-path": "error",
+            "import/no-namespace": "error",
             "import/order": [
                 "error",
                 {
@@ -47,7 +50,6 @@
                     ]
                 }
             ],
-            "import/no-duplicates": "error",
             "no-relative-import-paths/no-relative-import-paths": [
                 "error",
                 {
