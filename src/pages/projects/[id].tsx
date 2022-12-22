@@ -7,6 +7,7 @@ import type { ParsedSSRObjectProps } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 import { parseSSRArrayProps, parseSSRObjectProps } from "@/lib/utils";
 
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useCallback, useState } from "react";
 import { DragOverlay, DndContext } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -82,8 +83,8 @@ const Card = ({ name, order, isDragOverlay, isDragging }: PageProps["cards"][0] 
     );
 };
 
-    const { setNodeRef, listeners, transform, transition, isDragging } = useSortable({
 const CardContainer = (props: PageProps["cards"][0]) => {
+    const { setNodeRef, listeners, isDragging } = useSortable({
         id: props.id,
         data: {
             ...props,
@@ -91,19 +92,15 @@ const CardContainer = (props: PageProps["cards"][0]) => {
         },
     });
 
-    const style: CSSProperties = {
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-        transition,
-    };
-
     return (
-        <div {...listeners} ref={setNodeRef} style={style}>
+        <div {...listeners} ref={setNodeRef}>
             <Card {...props} isDragOverlay={false} isDragging={isDragging} />
         </div>
     );
 };
 
 const List = ({ id, name, cards }: PageProps["lists"][0] & { cards: PageProps["cards"] }) => {
+    const [cardListRef] = useAutoAnimate<HTMLDivElement>();
     const { setNodeRef, listeners, transform, transition } = useSortable({
         id,
         data: {
@@ -130,7 +127,7 @@ const List = ({ id, name, cards }: PageProps["lists"][0] & { cards: PageProps["c
                 <button className="rounded-md bg-white p-2 text-center text-slate-800">New</button>
             </div>
 
-            <div className="hide-scrollbar flex max-h-full flex-col gap-2 overflow-auto">
+            <div ref={cardListRef} className="hide-scrollbar flex max-h-full flex-col gap-2 overflow-auto px-3">
                 <SortableContext strategy={verticalListSortingStrategy} items={cards.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)}>
                     {cards.map((card) => (
                         <CardContainer key={card.id} {...card} />
