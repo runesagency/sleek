@@ -2,12 +2,24 @@ import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core"
 import type { GetServerSideProps } from "next";
 import type { cards, card_labels, card_users, lists } from "@prisma/client";
 import type { CSSProperties } from "react";
+import type { ParsedSSRObjectProps } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
+import { parseSSRArrayProps, parseSSRObjectProps } from "@/lib/utils";
 
 import { useCallback, useState } from "react";
 import { DragOverlay, DndContext } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+
+type PageProps = {
+    lists: ParsedSSRObjectProps<lists>[];
+    cards: ParsedSSRObjectProps<
+        cards & {
+            labels: ParsedSSRObjectProps<card_labels>[];
+            users: ParsedSSRObjectProps<card_users>[];
+        }
+    >[];
+};
 
 enum SortableType {
     List = "list",
@@ -147,31 +159,21 @@ export const getServerSideProps: GetServerSideProps = async () => {
         orderBy: {
             order: "asc",
         },
+        include: {
+            labels: true,
+            users: true,
+        },
     });
-
-    const parseDate = (obj: any[]) => {
-        return obj.map((item) => {
-            for (const key in item) {
-                if (!item[key]) continue;
-
-                if (item[key] instanceof Date) {
-                    item[key] = item[key].toString();
-                }
-
-                if (typeof item[key] === "object") {
-                    item[key] = parseDate(item[key]);
-                }
-            }
-
-            return item;
-        });
-    };
 
     return {
         props: {
-            lists: parseDate(lists),
-            cards: parseDate(cards),
-        },
+            lists: parseSSRArrayProps(lists),
+            cards: cards.map((card) => ({
+                ...parseSSRObjectProps(card),
+                labels: parseSSRArrayProps(card.labels),
+                users: parseSSRArrayProps(card.users),
+            })),
+        } as PageProps,
     };
 };
 
