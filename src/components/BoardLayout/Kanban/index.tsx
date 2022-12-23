@@ -6,7 +6,7 @@ import { Card, CardPopup } from "@/components/BoardLayout/Kanban/Card";
 
 import { PointerSensor, useSensor, useSensors, DragOverlay, DndContext } from "@dnd-kit/core";
 import { useCallback, useState } from "react";
-import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 
 export enum SortableType {
     List = "list",
@@ -48,47 +48,52 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
             const current = event.active.data.current;
             const target = event.over?.data.current;
 
-            if (current?.type === SortableType.Card) {
+            if (current?.type === SortableType.Card && target && current) {
+                const targetId: string = target.id;
+                const currentId: string = current.id;
+
                 let updatedCards: PageProps["cards"] = cards;
 
-                if (target?.type === SortableType.List) {
-                    const targetId = target.id;
+                const targetCard = cards.find((card) => card.id === targetId);
+                const currentCard = cards.find((card) => card.id === currentId);
 
+                if (!targetCard || !currentCard) return;
+
+                // Card to List
+                if (target?.type === SortableType.List) {
                     updatedCards = cards.map((card) => {
                         // append on top of the list
-                        if (card.id === current.id) {
+                        if (card.id === currentId) {
                             return {
                                 ...card,
                                 list_id: targetId,
                                 order: 0,
                             };
                         }
+
+                        // move down all cards on the new list under the current (new) card
                         if (card.list_id === targetId) {
-                            // move all cards below the current card
                             return {
                                 ...card,
                                 order: card.order + 1,
                             };
                         }
-                        if (card.list_id === current.list_id && card.order > current.order) {
-                            // move all cards below the current card
+
+                        // move up the old cards on the old list under the current (old) card
+                        if (card.list_id === current.list_id && card.order > currentCard.order) {
                             return {
                                 ...card,
                                 order: card.order - 1,
                             };
                         }
+
                         return card;
                     });
                 }
 
                 // Card to Another Card
                 if (target?.type === SortableType.Card) {
-                    const targetId = target.id;
-                    const currentId = current.id;
-                    const targetCard = cards.find((card) => card.id === targetId);
-
-                    if (!targetCard) return;
-
+                    // Move to another list
                     if (targetCard.list_id !== current.list_id) {
                         updatedCards = cards.map((card) => {
                             if (card.id === currentId) {
@@ -106,65 +111,30 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                             }
                             return card;
                         });
-                    } else {
-                        // up to down
-                        if (current.order < targetCard.order) {
-                            updatedCards = cards.map((card) => {
-                                // move the current card to the target card and lower all cards below the target card
-                                if (card.id === currentId) {
-                                    return {
-                                        ...card,
-                                        order: targetCard.order,
-                                    };
-                                }
-                                // move all cards below the current card
-                                if (card.list_id === targetCard.list_id) {
-                                    if (card.order > current.order && card.order <= targetCard.order) {
-                                        return {
-                                            ...card,
-                                            order: card.order - 1,
-                                        };
-                                    } else if (card.order === targetCard.order || card.order > targetCard.order) {
-                                        return {
-                                            ...card,
-                                            order: card.order + 1,
-                                        };
-                                    }
-                                }
-                                return card;
-                            });
-                        }
-                        // down to up
-                        if (current.order > targetCard.order) {
-                            updatedCards = cards.map((card) => {
-                                // move the current card to the target card and lower all cards below the target card
-                                if (card.id === currentId) {
-                                    return {
-                                        ...card,
-                                        order: targetCard.order,
-                                    };
-                                }
-                                // move all cards below the current card
-                                if (card.list_id === targetCard.list_id) {
-                                    if (card.order < current.order && card.order >= targetCard.order) {
-                                        return {
-                                            ...card,
-                                            order: card.order + 1,
-                                        };
-                                    } else if (card.order === targetCard.order || card.order < targetCard.order) {
-                                        return {
-                                            ...card,
-                                            order: card.order - 1,
-                                        };
-                                    }
-                                }
-                                return card;
-                            });
-                        }
+                    }
+
+                    // Move to another position in the same list
+                    else {
+                        const currentCards = cards.filter((card) => card.list_id === current.list_id);
+                        const otherCards = cards.filter((card) => card.list_id !== current.list_id);
+
+                        const currentCard = currentCards.find((card) => card.id === currentId);
+
+                        if (!currentCard) return;
+
+                        const newCards = arrayMove(currentCards, currentCard.order, targetCard.order).map((card, index) => {
+                            return {
+                                ...card,
+                                order: index,
+                            };
+                        });
+
+                        updatedCards = [...otherCards, ...newCards];
                     }
                 }
 
                 let sortIndex: Record<string, number> = {};
+
                 updatedCards
                     .sort((a, b) => a.order - b.order)
                     .map((card) => {
@@ -192,50 +162,19 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
 
             // List to Another List
             if (current?.type === SortableType.List && target?.type === SortableType.List) {
-                const targetId = target.id;
                 const currentId = current.id;
+                const targetId = target.id;
 
-                const currentList = lists.find((list) => list.id === currentId);
-                const targetList = lists.find((list) => list.id === targetId);
+                if (targetId && currentId) {
+                    const oldIndex = lists.findIndex((x) => x.id === currentId);
+                    const newIndex = lists.findIndex((x) => x.id === targetId);
 
-                if (!currentList || !targetList) return;
-
-                if (currentList.order < targetList.order) {
-                    setLists((lists) => {
-                        return lists.map((list) => {
-                            if (list.id === currentId) {
-                                return {
-                                    ...list,
-                                    order: targetList.order,
-                                };
-                            }
-                            if (list.order > currentList.order && list.order <= targetList.order) {
-                                return {
-                                    ...list,
-                                    order: list.order - 1,
-                                };
-                            }
-                            return list;
-                        });
+                    const newLists = arrayMove(lists, oldIndex, newIndex).map((list, index) => {
+                        list.order = index;
+                        return list;
                     });
-                } else {
-                    setLists((lists) => {
-                        return lists.map((list) => {
-                            if (list.id === currentId) {
-                                return {
-                                    ...list,
-                                    order: targetList.order,
-                                };
-                            }
-                            if (list.order < currentList.order && list.order >= targetList.order) {
-                                return {
-                                    ...list,
-                                    order: list.order + 1,
-                                };
-                            }
-                            return list;
-                        });
-                    });
+
+                    setLists(newLists);
                 }
             }
         },
