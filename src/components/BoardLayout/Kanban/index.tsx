@@ -185,13 +185,17 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         setOpenedCard(null);
     }, []);
 
+    const onCardAdded = useCallback((name: string) => {
+        const parsedName = name.trim();
+    }, []);
+
     return (
         <>
             <section className="flex max-h-full w-full max-w-full flex-1 justify-start gap-8 overflow-auto py-5 px-20">
                 <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
                     <SortableContext items={lists.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
                         {lists.map((list) => {
-                            return <List key={list.id} {...list} cards={cards.filter((c) => c.list_id === list.id)} onCardClick={setOpenedCard} />;
+                            return <List key={list.id} {...list} cards={cards.filter((c) => c.list_id === list.id)} onCardClick={setOpenedCard} onCardAdded={onCardAdded} />;
                         })}
                     </SortableContext>
 
