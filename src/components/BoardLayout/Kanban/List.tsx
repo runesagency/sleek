@@ -10,6 +10,7 @@ import { useCallback, useState } from "react";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { ScrollArea, Textarea } from "@mantine/core";
+import { IconDots, IconPlus } from "@tabler/icons";
 
 type NewCardComponentProps = {
     listId: string;
@@ -136,8 +137,8 @@ export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) =
                 <span className="rounded-md bg-neutral-700 px-3 py-1 font-semibold">{name}</span>
 
                 <div className="flex items-center gap-2">
-                    <button className="material-icons-outlined text-xl duration-200 hover:opacity-75">add</button>
-                    <button className="material-icons-outlined text-xl duration-200 hover:opacity-75">more_horiz</button>
+                    <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={() => onNewCardClick(NewCardLocation.UP)} />
+                    <IconDots height={20} className="duration-200 hover:opacity-75" />
                 </div>
             </div>
 
@@ -159,7 +160,7 @@ export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) =
                 className="flex items-center justify-center gap-2 rounded-md border border-dashed border-dark-600 bg-dark-800 p-2 text-center duration-200 hover:bg-dark-700/50"
                 onClick={() => onNewCardClick(NewCardLocation.DOWN)}
             >
-                <span className="material-icons-outlined text-sm">add</span>
+                <IconPlus height={15} />
                 <p>Add Card</p>
             </button>
         </div>

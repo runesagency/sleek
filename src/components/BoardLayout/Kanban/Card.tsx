@@ -4,6 +4,7 @@ import { SortableType } from ".";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { useCallback } from "react";
+import { IconMessageDots, IconPaperclip, IconUsers } from "@tabler/icons";
 
 export const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClose: () => void }) => {
     return (
@@ -16,7 +17,7 @@ export const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClos
                 <div className="flex flex-col gap-4">
                     <section className="flex gap-4">
                         <div className="flex gap-2">
-                            <span className="material-icons-outlined">group</span>
+                            <IconUsers height={20} />
                             <p className="font-semibold">Users</p>
                         </div>
 
@@ -52,14 +53,14 @@ export const Card = ({ name, isDragOverlay, isDragging, cover_attachment_id, att
 
             <section className="flex items-end justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <span className="material-icons-outlined text-lg">chat</span>
-                        <p>20</p>
+                    <div className="flex items-center gap-1">
+                        <IconMessageDots height={15} />
+                        <p>{activities?.length || 0}</p>
                     </div>
 
                     <div className="flex items-center gap-1">
-                        <span className="material-icons-outlined text-lg">attach_file</span>
-                        <p>5</p>
+                        <IconPaperclip height={15} />
+                        <p>{attachments?.length || 0}</p>
                     </div>
                 </div>
 
