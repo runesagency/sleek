@@ -7,8 +7,14 @@ import { CardContainer } from "@/components/BoardLayout/Kanban/Card";
 
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+type ListProps = PageProps["lists"][0] & {
+    cards: PageProps["cards"];
+    onCardClick: (card: PageProps["cards"][0]) => void;
+    onCardAdded: (name: string) => void;
+};
 
-export const List = ({ id, name, cards, onCardClick }: PageProps["lists"][0] & { cards: PageProps["cards"]; onCardClick: (card: PageProps["cards"][0]) => void }) => {
+export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) => {
+
     const [cardListRef] = useAutoAnimate<HTMLDivElement>();
     const { setNodeRef, listeners, transform, transition, attributes } = useSortable({
         id,

@@ -28,7 +28,7 @@ export const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClos
     );
 };
 
-export const Card = ({ name, isDragOverlay, isDragging, activities }: PageProps["cards"][0] & { isDragOverlay: boolean; isDragging: boolean }) => {
+export const Card = ({ name, isDragOverlay, isDragging, cover_attachment_id, attachments, labels, users, activities }: PageProps["cards"][0] & { isDragOverlay: boolean; isDragging: boolean }) => {
     return (
         <div
             className={`

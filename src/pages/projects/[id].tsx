@@ -1,5 +1,5 @@
 import type { GetServerSideProps } from "next";
-import type { activities, cards, card_labels, card_users, lists } from "@prisma/client";
+import type { activities, cards, card_attachments, card_labels, card_users, labels, lists, users } from "@prisma/client";
 import type { ParsedSSRObjectProps } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
@@ -10,9 +10,18 @@ export type PageProps = {
     lists: ParsedSSRObjectProps<lists>[];
     cards: ParsedSSRObjectProps<
         cards & {
-            labels: ParsedSSRObjectProps<card_labels>[];
-            users: ParsedSSRObjectProps<card_users>[];
+            labels: ParsedSSRObjectProps<
+                card_labels & {
+                    label: ParsedSSRObjectProps<labels>;
+                }
+            >[];
+            users: ParsedSSRObjectProps<
+                card_users & {
+                    user: ParsedSSRObjectProps<users>;
+                }
+            >[];
             activities: ParsedSSRObjectProps<activities>[];
+            attachments: ParsedSSRObjectProps<card_attachments>[];
         }
     >[];
 };
@@ -34,9 +43,18 @@ export const getServerSideProps: GetServerSideProps = async () => {
             order: "asc",
         },
         include: {
-            labels: true,
-            users: true,
+            labels: {
+                include: {
+                    label: true,
+                },
+            },
+            users: {
+                include: {
+                    user: true,
+                },
+            },
             activities: true,
+            attachments: true,
         },
     });
 
@@ -45,9 +63,16 @@ export const getServerSideProps: GetServerSideProps = async () => {
             lists: parseSSRArrayProps(lists),
             cards: cards.map((card) => ({
                 ...parseSSRObjectProps(card),
-                labels: parseSSRArrayProps(card.labels),
-                users: parseSSRArrayProps(card.users),
                 activities: parseSSRArrayProps(card.activities),
+                attachments: parseSSRArrayProps(card.attachments),
+                labels: card.labels.map((label) => ({
+                    ...parseSSRObjectProps(label),
+                    label: label.label ? parseSSRObjectProps(label.label) : null,
+                })),
+                users: card.users.map((user) => ({
+                    ...parseSSRObjectProps(user),
+                    user: user.user ? parseSSRObjectProps(user.user) : null,
+                })),
             })),
         } as PageProps,
     };
