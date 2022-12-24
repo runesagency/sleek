@@ -7,6 +7,7 @@ import { CardContainer } from "@/components/BoardLayout/Kanban/Card";
 
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { ScrollArea, Textarea } from "@mantine/core";
 type ListProps = PageProps["lists"][0] & {
     cards: PageProps["cards"];
     onCardClick: (card: PageProps["cards"][0]) => void;
@@ -47,13 +48,17 @@ export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) =
                 </div>
             </div>
 
-            <div ref={cardListRef} className="hide-scrollbar flex max-h-full flex-col gap-4 overflow-auto">
-                <SortableContext strategy={verticalListSortingStrategy} items={cards.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)}>
-                    {cards.map((card) => {
-                        return <CardContainer key={card.id} {...card} onCardClick={onCardClick} />;
-                    })}
-                </SortableContext>
-            </div>
+            <ScrollArea className="flex flex-col overflow-y-auto overflow-x-hidden">
+                <div ref={cardListRef} className="flex max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden">
+
+                    <SortableContext strategy={verticalListSortingStrategy} items={cards.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)}>
+                        {cards.map((card) => {
+                            return <CardContainer key={card.id} {...card} onCardClick={onCardClick} />;
+                        })}
+                    </SortableContext>
+
+                </div>
+            </ScrollArea>
 
             <button
                 className="flex items-center justify-center gap-2 rounded-md border border-dashed border-neutral-600 bg-neutral-800 p-2 text-center duration-200 hover:bg-neutral-700/50"
