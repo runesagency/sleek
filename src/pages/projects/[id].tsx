@@ -80,15 +80,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 export default function BoardPage({ lists, cards }: PageProps) {
     return (
-        <main className="relative flex h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-neutral-800 text-white">
-            <section className="flex w-full items-center justify-between bg-neutral-900/75 px-20 py-5">
+        <main className="relative flex h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-dark-800 text-white">
+            <section className="flex w-full items-center justify-between bg-dark-900/75 px-20 py-5">
                 <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-8" />
 
                 <div className="flex items-center gap-8">
                     <span className="material-icons-outlined">people</span>
                     <span className="material-icons-outlined">notifications</span>
 
-                    <div className="flex items-center gap-4 rounded-md bg-neutral-700 px-3 py-2">
+                    <div className="flex items-center gap-4 rounded-md bg-dark-700 px-3 py-2">
                         <img src="https://picsum.photos/200" alt="User Image" className="h-7 rounded-full" />
                         <p className="text-sm font-semibold">John Doe</p>
                     </div>

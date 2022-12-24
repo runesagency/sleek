@@ -133,8 +133,8 @@ export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) =
             style={style}
             className="group/container relative flex h-max max-h-full w-60 cursor-pointer flex-col gap-4 overflow-auto rounded-md text-sm"
         >
-            <div className="flex w-full items-center justify-between gap-4 border-b border-b-neutral-700 pb-3 duration-200">
-                <span className="rounded-md bg-neutral-700 px-3 py-1 font-semibold">{name}</span>
+            <div className="flex w-full items-center justify-between gap-4 border-b border-b-dark-700 pb-3 duration-200">
+                <span className="rounded-md bg-dark-700 px-3 py-1 font-semibold">{name}</span>
 
                 <div className="flex items-center gap-2">
                     <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={() => onNewCardClick(NewCardLocation.UP)} />
