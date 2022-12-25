@@ -15,7 +15,6 @@ export enum SortableType {
 
 export default function KanbanLayout({ lists: originalLists, cards: originalCards }: PageProps) {
     const [draggedItem, setDraggedItem] = useState<PageProps["cards"][0] | null>(null);
-    const [openedCard, setOpenedCard] = useState<PageProps["cards"][0] | null>(null);
 
     const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
     const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
@@ -181,10 +180,6 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         [lists]
     );
 
-    const onCardPopupClose = useCallback(() => {
-        setOpenedCard(null);
-    }, []);
-
     const onCardAdded = useCallback((name: string, listId: string) => {
         const parsedName = name.trim();
     }, []);
@@ -199,7 +194,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                 <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
                     <SortableContext items={lists.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
                         {lists.map((list) => {
-                            return <List key={list.id} {...list} cards={cards.filter((c) => c.list_id === list.id)} onCardClick={setOpenedCard} onCardAdded={onCardAdded} />;
+                            return <List key={list.id} {...list} cards={cards.filter((c) => c.list_id === list.id)} onCardAdded={onCardAdded} />;
                         })}
                     </SortableContext>
 
@@ -211,7 +206,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                 </DndContext>
             </section>
 
-            {openedCard && <CardPopup {...openedCard} onClose={onCardPopupClose} onUpdated={onCardUpdated} />}
+            <CardPopup onUpdated={onCardUpdated} />
         </>
     );
 }

@@ -3,19 +3,21 @@ import type { PageProps } from "@/pages/projects/[id]";
 import { SortableType } from ".";
 
 import useMenu from "@/lib/hooks/use-menu";
+import useCustomEvent from "@/lib/hooks/use-custom-event";
 
 import { useSortable } from "@dnd-kit/sortable";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IconDots, IconMessageDots, IconPaperclip, IconTags, IconUsers } from "@tabler/icons";
 import { Modal, MultiSelect } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 
-type CardPopupProps = PageProps["cards"][0] & {
-    onClose: () => void;
+type CardPopupProps = {
     onUpdated: (card: PageProps["cards"][0]) => void;
 };
 
-export const CardPopup = ({ onClose, ...card }: CardPopupProps) => {
+export const CardPopup = ({ onUpdated }: CardPopupProps) => {
+    const { data: card } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
+    const [open, setOpen] = useState(false);
     const [updatedTitle, setUpdatedTitle] = useDebouncedState("", 200);
 
     const onTitleChange = useCallback(
@@ -28,36 +30,46 @@ export const CardPopup = ({ onClose, ...card }: CardPopupProps) => {
         [setUpdatedTitle]
     );
 
+    useEffect(() => {
+        if (card) {
+            setOpen(true);
+        } else {
+            setOpen(false);
+        }
+    }, [card]);
+
     return (
-        <Modal opened={true} withCloseButton={false} size="xl" radius="md" centered onClose={onClose}>
-            <div className="relative z-20 flex w-full max-w-4xl flex-col gap-8 rounded-md bg-dark-700 p-10">
-                <textarea
-                    placeholder="Enter Your Card Title Here..."
-                    rows={1}
-                    className="hide-scrollbar resize-none bg-transparent text-3xl font-bold focus:outline-none"
-                    defaultValue={card.name}
-                    autoFocus
-                    onChange={onTitleChange}
-                />
-
-                <div className="flex flex-wrap gap-4">
-                    <MultiSelect
-                        value={card.users.map(({ user }) => user.id)}
-                        data={card.users.map(({ user }) => ({ label: user.name, value: user.id }))}
-                        label="Members"
-                        placeholder="Assign a Member"
-                        icon={<IconUsers height={20} />}
+        <Modal opened={open} withCloseButton={false} size="xl" radius="md" centered onClose={() => setOpen(false)}>
+            {card && (
+                <div className="relative z-20 flex w-full max-w-4xl flex-col gap-8 rounded-md bg-dark-700 p-10">
+                    <textarea
+                        placeholder="Enter Your Card Title Here..."
+                        rows={1}
+                        className="hide-scrollbar resize-none bg-transparent text-3xl font-bold focus:outline-none"
+                        defaultValue={card.name}
+                        autoFocus
+                        onChange={onTitleChange}
                     />
 
-                    <MultiSelect
-                        value={card.users.map(({ user }) => user.id)}
-                        data={card.users.map(({ user }) => ({ label: user.name, value: user.id }))}
-                        placeholder="Assign a Label"
-                        icon={<IconTags height={20} />}
-                        label="Labels"
-                    />
+                    <div className="flex flex-wrap gap-4">
+                        <MultiSelect
+                            value={card.users.map(({ user }) => user.id)}
+                            data={card.users.map(({ user }) => ({ label: user.name, value: user.id }))}
+                            label="Members"
+                            placeholder="Assign a Member"
+                            icon={<IconUsers height={20} />}
+                        />
+
+                        <MultiSelect
+                            value={card.users.map(({ user }) => user.id)}
+                            data={card.users.map(({ user }) => ({ label: user.name, value: user.id }))}
+                            placeholder="Assign a Label"
+                            icon={<IconTags height={20} />}
+                            label="Labels"
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
         </Modal>
     );
 };
@@ -65,13 +77,13 @@ export const CardPopup = ({ onClose, ...card }: CardPopupProps) => {
 type CardProps = PageProps["cards"][0] & {
     isDragOverlay: boolean;
     isDragging: boolean;
-    onClick?: () => void;
 };
 
-export const Card = ({ onClick, ...props }: CardProps) => {
+export const Card = (props: CardProps) => {
     const { name, isDragOverlay, isDragging, cover_attachment_id, attachments, labels, users, activities } = props;
     const cardCover = cover_attachment_id && attachments.find(({ id }) => id === cover_attachment_id);
 
+    const { emit } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
     const [isOnMenuButton, setIsOnMenuButton] = useState(false);
     const { openMenu, closeMenu, toggleMenu } = useMenu({
         items: () => {
@@ -84,11 +96,12 @@ export const Card = ({ onClick, ...props }: CardProps) => {
             e.preventDefault();
 
             if (!isOnMenuButton) {
-                onClick?.();
+                console.log("clicked");
+                emit(props);
                 closeMenu();
             }
         },
-        [closeMenu, isOnMenuButton, onClick]
+        [closeMenu, isOnMenuButton, emit, props]
     );
 
     return (
@@ -163,11 +176,9 @@ export const Card = ({ onClick, ...props }: CardProps) => {
     );
 };
 
-type CardContainerProps = PageProps["cards"][0] & {
-    onCardClick: (card: PageProps["cards"][0]) => void;
-};
+type CardContainerProps = PageProps["cards"][0];
 
-export const CardContainer = ({ onCardClick, ...props }: CardContainerProps) => {
+export const CardContainer = (props: CardContainerProps) => {
     const { setNodeRef, listeners, isDragging } = useSortable({
         id: props.id,
         data: {
@@ -176,13 +187,9 @@ export const CardContainer = ({ onCardClick, ...props }: CardContainerProps) => 
         },
     });
 
-    const onClick = useCallback(() => {
-        onCardClick(props);
-    }, [props, onCardClick]);
-
     return (
         <div {...listeners} ref={setNodeRef}>
-            <Card {...props} isDragOverlay={false} isDragging={isDragging} onClick={onClick} />
+            <Card {...props} isDragOverlay={false} isDragging={isDragging} />
         </div>
     );
 };

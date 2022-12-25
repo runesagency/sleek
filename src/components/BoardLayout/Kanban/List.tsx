@@ -81,11 +81,10 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
 
 type ListProps = PageProps["lists"][0] & {
     cards: PageProps["cards"];
-    onCardClick: (card: PageProps["cards"][0]) => void;
     onCardAdded: (name: string, listId: string) => void;
 };
 
-export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) => {
+export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
     enum NewCardLocation {
         UP = "UP",
         DOWN = "DOWN",
@@ -155,7 +154,7 @@ export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) =
 
                     <SortableContext strategy={verticalListSortingStrategy} items={cards.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)}>
                         {cards.map((card) => {
-                            return <CardContainer key={card.id} {...card} onCardClick={onCardClick} />;
+                            return <CardContainer key={card.id} {...card} />;
                         })}
                     </SortableContext>
 
