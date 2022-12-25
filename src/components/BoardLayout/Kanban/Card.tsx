@@ -2,6 +2,8 @@ import type { PageProps } from "@/pages/projects/[id]";
 
 import { SortableType } from ".";
 
+import useMenu from "@/lib/hooks/use-menu";
+
 import { useSortable } from "@dnd-kit/sortable";
 import { useCallback } from "react";
 import { IconMessageDots, IconPaperclip, IconUsers } from "@tabler/icons";
@@ -32,16 +34,48 @@ export const CardPopup = ({ onClose, ...card }: PageProps["cards"][0] & { onClos
 export const Card = ({ name, isDragOverlay, isDragging, cover_attachment_id, attachments, labels, users, activities }: PageProps["cards"][0] & { isDragOverlay: boolean; isDragging: boolean }) => {
     const cardCover = cover_attachment_id && attachments.find(({ id }) => id === cover_attachment_id);
 
+    const [isOnMenuButton, setIsOnMenuButton] = useState(false);
+    const { openMenu, closeMenu, toggleMenu } = useMenu({
+        items: () => {
+            return <div>123</div>;
+        },
+    });
+
+    const onCardClick = useCallback(
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            e.preventDefault();
+
+            if (!isOnMenuButton) {
+                onClick?.();
+                closeMenu();
+            }
+        },
+        [closeMenu, isOnMenuButton, onClick]
+    );
+
     return (
         <div
+            onContextMenu={openMenu}
+            onClick={onCardClick}
             className={`
-                group/row relative flex flex-col gap-4 rounded-md border border-dark-600 bg-dark-700 p-3 drop-shadow-xl duration-200 hover:border-dark-500
+                group/card relative flex flex-col gap-4 rounded-md border border-dark-600 bg-dark-700 p-4 drop-shadow-xl duration-200 hover:border-dark-500
                 ${isDragging && !isDragOverlay ? "cursor-grab opacity-50" : "cursor-pointer"}
             `}
         >
             {cardCover && <img src={cardCover.url} alt="Card Cover" className="h-28 rounded-md object-cover object-center" loading="lazy" />}
 
-            <span className="font-semibold">{name}</span>
+            <div className="flex items-center justify-between gap-2">
+                <span>{name}</span>
+
+                <div
+                    className="hidden h-6 w-6 items-center justify-center rounded-md bg-dark-500 p-1 duration-200 hover:opacity-75 group-hover/card:flex"
+                    onMouseOver={() => setIsOnMenuButton(true)}
+                    onMouseLeave={() => setIsOnMenuButton(false)}
+                    onClick={toggleMenu}
+                >
+                    <IconDots className="w-full" />
+                </div>
+            </div>
 
             {labels?.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2">
@@ -99,6 +133,8 @@ export const CardContainer = ({ onCardClick, ...props }: PageProps["cards"][0] &
     return (
         <div {...listeners} ref={setNodeRef} onClick={onClick}>
             <Card {...props} isDragOverlay={false} isDragging={isDragging} />
+        <div {...listeners} ref={setNodeRef}>
+            <Card {...props} isDragOverlay={false} isDragging={isDragging} onClick={onClick} />
         </div>
     );
 };
