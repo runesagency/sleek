@@ -79,8 +79,6 @@
             "react/jsx-sort-props": [
                 "error",
                 {
-                    "callbacksLast": true,
-                    "shorthandLast": true,
                     "multiline": "last",
                     "ignoreCase": false,
                     "noSortAlphabetically": true,
