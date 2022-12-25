@@ -1,4 +1,6 @@
 import "@szhsin/react-menu/dist/index.css";
+import "@szhsin/react-menu/dist/theme-dark.css";
+import "@szhsin/react-menu/dist/transitions/slide.css";
 
 import useMenu from "@/lib/hooks/use-menu";
 
@@ -66,7 +68,7 @@ export default function ContextMenu() {
     }
 
     return (
-        <ControlledMenu {...menuProps} ref={detectBlurRef} anchorPoint={anchorPoint} direction="right" offsetX={10} position="auto" initialMounted align="start">
+        <ControlledMenu {...menuProps} ref={detectBlurRef} anchorPoint={anchorPoint} direction="right" offsetX={10} position="auto" initialMounted align="start" theming="dark">
             {data?.withFilter && <FocusableItem>{({ ref }) => <input ref={ref} type="text" placeholder="Type to filter" value={filter} onChange={(e) => setFilter(e.target.value)} />}</FocusableItem>}
 
             {data?.items instanceof Function ? (
