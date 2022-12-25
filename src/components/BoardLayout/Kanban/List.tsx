@@ -82,7 +82,7 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
 type ListProps = PageProps["lists"][0] & {
     cards: PageProps["cards"];
     onCardClick: (card: PageProps["cards"][0]) => void;
-    onCardAdded: (name: string) => void;
+    onCardAdded: (name: string, listId: string) => void;
 };
 
 export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) => {
@@ -123,7 +123,14 @@ export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) =
         setIsAddingNewCard(false);
     }, []);
 
-    const addCardComponent = <AddCardComponent listId={id} onClose={onNewCardClose} onSave={onCardAdded} />;
+    const onNewCardAdded = useCallback(
+        (name: string) => {
+            onCardAdded(name, id);
+        },
+        [id, onCardAdded]
+    );
+
+    const addCardComponent = <AddCardComponent listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
 
     return (
         <div
@@ -143,7 +150,7 @@ export const List = ({ id, name, cards, onCardClick, onCardAdded }: ListProps) =
             </div>
 
             <ScrollArea className="flex flex-col overflow-y-auto overflow-x-hidden">
-                <div ref={cardListRef} className="flex max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden">
+                <div ref={cardListRef} className="hide-scrollbar flex max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden">
                     {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
                     <SortableContext strategy={verticalListSortingStrategy} items={cards.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)}>

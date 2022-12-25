@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { parseSSRArrayProps, parseSSRObjectProps } from "@/lib/utils";
 import KanbanLayout from "@/components/BoardLayout/Kanban";
 
+import { IconBell, IconUser, IconUsers } from "@tabler/icons";
+
 export type PageProps = {
     lists: ParsedSSRObjectProps<lists>[];
     cards: ParsedSSRObjectProps<
@@ -84,9 +86,9 @@ export default function BoardPage({ lists, cards }: PageProps) {
             <section className="flex w-full items-center justify-between bg-dark-900/75 px-20 py-5">
                 <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-8" />
 
-                <div className="flex items-center gap-8">
-                    <span className="material-icons-outlined">people</span>
-                    <span className="material-icons-outlined">notifications</span>
+                <div className="flex items-center gap-4">
+                    <IconUsers height={20} />
+                    <IconBell height={20} />
 
                     <div className="flex items-center gap-4 rounded-md bg-dark-700 px-3 py-2">
                         <img src="https://picsum.photos/200" alt="User Image" className="h-7 rounded-full" />

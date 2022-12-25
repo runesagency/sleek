@@ -18,14 +18,13 @@ const manrope = Manrope({
 export default function App({ Component, pageProps }: AppProps) {
     return (
         <MantineProvider
+            withCSSVariables
             theme={{
                 colorScheme: "dark",
+                fontFamily: "Manrope, sans-serif",
             }}
-            withCSSVariables
-            withGlobalStyles
-            withNormalizeCSS
         >
-            <main className={`${manrope.variable} font-sans`}>
+            <main className={`${manrope.variable} max-h-screen w-screen overflow-auto font-sans`}>
                 <RouterTransition />
                 <Component {...pageProps} />
                 <ContextMenu />

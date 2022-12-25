@@ -181,12 +181,16 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         [lists]
     );
 
-    const onPopupClose = useCallback(() => {
+    const onCardPopupClose = useCallback(() => {
         setOpenedCard(null);
     }, []);
 
-    const onCardAdded = useCallback((name: string) => {
+    const onCardAdded = useCallback((name: string, listId: string) => {
         const parsedName = name.trim();
+    }, []);
+
+    const onCardUpdated = useCallback((card: PageProps["cards"][0]) => {
+        //
     }, []);
 
     return (
@@ -207,7 +211,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                 </DndContext>
             </section>
 
-            {openedCard && <CardPopup {...openedCard} onClose={onPopupClose} />}
+            {openedCard && <CardPopup {...openedCard} onClose={onCardPopupClose} onUpdated={onCardUpdated} />}
         </>
     );
 }

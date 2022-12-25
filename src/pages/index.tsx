@@ -7,8 +7,8 @@ export default function Home() {
                 <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-8" />
 
                 <div className="flex items-center gap-8">
-                    <span className="material-icons-outlined">people</span>
-                    <span className="material-icons-outlined">notifications</span>
+                    <span>people</span>
+                    <span>notifications</span>
 
                     <div className="flex items-center gap-4 rounded-md bg-slate-700 px-3.5 py-2">
                         <img src="https://picsum.photos/200" alt="User Image" className="h-7 rounded-full" />
