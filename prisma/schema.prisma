@@ -109,8 +109,10 @@ model users {
   projects_joined      project_users[]
   organizations_joined organization_users[]
   permissions          user_permissions[]
-  cards                card_users[]
+  cards_joined         card_users[]
   labels_created       labels[]
+  card_labels_created  card_labels[]
+  cards_created        cards[]
 }
 
 model user_permissions {
@@ -221,9 +223,11 @@ model cards {
   start_date DateTime?
   due_date   DateTime?
 
+  created_by String?
   created_at DateTime @default(now())
 
-  list lists? @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  list    lists? @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creator users? @relation(fields: [created_by], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   activities  activities[]
   users       card_users[]
@@ -236,10 +240,12 @@ model card_labels {
   card_id  String
   label_id String
 
+  created_by String?
   created_at DateTime @default(now())
 
-  card  cards?  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  label labels? @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  card    cards?  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  label   labels? @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creator users?  @relation(fields: [created_by], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model card_users {
