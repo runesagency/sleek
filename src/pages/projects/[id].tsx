@@ -3,10 +3,10 @@ import type { activities, cards, card_attachments, card_labels, card_users, labe
 import type { ParsedSSRObjectProps } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
-import { parseSSRArrayProps, parseSSRObjectProps } from "@/lib/utils";
 import KanbanLayout from "@/components/BoardLayout/Kanban";
+import { parseSSRArrayProps, parseSSRObjectProps } from "@/lib/utils";
 
-import { IconBell, IconUser, IconUsers } from "@tabler/icons";
+import { IconBell, IconUsers } from "@tabler/icons";
 
 export type PageProps = {
     lists: ParsedSSRObjectProps<lists>[];
@@ -82,9 +82,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 export default function BoardPage({ lists, cards }: PageProps) {
     return (
-        <main className="relative flex h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-dark-800 text-white">
-            <section className="flex w-full items-center justify-between bg-dark-900/75 px-20 py-5">
-                <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-8" />
+        <main className="relative flex h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-dark-900 text-white">
+            <section className="flex w-full items-center justify-between border-b border-b-dark-700 bg-dark-800 px-10 py-3">
+                <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-7" />
 
                 <div className="flex items-center gap-4">
                     <IconUsers height={20} />
@@ -92,7 +92,7 @@ export default function BoardPage({ lists, cards }: PageProps) {
 
                     <div className="flex items-center gap-4 rounded-md bg-dark-700 px-3 py-2">
                         <img src="https://picsum.photos/200" alt="User Image" className="h-7 rounded-full" />
-                        <p className="text-sm font-semibold">John Doe</p>
+                        <p className="text-sm font-semibold ">John Doe</p>
                     </div>
                 </div>
             </section>

@@ -69,7 +69,6 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
             <Textarea
                 placeholder="Enter your card title here" //
                 label="Add New Card"
-                variant="filled"
                 value={value}
                 withAsterisk
                 autoFocus
@@ -130,9 +129,9 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
             {...attributes}
             ref={setNodeRef}
             style={style}
-            className="group/container relative flex h-max max-h-full w-60 cursor-pointer flex-col gap-4 overflow-auto rounded-md text-sm"
+            className="group/container relative flex h-max max-h-full w-72 cursor-pointer flex-col gap-4 overflow-y-auto overflow-x-hidden rounded-md border border-dark-700 bg-dark-800 p-4 text-sm"
         >
-            <div className="flex w-full items-center justify-between gap-4 border-b border-b-dark-700 pb-3 duration-200">
+            <div className="flex w-full items-center justify-between gap-4 duration-200">
                 <span className="rounded-md bg-dark-700 px-3 py-1 font-semibold">{name}</span>
 
                 <div className="flex items-center gap-2">
@@ -158,7 +157,7 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
             )}
 
             <button
-                className="flex items-center justify-center gap-2 rounded-md border border-dashed border-dark-600 bg-dark-800 p-2 text-center duration-200 hover:bg-dark-700/50"
+                className="flex items-center justify-center gap-2 rounded-md border border-dashed border-dark-500 p-2 text-center duration-200 hover:opacity-50"
                 onClick={() => onNewCardClick(NewCardLocation.DOWN)}
             >
                 <IconPlus height={15} />

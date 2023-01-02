@@ -80,7 +80,7 @@ type CardProps = PageProps["cards"][0] & {
 };
 
 export const Card = (props: CardProps) => {
-    const { name, isDragOverlay, isDragging, cover_attachment_id, attachments, labels, users, activities } = props;
+    const { name, isDragOverlay, isDragging, cover_attachment_id, attachments, labels, users, activities, order } = props;
     const cardCover = cover_attachment_id && attachments.find(({ id }) => id === cover_attachment_id);
 
     const { emit } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
@@ -96,7 +96,6 @@ export const Card = (props: CardProps) => {
             e.preventDefault();
 
             if (!isOnMenuButton) {
-                console.log("clicked");
                 emit(props);
                 closeMenu();
             }
@@ -109,17 +108,19 @@ export const Card = (props: CardProps) => {
             onContextMenu={openMenu}
             onClick={onCardClick}
             className={`
-                group/card relative flex flex-col gap-4 rounded-md border border-dark-600 bg-dark-700 p-4 drop-shadow-xl duration-200 hover:border-dark-500
+                group/card relative flex max-w-full flex-col gap-4 overflow-hidden rounded-md border border-dark-600 bg-dark-700 p-3 drop-shadow-xl duration-200 hover:border-dark-400
                 ${isDragging && !isDragOverlay ? "cursor-grab opacity-50" : "cursor-pointer"}
             `}
         >
             {cardCover && <img src={cardCover.url} alt="Card Cover" className="h-28 rounded-md object-cover object-center" loading="lazy" />}
 
-            <div className="flex items-center justify-between gap-2">
-                <span>{name}</span>
+            <div className="flex max-w-full items-center justify-between gap-2 overflow-hidden">
+                <span className="break-words py-1">
+                    {order} | {name}
+                </span>
 
                 <div
-                    className="hidden h-6 w-6 items-center justify-center rounded-md bg-dark-500 p-1 duration-200 hover:opacity-75 group-hover/card:flex"
+                    className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-md bg-dark-800 p-1 hover:opacity-75 group-hover/card:flex"
                     onMouseOver={() => setIsOnMenuButton(true)}
                     onMouseLeave={() => setIsOnMenuButton(false)}
                     onClick={toggleMenu}
