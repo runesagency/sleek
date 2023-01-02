@@ -2,7 +2,7 @@ import type { PageProps } from "@/pages/projects/[id]";
 import type { OnDragEndResponder } from "react-beautiful-dnd";
 
 import { NewCardLocation, List } from "@/components/BoardLayout/Kanban/List";
-import { Card, CardPopup } from "@/components/BoardLayout/Kanban/Card";
+import { CardPopup } from "@/components/BoardLayout/Kanban/Card";
 
 import { StrictMode, useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";

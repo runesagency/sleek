@@ -6,7 +6,7 @@ import useMenu from "@/lib/hooks/use-menu";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
 import { useCallback, useEffect, useState } from "react";
-import { IconDots, IconMessageDots, IconPaperclip, IconTags, IconUsers } from "@tabler/icons";
+import { IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
 import { useDebouncedState } from "@mantine/hooks";
 import { Draggable } from "react-beautiful-dnd";
 
@@ -57,12 +57,11 @@ export const CardPopup = ({ onUpdated }: CardPopupProps) => {
     );
 };
 
-type CardProps = PageProps["cards"][0] & {
-    isDragOverlay: boolean;
-};
+type CardContainerProps = PageProps["cards"][0];
 
-export const Card = (props: CardProps) => {
-    const { name, isDragOverlay, cover_attachment_id, attachments, labels, users, activities, order } = props;
+export const Card = (props: CardContainerProps) => {
+    const { name, cover_attachment_id, attachments, labels, users, activities, order } = props;
+
     const cardCover = cover_attachment_id && attachments.find(({ id }) => id === cover_attachment_id);
 
     const { emit } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
@@ -86,89 +85,72 @@ export const Card = (props: CardProps) => {
     );
 
     return (
-        <div
-            onContextMenu={openMenu}
-            onClick={onCardClick}
-            className={`
-                group/card relative flex max-w-full flex-col gap-4 overflow-hidden rounded-md border border-dark-600 bg-dark-700 p-3 drop-shadow-xl duration-200 hover:border-dark-400
-                ${!isDragOverlay ? "cursor-grab opacity-50" : "cursor-pointer"}
-            `}
-        >
-            {cardCover && <img src={cardCover.url} alt="Card Cover" className="h-28 rounded-md object-cover object-center" loading="lazy" />}
-
-            <div className="flex max-w-full items-center justify-between gap-2 overflow-hidden">
-                <span className="break-words py-1">
-                    {order} | {name}
-                </span>
-
         <Draggable draggableId={props.id} index={props.order}>
             {(provided) => (
                 <div
-                    className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-md bg-dark-800 p-1 hover:opacity-75 group-hover/card:flex"
-                    onMouseOver={() => setIsOnMenuButton(true)}
-                    onMouseLeave={() => setIsOnMenuButton(false)}
-                    onClick={toggleMenu}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                    onContextMenu={openMenu}
+                    onClick={onCardClick}
+                    className="group/card relative flex max-w-full flex-col gap-5 overflow-hidden rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 duration-200"
                 >
-                    <IconDots className="w-full" />
-                </div>
-            </div>
+                    {/* <img src={"https://picsum.photos/200/300"} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" /> */}
 
-            {labels?.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2">
-                    {labels.map(({ label }, i) => (
-                        <div key={i} className="rounded-md px-2 py-1 text-xs" style={{ backgroundColor: label.color }}>
-                            {label.name}
+                    <div className="flex max-w-full items-start justify-between gap-2 overflow-hidden">
+                        <span className="flex-1 break-words font-semibold">
+                            {order} - {name}
+                        </span>
+
+                        <div
+                            className="hidden h-4 w-4 shrink-0 items-center justify-center rounded-md hover:opacity-75 group-hover/card:flex"
+                            onMouseOver={() => setIsOnMenuButton(true)}
+                            onMouseLeave={() => setIsOnMenuButton(false)}
+                            onClick={toggleMenu}
+                        >
+                            <IconDots
+                                className="hidden h-4 w-4 shrink-0 items-center justify-center rounded-md hover:opacity-75 group-hover/card:flex"
+                                onMouseOver={() => setIsOnMenuButton(true)}
+                                onMouseLeave={() => setIsOnMenuButton(false)}
+                                onClick={toggleMenu}
+                            />
                         </div>
-                    ))}
-                </div>
-            )}
+                    </div>
 
-            {(users.length > 0 || activities?.length > 0 || attachments?.length > 0) && (
-                <section className="flex items-end justify-between gap-4">
-                    {(activities?.length > 0 || attachments?.length > 0) && (
-                        <div className="flex items-center gap-4">
-                            {activities?.length > 0 && (
+                    {/* <div className="flex flex-wrap items-center gap-2">
+                            {[...Array(20)].map((_, i) => (
+                                <div key={i} className="rounded-full bg-dark-800 px-2 py-1 text-xs">
+                                    {i}
+                                </div>
+                            ))}
+                        </div> */}
+
+                    {/* <section className="flex items-end justify-between gap-4">
+                            <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-1">
                                     <IconMessageDots height={15} />
                                     <p>{activities.length}</p>
                                 </div>
-                            )}
 
-                            {attachments?.length > 0 && (
                                 <div className="flex items-center gap-1">
                                     <IconPaperclip height={15} />
                                     <p>{attachments.length}</p>
                                 </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="flex shrink-0 flex-wrap items-center -space-x-2">
-                        {users.map(({ user }, i) => (
-                            <div key={i} className="h-7 w-7 overflow-hidden rounded-full border-2 border-dark-700">
-                                <img
-                                    src={user.image_url || `https://ui-avatars.com/api/?background=random&name=${encodeURI(user.name)}`}
-                                    alt={user.name}
-                                    title={user.name}
-                                    className="object-cover object-center"
-                                />
                             </div>
-                        ))}
-                    </div>
-                </section>
-            )}
-        </div>
-    );
-};
 
-type CardContainerProps = PageProps["cards"][0];
-
-export const CardContainer = (props: CardContainerProps) => {
-    return (
-        <Draggable draggableId={props.id} index={props.order}>
-            {(draggableProvided, draggableSnapshot) => (
-                <div {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps} ref={draggableProvided.innerRef}>
-                    <Card {...props} isDragOverlay={false} />
+                            <div className="flex shrink-0 flex-wrap items-center -space-x-2">
+                                {users.map(({ user }, i) => (
+                                    <div key={i} className="h-7 w-7 overflow-hidden rounded-full border-2 border-dark-700">
+                                        <img
+                                            src={user.image_url || `https://ui-avatars.com/api/?background=random&name=${encodeURI(user.name)}`}
+                                            alt={user.name}
+                                            title={user.name}
+                                            className="object-cover object-center"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </section> */}
                 </div>
             )}
         </Draggable>

@@ -3,7 +3,7 @@ import type { PageProps } from "@/pages/projects/[id]";
 
 import { SortableType } from ".";
 
-import { CardContainer } from "@/components/BoardLayout/Kanban/Card";
+import { Card } from "@/components/BoardLayout/Kanban/Card";
 
 import { useClickOutside, useLocalStorage } from "@mantine/hooks";
 import { useCallback, useState } from "react";
