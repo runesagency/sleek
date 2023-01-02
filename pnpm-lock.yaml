@@ -29,6 +29,7 @@ specifiers:
   react: 18.2.0
   react-beautiful-dnd: ^13.1.1
   react-dom: 18.2.0
+  react-top-loading-bar: ^2.3.1
   tailwindcss: ^3.2.4
   ts-node: ^10.9.1
   typescript: 4.9.4
@@ -44,6 +45,7 @@ dependencies:
   react: 18.2.0
   react-beautiful-dnd: 13.1.1_biqbaboplfbrettd7655fr4n2y
   react-dom: 18.2.0_react@18.2.0
+  react-top-loading-bar: 2.3.1_react@18.2.0
 
 devDependencies:
   '@types/node': 18.11.17
@@ -2383,6 +2385,15 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-is: 17.0.2
+    dev: false
+
+  /react-top-loading-bar/2.3.1_react@18.2.0:
+    resolution: {integrity: sha512-rQk2Nm+TOBrM1C4E3e6KwT65iXyRSgBHjCkr2FNja1S51WaPulRA5nKj/xazuQ3x89wDDdGsrqkqy0RBIfd0xg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react-transition-state/1.1.5_biqbaboplfbrettd7655fr4n2y:
