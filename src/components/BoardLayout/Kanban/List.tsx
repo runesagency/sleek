@@ -12,6 +12,11 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { ScrollArea, Textarea } from "@mantine/core";
 import { IconDots, IconPlus } from "@tabler/icons";
 
+export enum NewCardLocation {
+    UP = "UP",
+    DOWN = "DOWN",
+}
+
 type NewCardComponentProps = {
     listId: string;
     onClose: () => void;
@@ -81,16 +86,11 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
 
 type ListProps = PageProps["lists"][0] & {
     cards: PageProps["cards"];
-    onCardAdded: (name: string, listId: string) => void;
+    onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
 };
 
 export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
-    enum NewCardLocation {
-        UP = "UP",
-        DOWN = "DOWN",
-    }
-
-    const [cardListRef] = useAutoAnimate<HTMLDivElement>();
+    // const [cardListRef] = useAutoAnimate<HTMLDivElement>();
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
     const { setNodeRef, listeners, transform, transition, attributes } = useSortable({
         id,
@@ -108,14 +108,6 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
 
     const onNewCardClick = (location: NewCardLocation) => {
         setIsAddingNewCard(location);
-
-        if (location === NewCardLocation.UP) {
-            cardListRef.current?.scrollTo(0, 0);
-        }
-
-        if (location === NewCardLocation.DOWN) {
-            cardListRef.current?.scrollTo(0, cardListRef.current.scrollHeight);
-        }
     };
 
     const onNewCardClose = useCallback(() => {
@@ -124,9 +116,10 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
 
     const onNewCardAdded = useCallback(
         (name: string) => {
-            onCardAdded(name, id);
+            if (!isAddingNewCard) return;
+            onCardAdded(name, id, isAddingNewCard);
         },
-        [id, onCardAdded]
+        [id, isAddingNewCard, onCardAdded]
     );
 
     const addCardComponent = <AddCardComponent listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
