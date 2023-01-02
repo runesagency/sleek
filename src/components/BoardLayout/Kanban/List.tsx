@@ -152,11 +152,11 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
                 <div ref={cardListRef} className="hide-scrollbar flex max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden">
                     {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
-                    <SortableContext strategy={verticalListSortingStrategy} items={cards.sort((a, b) => a.order - b.order).flatMap(({ id }) => id)}>
-                        {cards.map((card) => {
-                            return <CardContainer key={card.id} {...card} />;
-                        })}
-                    </SortableContext>
+                        <SortableContext strategy={rectSortingStrategy} items={cards.flatMap(({ id }) => id)}>
+                            {cards.map((card) => {
+                                return <CardContainer key={card.id} {...card} />;
+                            })}
+                        </SortableContext>
 
                     {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
                 </div>
