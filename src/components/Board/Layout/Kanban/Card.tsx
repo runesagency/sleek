@@ -1,7 +1,5 @@
 import type { PageProps } from "@/pages/projects/[id]";
 
-import { SortableType } from ".";
-
 import useMenu from "@/lib/hooks/use-menu";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
@@ -45,14 +43,12 @@ export const Card = (props: CardContainerProps) => {
                     ref={provided.innerRef}
                     onContextMenu={openMenu}
                     onClick={onCardClick}
-                    className="group/card relative flex max-w-full flex-col gap-5 overflow-hidden rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 duration-200"
+                    className="group/card relative my-2 flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4"
                 >
                     {/* <img src={"https://picsum.photos/200/300"} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" /> */}
 
-                    <div className="flex max-w-full items-start justify-between gap-2 overflow-hidden">
-                        <span className="flex-1 break-words font-semibold">
-                            {order} - {name}
-                        </span>
+                    <div className="flex max-w-full items-start justify-between gap-2">
+                        <span className="flex-1 break-words font-semibold">{name}</span>
 
                         <div
                             className="hidden h-4 w-4 shrink-0 items-center justify-center rounded-md hover:opacity-75 group-hover/card:flex"
@@ -60,12 +56,7 @@ export const Card = (props: CardContainerProps) => {
                             onMouseLeave={() => setIsOnMenuButton(false)}
                             onClick={toggleMenu}
                         >
-                            <IconDots
-                                className="hidden h-4 w-4 shrink-0 items-center justify-center rounded-md hover:opacity-75 group-hover/card:flex"
-                                onMouseOver={() => setIsOnMenuButton(true)}
-                                onMouseLeave={() => setIsOnMenuButton(false)}
-                                onClick={toggleMenu}
-                            />
+                            <IconDots />
                         </div>
                     </div>
 

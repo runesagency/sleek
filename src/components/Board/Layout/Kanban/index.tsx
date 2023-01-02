@@ -34,11 +34,12 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
             }
 
             if (type === SortableType.List) {
-                const newList = [...lists];
-                const [removed] = newList.splice(source.index, 1);
-                newList.splice(destination.index, 0, removed);
-
-                setLists(newList);
+                setLists((lists) =>
+                    arrayMoveImmutable(lists, source.index, destination.index).map((list, index) => ({
+                        ...list,
+                        order: index,
+                    }))
+                );
             } else if (type === SortableType.Card) {
                 const sourceListId = source.droppableId;
                 const destinationListId = destination.droppableId;
@@ -79,7 +80,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                 }
             }
         },
-        [cards, lists]
+        [cards]
     );
 
     const onCardAdded = useCallback(
@@ -90,19 +91,30 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
             const list = lists.find((list) => list.id === listId);
             if (!list) return;
 
+            const otherCards = cards.filter((card) => card.list_id !== listId);
             const listCards = cards.filter((card) => card.list_id === listId);
-            const order = location === NewCardLocation.UP ? -1 : listCards.length;
 
-            // setCards((cards) => [
-            //     ...cards,
-            //     {
-            //         id: randomId(),
-            //         name: parsedName,
-            //         list_id: listId,
-            //         users: [],
-            //         order,
-            //     } as any,
-            // ]);
+            const newCard = {
+                id: randomId(),
+                name: parsedName,
+                list_id: listId,
+                users: [],
+                order: location === NewCardLocation.UP ? 0 : listCards.length,
+            } as any;
+
+            if (location === NewCardLocation.UP) {
+                setCards([
+                    ...otherCards, //
+                    newCard,
+                    ...listCards.map((card) => ({ ...card, order: card.order + 1 })),
+                ]);
+            } else {
+                setCards([
+                    ...otherCards, //
+                    ...listCards,
+                    newCard,
+                ]);
+            }
         },
         [cards, lists]
     );
@@ -111,10 +123,13 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="board" type={SortableType.List} direction="horizontal">
                 {(provided) => (
-                    <div ref={provided.innerRef} className="flex max-h-full w-full max-w-full flex-1 justify-start gap-7 overflow-auto py-10 px-14" {...provided.droppableProps}>
-                        {lists.map((list, index) => {
-                            return <List key={list.id} index={index} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
-                        })}
+                    <div ref={provided.innerRef} className="flex h-full max-h-full w-full max-w-full flex-1 justify-start overflow-auto py-10 px-11" {...provided.droppableProps}>
+                        {lists
+                            .sort((a, b) => a.order - b.order)
+                            .map((list) => {
+                                return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
+                            })}
+
                         {provided.placeholder}
                     </div>
                 )}

@@ -79,12 +79,11 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
 };
 
 type ListProps = PageProps["lists"][0] & {
-    index: number;
     cards: PageProps["cards"];
     onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
 };
 
-export const List = ({ id, name, cards, onCardAdded, index }: ListProps) => {
+export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
 
     const onNewCardClick = (location: NewCardLocation) => {
@@ -106,15 +105,14 @@ export const List = ({ id, name, cards, onCardAdded, index }: ListProps) => {
     const addCardComponent = <AddCardComponent listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
 
     return (
-        <Draggable draggableId={id} index={index}>
+        <Draggable draggableId={id} index={order}>
             {(provided) => (
                 <div
                     {...provided.draggableProps}
-                    {...provided.dragHandleProps}
                     ref={provided.innerRef}
-                    className="group/container relative flex h-max w-full max-w-sm cursor-pointer flex-col rounded-lg border border-dark-600 bg-dark-800 text-sm"
+                    className="group/container relative mx-3.5 flex h-max max-h-full w-full max-w-sm flex-col overflow-auto rounded-lg border border-dark-600 bg-dark-800 text-sm"
                 >
-                    <div className="flex w-full items-center justify-between gap-4 bg-dark-900 px-7 py-4 duration-200">
+                    <div {...provided.dragHandleProps} className="flex w-full items-center justify-between gap-4 bg-dark-900 px-7 py-4 duration-200">
                         <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{name}</span>
 
                         <div className="flex items-center gap-3">
@@ -123,24 +121,25 @@ export const List = ({ id, name, cards, onCardAdded, index }: ListProps) => {
                         </div>
                     </div>
 
-                    <Droppable droppableId={id} type={SortableType.Card} ignoreContainerClipping={false}>
+                    <Droppable droppableId={id} type={SortableType.Card}>
                         {(provided) => (
                             <div
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                                 className={`
-                                    hide-scrollbar flex max-h-full flex-col gap-4 overflow-hidden
-                                    ${cards.length > 0 || isAddingNewCard ? "p-5" : "bg-dark-900 p-1"}
+                                    hide-scrollbar flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5
+                                    ${cards.length > 0 || isAddingNewCard ? "py-3" : "bg-dark-900 py-1"}
                                 `}
                             >
                                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
-                                <div className="flex max-h-full flex-col gap-4">
+                                <div className="flex max-h-full flex-col">
                                     {cards
                                         .sort((a, b) => a.order - b.order)
                                         .map((card) => {
                                             return <Card key={card.id} {...card} />;
                                         })}
+
                                     {provided.placeholder}
                                 </div>
 
