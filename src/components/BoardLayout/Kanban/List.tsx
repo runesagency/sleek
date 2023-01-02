@@ -112,15 +112,15 @@ export const List = ({ id, name, cards, onCardAdded, index }: ListProps) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     ref={provided.innerRef}
-                    className="group/container relative flex h-max max-h-full w-72 cursor-pointer flex-col gap-4 overflow-y-auto overflow-x-hidden rounded-md border border-dark-700 bg-dark-800 p-4 text-sm"
+                    className="group/container relative flex h-max w-full max-w-sm cursor-pointer flex-col rounded-lg border border-dark-600 bg-dark-800 text-sm"
                 >
-                    <div className="flex w-full items-center justify-between gap-4 duration-200">
-                        <span className="rounded-md bg-dark-700 px-3 py-1 font-semibold">{name}</span>
+                    <div className="flex w-full items-center justify-between gap-4 bg-dark-900 px-7 py-4 duration-200">
+                        <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{name}</span>
 
-                        {/* <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                             <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={() => onNewCardClick(NewCardLocation.UP)} />
                             <IconDots height={20} className="duration-200 hover:opacity-75" />
-                        </div> */}
+                        </div>
                     </div>
 
                     <Droppable droppableId={id} type={SortableType.Card} ignoreContainerClipping={false}>
@@ -150,7 +150,7 @@ export const List = ({ id, name, cards, onCardAdded, index }: ListProps) => {
                     </Droppable>
 
                     <button
-                        className="flex items-center justify-center gap-2 rounded-md border border-dashed border-dark-500 p-2 text-center duration-200 hover:opacity-50"
+                        className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center duration-200 hover:opacity-75"
                         onClick={() => onNewCardClick(NewCardLocation.DOWN)}
                     >
                         <IconPlus height={15} />
