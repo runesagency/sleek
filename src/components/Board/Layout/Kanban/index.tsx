@@ -1,7 +1,7 @@
 import type { PageProps } from "@/pages/projects/[id]";
 import type { OnDragEndResponder } from "react-beautiful-dnd";
 
-import { NewCardLocation, List } from "@/components/BoardLayout/Kanban/List";
+import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
 
 import { useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
@@ -93,18 +93,16 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
             const listCards = cards.filter((card) => card.list_id === listId);
             const order = location === NewCardLocation.UP ? -1 : listCards.length;
 
-            setCards((cards) =>
-                [
-                    ...cards,
-                    {
-                        id: randomId(),
-                        name: parsedName,
-                        list_id: listId,
-                        users: [],
-                        order,
-                    } as any,
-                ].sort(cardSortAlgorithm(lists))
-            );
+            // setCards((cards) => [
+            //     ...cards,
+            //     {
+            //         id: randomId(),
+            //         name: parsedName,
+            //         list_id: listId,
+            //         users: [],
+            //         order,
+            //     } as any,
+            // ]);
         },
         [cards, lists]
     );

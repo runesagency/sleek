@@ -3,7 +3,7 @@ import type { activities, cards, card_attachments, card_labels, card_users, labe
 import type { ParsedSSRObjectProps } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
-import KanbanLayout from "@/components/BoardLayout/Kanban";
+import KanbanLayout from "@/components/Board/Layout/Kanban";
 import { parseSSRArrayProps, parseSSRObjectProps } from "@/lib/utils";
 import TaskModal from "@/components/Board/TaskModal";
 
