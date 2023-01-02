@@ -148,9 +148,10 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
                 </div>
             </div>
 
-            <ScrollArea className="flex flex-col overflow-y-auto overflow-x-hidden">
-                <div ref={cardListRef} className="hide-scrollbar flex max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden">
-                    {isAddingNewCard === NewCardLocation.UP && addCardComponent}
+            {(cards.length > 0 || isAddingNewCard) && (
+                <ScrollArea className="flex flex-col overflow-hidden" scrollbarSize={8} scrollHideDelay={500}>
+                    <div className="hide-scrollbar flex max-h-full flex-col gap-4 overflow-hidden">
+                        {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
                         <SortableContext strategy={rectSortingStrategy} items={cards.flatMap(({ id }) => id)}>
                             {cards.map((card) => {
@@ -158,9 +159,10 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
                             })}
                         </SortableContext>
 
-                    {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
-                </div>
-            </ScrollArea>
+                        {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
+                    </div>
+                </ScrollArea>
+            )}
 
             <button
                 className="flex items-center justify-center gap-2 rounded-md border border-dashed border-dark-600 bg-dark-800 p-2 text-center duration-200 hover:bg-dark-700/50"
