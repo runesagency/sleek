@@ -5,10 +5,10 @@ import { SortableType } from ".";
 import useMenu from "@/lib/hooks/use-menu";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
-import { useSortable } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useState } from "react";
 import { IconDots, IconMessageDots, IconPaperclip, IconTags, IconUsers } from "@tabler/icons";
 import { useDebouncedState } from "@mantine/hooks";
+import { Draggable } from "react-beautiful-dnd";
 
 type CardPopupProps = {
     onUpdated: (card: PageProps["cards"][0]) => void;
@@ -59,11 +59,10 @@ export const CardPopup = ({ onUpdated }: CardPopupProps) => {
 
 type CardProps = PageProps["cards"][0] & {
     isDragOverlay: boolean;
-    isDragging: boolean;
 };
 
 export const Card = (props: CardProps) => {
-    const { name, isDragOverlay, isDragging, cover_attachment_id, attachments, labels, users, activities, order } = props;
+    const { name, isDragOverlay, cover_attachment_id, attachments, labels, users, activities, order } = props;
     const cardCover = cover_attachment_id && attachments.find(({ id }) => id === cover_attachment_id);
 
     const { emit } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
@@ -92,7 +91,7 @@ export const Card = (props: CardProps) => {
             onClick={onCardClick}
             className={`
                 group/card relative flex max-w-full flex-col gap-4 overflow-hidden rounded-md border border-dark-600 bg-dark-700 p-3 drop-shadow-xl duration-200 hover:border-dark-400
-                ${isDragging && !isDragOverlay ? "cursor-grab opacity-50" : "cursor-pointer"}
+                ${!isDragOverlay ? "cursor-grab opacity-50" : "cursor-pointer"}
             `}
         >
             {cardCover && <img src={cardCover.url} alt="Card Cover" className="h-28 rounded-md object-cover object-center" loading="lazy" />}
@@ -163,17 +162,13 @@ export const Card = (props: CardProps) => {
 type CardContainerProps = PageProps["cards"][0];
 
 export const CardContainer = (props: CardContainerProps) => {
-    const { setNodeRef, listeners, isDragging } = useSortable({
-        id: props.id,
-        data: {
-            ...props,
-            type: SortableType.Card,
-        },
-    });
-
     return (
-        <div {...listeners} ref={setNodeRef}>
-            <Card {...props} isDragOverlay={false} isDragging={isDragging} />
-        </div>
+        <Draggable draggableId={props.id} index={props.order}>
+            {(draggableProvided, draggableSnapshot) => (
+                <div {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps} ref={draggableProvided.innerRef}>
+                    <Card {...props} isDragOverlay={false} />
+                </div>
+            )}
+        </Draggable>
     );
 };
