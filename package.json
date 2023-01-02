@@ -132,7 +132,6 @@
         "@prisma/client": "^4.8.0",
         "@szhsin/react-menu": "^3.3.1",
         "@tabler/icons": "^1.118.0",
-        "eslint-plugin-no-relative-import-paths": "^1.5.2",
         "next": "13.0.7",
         "react": "18.2.0",
         "react-dom": "18.2.0"
@@ -148,6 +147,7 @@
         "eslint-config-next": "13.0.7",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-no-relative-import-paths": "^1.5.2",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-react": "^7.31.11",
         "eslint-plugin-tailwindcss": "^3.7.1",

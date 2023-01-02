@@ -42,7 +42,6 @@ dependencies:
   '@prisma/client': 4.8.0_prisma@4.8.0
   '@szhsin/react-menu': 3.3.1_biqbaboplfbrettd7655fr4n2y
   '@tabler/icons': 1.118.0_biqbaboplfbrettd7655fr4n2y
-  eslint-plugin-no-relative-import-paths: 1.5.2
   next: 13.0.7_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -58,6 +57,7 @@ devDependencies:
   eslint-config-next: 13.0.7_lzzuuodtsqwxnvqeq4g4likcqa
   eslint-config-prettier: 8.5.0_eslint@8.30.0
   eslint-plugin-import: 2.26.0_tqyj5ytb5g6r5ett7xxedhk6eq
+  eslint-plugin-no-relative-import-paths: 1.5.2
   eslint-plugin-prettier: 4.2.1_kl4pe43v5b43npmso5hoplpbyi
   eslint-plugin-react: 7.31.11_eslint@8.30.0
   eslint-plugin-tailwindcss: 3.7.1_ts-node@10.9.1
