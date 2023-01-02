@@ -101,6 +101,8 @@ export const Card = (props: CardProps) => {
                     {order} | {name}
                 </span>
 
+        <Draggable draggableId={props.id} index={props.order}>
+            {(provided) => (
                 <div
                     className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-md bg-dark-800 p-1 hover:opacity-75 group-hover/card:flex"
                     onMouseOver={() => setIsOnMenuButton(true)}

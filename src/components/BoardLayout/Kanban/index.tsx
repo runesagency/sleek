@@ -1,4 +1,5 @@
 import type { PageProps } from "@/pages/projects/[id]";
+import type { OnDragEndResponder } from "react-beautiful-dnd";
 
 import { NewCardLocation, List } from "@/components/BoardLayout/Kanban/List";
 import { Card, CardPopup } from "@/components/BoardLayout/Kanban/Card";
@@ -6,90 +7,80 @@ import { Card, CardPopup } from "@/components/BoardLayout/Kanban/Card";
 import { StrictMode, useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { arrayMoveImmutable } from "array-move";
 
 export enum SortableType {
     List = "list",
     Card = "card",
 }
 
-const cardSortAlgorithm = (lists: PageProps["lists"]) => (a: PageProps["cards"][0], b: PageProps["cards"][0]) => {
-    const list1 = lists.filter((list) => list.id === a.list_id)[0];
-    const list2 = lists.filter((list) => list.id === b.list_id)[0];
-
-    // group by list_id using list
-    // sort by list order and then by card order
-    return list1.order - list2.order || a.order - b.order;
-};
-
 export default function KanbanLayout({ lists: originalLists, cards: originalCards }: PageProps) {
-    const [lists, setLists] = useState<PageProps["lists"]>(originalLists.sort((a, b) => a.order - b.order));
-    const [cards, setCards] = useState<PageProps["cards"]>(originalCards.sort(cardSortAlgorithm(lists)));
+    const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
+    const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
 
-    const onDragEnd = useCallback(
-        (event: any) => {
-            const current = event.active.data.current;
-            const target = event.over?.data.current;
-
-            // List to Another List
-            if (current?.type === SortableType.List && target?.type === SortableType.List) {
-                setLists((lists) => {
-                    const currentId = current.id;
-                    const targetId = target.id;
-
-                    if (targetId && currentId) {
-                        const oldIndex = lists.findIndex((x) => x.id === currentId);
-                        const newIndex = lists.findIndex((x) => x.id === targetId);
-
-                        // return arrayMove(lists, oldIndex, newIndex).map((list, index) => {
-                        //     list.order = index;
-                        //     return list;
-                        // });
-                    }
-
-                    return lists;
-                });
+    const onDragEnd: OnDragEndResponder = useCallback(
+        (result) => {
+            // dropped nowhere
+            if (!result.destination) {
+                return;
             }
 
-            // Card to Another Card
-            if (current?.type === SortableType.Card && target?.type === SortableType.Card) {
-                setCards((cards) => {
-                    let sortIndex: Record<string, number> = {};
+            const type = result.type;
+            const source = result.source;
+            const destination = result.destination;
 
-                    // card to card in the same list
-                    if (target?.type === SortableType.Card) {
-                        const currentId = current.id;
-                        const targetId = target.id;
+            // did not move anywhere - can bail early
+            if (source.droppableId === destination.droppableId && source.index === destination.index) {
+                return;
+            }
 
-                        const currentCardIndex = cards.findIndex((card) => card.id === currentId);
-                        const currentCard = cards[currentCardIndex];
-                        if (!currentCard) return cards;
+            if (type === SortableType.List) {
+                const newList = [...lists];
+                const [removed] = newList.splice(source.index, 1);
+                newList.splice(destination.index, 0, removed);
 
-                        const targetCardIndex = cards.findIndex((card) => card.id === targetId);
-                        const targetCard = cards[targetCardIndex];
+                setLists(newList);
+            } else if (type === SortableType.Card) {
+                const sourceListId = source.droppableId;
+                const destinationListId = destination.droppableId;
 
-                        if (!targetCard) return cards;
+                // same list
+                if (sourceListId === destinationListId) {
+                    // change the card order
+                    const listCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
+                    const newListCards = arrayMoveImmutable(listCards, source.index, destination.index).map((card, index) => ({
+                        ...card,
+                        order: index,
+                    }));
 
-                        // If the card is moving to another list, change the list_id
-                        if (targetCard.list_id !== current.list_id) return cards;
+                    setCards((cards) => [
+                        ...cards.filter((card) => card.list_id !== sourceListId), //
+                        ...newListCards,
+                    ]);
+                } else {
+                    // different lists
+                    const sourceListCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
+                    const destinationListCards = cards.filter((card) => card.list_id === destinationListId).sort((a, b) => a.order - b.order);
 
-                        // cards = arrayMove(cards, currentCardIndex, targetCardIndex);
-                    }
+                    const [removed] = sourceListCards.splice(source.index, 1);
+                    destinationListCards.splice(destination.index, 0, removed);
 
-                    return cards
-                        .map((card) => {
-                            if (typeof sortIndex[card.list_id] !== "undefined") {
-                                sortIndex[card.list_id] += 1;
-                            } else {
-                                sortIndex[card.list_id] = 0;
-                            }
-                            card.order = sortIndex[card.list_id];
-                            return card;
-                        })
-                        .sort(cardSortAlgorithm(lists));
-                });
+                    const newSourceListCards = sourceListCards.map((card, index) => ({ ...card, order: index }));
+                    const newDestinationListCards = destinationListCards.map((card, index) => ({
+                        ...card,
+                        order: index,
+                        list_id: destinationListId,
+                    }));
+
+                    setCards((cards) => [
+                        ...cards.filter((card) => card.list_id !== sourceListId && card.list_id !== destinationListId), //
+                        ...newSourceListCards,
+                        ...newDestinationListCards,
+                    ]);
+                }
             }
         },
-        [lists]
+        [cards, lists]
     );
 
     const onCardAdded = useCallback(
@@ -126,11 +117,11 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
     return (
         <>
             <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="board" type="COLUMN" direction="horizontal">
+                <Droppable droppableId="board" type={SortableType.List} direction="horizontal">
                     {(provided) => (
-                        <div ref={provided.innerRef} className="flex max-h-full w-full max-w-full flex-1 justify-start gap-8 overflow-auto py-5 px-20" {...provided.droppableProps}>
+                        <div ref={provided.innerRef} className="flex max-h-full w-full max-w-full flex-1 justify-start gap-7 overflow-auto py-10 px-14" {...provided.droppableProps}>
                             {lists.map((list, index) => {
-                                return <List key={list.id} index={index} {...list} cards={cards.filter((c) => c.list_id === list.id)} onCardAdded={onCardAdded} />;
+                                return <List key={list.id} index={index} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
                             })}
                             {provided.placeholder}
                         </div>

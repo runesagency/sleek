@@ -124,25 +124,31 @@ export const List = ({ id, name, cards, onCardAdded, index }: ListProps) => {
                         </div> */}
                     </div>
 
-                    {(cards.length > 0 || isAddingNewCard) && (
-                        <div className="flex flex-col overflow-hidden">
-                            <div className="hide-scrollbar flex max-h-full flex-col gap-4 overflow-hidden">
+                    <Droppable droppableId={id} type={SortableType.Card} ignoreContainerClipping={false}>
+                        {(provided) => (
+                            <div
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                                className={`
+                                    hide-scrollbar flex max-h-full flex-col gap-4 overflow-hidden
+                                    ${cards.length > 0 || isAddingNewCard ? "p-5" : "bg-dark-900 p-1"}
+                                `}
+                            >
                                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
-                                <Droppable droppableId={id} type="task">
-                                    {(droppableProvided, droppableSnapshot) => (
-                                        <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-                                            {cards.map((card) => {
-                                                return <CardContainer key={card.id} {...card} />;
-                                            })}
-                                        </div>
-                                    )}
-                                </Droppable>
+                                <div className="flex max-h-full flex-col gap-4">
+                                    {cards
+                                        .sort((a, b) => a.order - b.order)
+                                        .map((card) => {
+                                            return <Card key={card.id} {...card} />;
+                                        })}
+                                    {provided.placeholder}
+                                </div>
 
                                 {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </Droppable>
 
                     <button
                         className="flex items-center justify-center gap-2 rounded-md border border-dashed border-dark-500 p-2 text-center duration-200 hover:opacity-50"
