@@ -7,9 +7,7 @@ import { CardContainer } from "@/components/BoardLayout/Kanban/Card";
 
 import { useClickOutside, useLocalStorage } from "@mantine/hooks";
 import { useCallback, useState } from "react";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { ScrollArea, Textarea } from "@mantine/core";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { IconDots, IconPlus } from "@tabler/icons";
 
 export enum NewCardLocation {
@@ -66,11 +64,9 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
 
     return (
         <div ref={ref} className="flex flex-col gap-2">
-            <Textarea
+            <textarea
                 placeholder="Enter your card title here" //
-                label="Add New Card"
                 value={value}
-                withAsterisk
                 autoFocus
                 onKeyDown={onKeyDown}
                 onChange={onChange}
@@ -141,11 +137,11 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
             </div>
 
             {(cards.length > 0 || isAddingNewCard) && (
-                <ScrollArea className="flex flex-col overflow-hidden" scrollbarSize={8} scrollHideDelay={500}>
+                <div className="flex flex-col overflow-hidden">
                     <div className="hide-scrollbar flex max-h-full flex-col gap-4 overflow-hidden">
                         {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
-                        <SortableContext strategy={rectSortingStrategy} items={cards.flatMap(({ id }) => id)}>
+                        <SortableContext items={cards.flatMap(({ id }) => id)}>
                             {cards.map((card) => {
                                 return <CardContainer key={card.id} {...card} />;
                             })}
@@ -153,7 +149,7 @@ export const List = ({ id, name, cards, onCardAdded }: ListProps) => {
 
                         {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
                     </div>
-                </ScrollArea>
+                </div>
             )}
 
             <button

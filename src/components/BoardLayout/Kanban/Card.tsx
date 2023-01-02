@@ -8,7 +8,6 @@ import useCustomEvent from "@/lib/hooks/use-custom-event";
 import { useSortable } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useState } from "react";
 import { IconDots, IconMessageDots, IconPaperclip, IconTags, IconUsers } from "@tabler/icons";
-import { Modal, MultiSelect } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 
 type CardPopupProps = {
@@ -39,7 +38,7 @@ export const CardPopup = ({ onUpdated }: CardPopupProps) => {
     }, [card]);
 
     return (
-        <Modal opened={open} withCloseButton={false} size="xl" radius="md" centered onClose={() => setOpen(false)}>
+        <div>
             {card && (
                 <div className="relative z-20 flex w-full max-w-4xl flex-col gap-8 rounded-md bg-dark-700 p-10">
                     <textarea
@@ -51,26 +50,10 @@ export const CardPopup = ({ onUpdated }: CardPopupProps) => {
                         onChange={onTitleChange}
                     />
 
-                    <div className="flex flex-wrap gap-4">
-                        <MultiSelect
-                            value={card.users.map(({ user }) => user.id)}
-                            data={card.users.map(({ user }) => ({ label: user.name, value: user.id }))}
-                            label="Members"
-                            placeholder="Assign a Member"
-                            icon={<IconUsers height={20} />}
-                        />
-
-                        <MultiSelect
-                            value={card.users.map(({ user }) => user.id)}
-                            data={card.users.map(({ user }) => ({ label: user.name, value: user.id }))}
-                            placeholder="Assign a Label"
-                            icon={<IconTags height={20} />}
-                            label="Labels"
-                        />
-                    </div>
+                    <div className="flex flex-wrap gap-4" />
                 </div>
             )}
-        </Modal>
+        </div>
     );
 };
 
