@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import type { PageProps } from "@/pages/projects/[id]";
 
 import { SortableType } from ".";

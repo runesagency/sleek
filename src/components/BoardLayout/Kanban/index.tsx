@@ -4,7 +4,7 @@ import type { OnDragEndResponder } from "react-beautiful-dnd";
 import { NewCardLocation, List } from "@/components/BoardLayout/Kanban/List";
 import { CardPopup } from "@/components/BoardLayout/Kanban/Card";
 
-import { StrictMode, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { arrayMoveImmutable } from "array-move";
