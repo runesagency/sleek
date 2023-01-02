@@ -55,5 +55,6 @@ export default function useCustomEvent<T>(eventName: string, broadcasted = true)
         customId: id,
         data,
         emit,
+        setData,
     };
 }
