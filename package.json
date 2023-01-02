@@ -34,6 +34,7 @@
             "import/no-duplicates": "error",
             "import/no-absolute-path": "error",
             "import/no-namespace": "error",
+            "import/first": "error",
             "import/order": [
                 "error",
                 {
