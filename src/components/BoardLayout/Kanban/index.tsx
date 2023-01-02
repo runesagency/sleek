@@ -2,7 +2,6 @@ import type { PageProps } from "@/pages/projects/[id]";
 import type { OnDragEndResponder } from "react-beautiful-dnd";
 
 import { NewCardLocation, List } from "@/components/BoardLayout/Kanban/List";
-import { CardPopup } from "@/components/BoardLayout/Kanban/Card";
 
 import { useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
@@ -110,26 +109,18 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         [cards, lists]
     );
 
-    const onCardUpdated = useCallback((card: PageProps["cards"][0]) => {
-        //
-    }, []);
-
     return (
-        <>
-            <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="board" type={SortableType.List} direction="horizontal">
-                    {(provided) => (
-                        <div ref={provided.innerRef} className="flex max-h-full w-full max-w-full flex-1 justify-start gap-7 overflow-auto py-10 px-14" {...provided.droppableProps}>
-                            {lists.map((list, index) => {
-                                return <List key={list.id} index={index} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
-                            })}
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
-
-            <CardPopup onUpdated={onCardUpdated} />
-        </>
+        <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="board" type={SortableType.List} direction="horizontal">
+                {(provided) => (
+                    <div ref={provided.innerRef} className="flex max-h-full w-full max-w-full flex-1 justify-start gap-7 overflow-auto py-10 px-14" {...provided.droppableProps}>
+                        {lists.map((list, index) => {
+                            return <List key={list.id} index={index} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
+                        })}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
+        </DragDropContext>
     );
 }

@@ -5,6 +5,7 @@ import type { ParsedSSRObjectProps } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 import KanbanLayout from "@/components/BoardLayout/Kanban";
 import { parseSSRArrayProps, parseSSRObjectProps } from "@/lib/utils";
+import TaskModal from "@/components/Board/TaskModal";
 
 import { IconBell, IconUsers } from "@tabler/icons";
 
@@ -93,6 +94,7 @@ export default function BoardPage({ lists, cards }: PageProps) {
             </section>
 
             <KanbanLayout cards={cards} lists={lists} />
+            <TaskModal />
         </main>
     );
 }

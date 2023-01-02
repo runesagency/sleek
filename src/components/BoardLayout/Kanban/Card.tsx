@@ -5,57 +5,9 @@ import { SortableType } from ".";
 import useMenu from "@/lib/hooks/use-menu";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
-import { useCallback, useEffect, useState } from "react";
-import { IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
-import { useDebouncedState } from "@mantine/hooks";
+import { useCallback, useState } from "react";
+import { IconDots } from "@tabler/icons";
 import { Draggable } from "react-beautiful-dnd";
-
-type CardPopupProps = {
-    onUpdated: (card: PageProps["cards"][0]) => void;
-};
-
-export const CardPopup = ({ onUpdated }: CardPopupProps) => {
-    const { data: card } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
-    const [open, setOpen] = useState(false);
-    const [updatedTitle, setUpdatedTitle] = useDebouncedState("", 200);
-
-    const onTitleChange = useCallback(
-        (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-            event.target.style.height = "0px";
-            event.target.style.height = event.target.scrollHeight + "px";
-
-            setUpdatedTitle(event.target.value);
-        },
-        [setUpdatedTitle]
-    );
-
-    useEffect(() => {
-        if (card) {
-            setOpen(true);
-        } else {
-            setOpen(false);
-        }
-    }, [card]);
-
-    return (
-        <div>
-            {card && (
-                <div className="relative z-20 flex w-full max-w-4xl flex-col gap-8 rounded-md bg-dark-700 p-10">
-                    <textarea
-                        placeholder="Enter Your Card Title Here..."
-                        rows={1}
-                        className="hide-scrollbar resize-none bg-transparent text-3xl font-bold focus:outline-none"
-                        defaultValue={card.name}
-                        autoFocus
-                        onChange={onTitleChange}
-                    />
-
-                    <div className="flex flex-wrap gap-4" />
-                </div>
-            )}
-        </div>
-    );
-};
 
 type CardContainerProps = PageProps["cards"][0];
 
