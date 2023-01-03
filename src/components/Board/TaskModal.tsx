@@ -3,7 +3,7 @@ import type { PageProps } from "@/pages/projects/[id]";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
 import { useDebouncedState } from "@mantine/hooks";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export default function TaskModal() {
     const { data: card, setData: setCard } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
@@ -19,6 +19,28 @@ export default function TaskModal() {
         [setUpdatedTitle]
     );
 
+    const setCursorPosTitle = useCallback(
+        (e: React.FocusEvent<HTMLTextAreaElement>) => {
+            const valLength = e.currentTarget.value.length;
+            const currentCursor = e.currentTarget.selectionStart;
+            const currentCursorEnd = e.currentTarget.selectionEnd;
+            if (e.currentTarget.selectionStart !== 0) {
+                if (currentCursorEnd) {
+                    e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
+                } else {
+                    e.currentTarget.setSelectionRange(currentCursor, currentCursor);
+                }
+            } else {
+                if (currentCursorEnd) {
+                    e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
+                } else {
+                    e.currentTarget.setSelectionRange(valLength, valLength);
+                }
+            }
+        },
+        [card]
+    );
+
     if (!card) return null;
 
     return (
@@ -27,11 +49,13 @@ export default function TaskModal() {
 
             <div className="relative z-20 flex w-full max-w-4xl flex-col gap-8 rounded-md bg-dark-700 p-10">
                 <textarea
+                    id="title"
                     placeholder="Enter Your Card Title Here..."
                     rows={1}
                     className="hide-scrollbar resize-none bg-transparent text-3xl font-bold focus:outline-none"
                     defaultValue={card.name}
                     autoFocus
+                    onFocus={(e) => setCursorPosTitle(e)}
                     onChange={onTitleChange}
                 />
 
