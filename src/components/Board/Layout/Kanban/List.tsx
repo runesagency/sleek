@@ -127,7 +127,7 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                                 className={`
-                                    hide-scrollbar flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5
+                                    hide-scrollbar flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 duration-200
                                     ${cards.length > 0 || isAddingNewCard ? "py-3" : "bg-dark-900 py-1"}
                                 `}
                             >
