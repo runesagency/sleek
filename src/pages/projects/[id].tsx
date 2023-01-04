@@ -25,7 +25,7 @@ export type PageProps = {
     >;
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
     const lists = await prisma.lists.findMany({
         orderBy: {
             order: "asc",
@@ -54,6 +54,12 @@ export const getServerSideProps: GetServerSideProps = async () => {
             },
             activities: true,
             attachments: true,
+            cover: true,
+            checklists: {
+                include: {
+                    tasks: true,
+                },
+            },
         },
     });
 
@@ -61,7 +67,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         props: {
             lists: parseSSRProps(lists),
             cards: parseSSRProps(cards),
-        } as PageProps,
+        },
     };
 };
 
