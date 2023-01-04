@@ -78,6 +78,19 @@
             ],
             "tailwindcss/no-arbitrary-value": "warn",
             "react/react-in-jsx-scope": "off",
+            "react/jsx-boolean-value": "error",
+            "react/destructuring-assignment": [
+                "error",
+                "always"
+            ],
+            "react/jsx-curly-brace-presence": [
+                "error",
+                {
+                    "props": "never",
+                    "children": "never",
+                    "propElementValues": "always"
+                }
+            ],
             "react/jsx-sort-props": [
                 "error",
                 {

@@ -39,7 +39,7 @@ const TasksProgress = () => {
 };
 
 export const Card = (props: PageProps["cards"][0]) => {
-    const { name, cover_attachment_id, attachments, labels, users, activities, order } = props;
+    const { name, cover_attachment_id, attachments, id, activities, order } = props;
 
     const cardCover = cover_attachment_id && attachments.find(({ id }) => id === cover_attachment_id);
 
@@ -64,7 +64,7 @@ export const Card = (props: PageProps["cards"][0]) => {
     );
 
     return (
-        <Draggable draggableId={props.id} index={props.order}>
+        <Draggable draggableId={id} index={order}>
             {(provided, snapshot) => (
                 <div
                     {...provided.draggableProps}
@@ -79,7 +79,7 @@ export const Card = (props: PageProps["cards"][0]) => {
                     `}
                 >
                     {/* Cover Image */}
-                    <img src={"https://picsum.photos/200/300"} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />
+                    <img src="https://picsum.photos/200/300" alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />
 
                     {/* Head */}
                     <div className="flex max-w-full items-start justify-between gap-2">
@@ -140,7 +140,7 @@ export const Card = (props: PageProps["cards"][0]) => {
                                     <img
                                         key={i}
                                         src={`https://ui-avatars.com/api/?background=random&name=${i}`}
-                                        alt={""}
+                                        alt=""
                                         // title={user.name}
                                         className="box-border h-6 w-6 rounded-full border border-dark-600 object-cover object-center"
                                     />

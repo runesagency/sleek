@@ -30,5 +30,5 @@ export default function RouterTransition() {
         };
     }, [router.asPath, router.events]);
 
-    return <LoadingBar ref={ref} color={"#FFFFFF"} shadow />;
+    return <LoadingBar ref={ref} color="#FFFFFF" shadow />;
 }
