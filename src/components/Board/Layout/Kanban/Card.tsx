@@ -4,7 +4,6 @@ import useMenu from "@/lib/hooks/use-menu";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 import { Small as ButtonSmall } from "@/components/Forms/Button";
 
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useCallback, useState } from "react";
 import { IconCalendar, IconChevronDown, IconDots, IconHourglass, IconMessageDots, IconPaperclip } from "@tabler/icons";
 import { Draggable } from "react-beautiful-dnd";
