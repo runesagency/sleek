@@ -13,3 +13,12 @@ export const Small = ({ children, className, icon: Icon, ...props }: ButtonProps
         </button>
     );
 };
+
+export const Large = ({ children, className, icon: Icon, ...props }: ButtonProps) => {
+    return (
+        <button className={`flex w-max items-center justify-center gap-2 rounded-lg bg-dark-600 px-4 py-2 text-base font-bold text-dark-50 duration-200 hover:opacity-50 ${className}`} {...props}>
+            {Icon && <Icon height={20} width={undefined} className="shrink-0" />}
+            {children}
+        </button>
+    );
+};
