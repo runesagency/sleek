@@ -115,17 +115,19 @@ export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => 
             {checklists.length > 0 && <TasksProgress checklists={checklists} />}
 
             {/* Dates & Timer */}
-            <section className="flex items-end justify-between gap-4">
-                {due_date && (
-                    <ButtonSmall className=" overflow-hidden !bg-dark-700" icon={IconCalendar}>
-                        <p className="truncate text-xs">{due_date}</p>
-                    </ButtonSmall>
-                )}
+            {due_date && (
+                <section className="flex items-end justify-between gap-4">
+                    {due_date && (
+                        <ButtonSmall className=" overflow-hidden !bg-dark-700" icon={IconCalendar}>
+                            <p className="truncate text-xs">{due_date}</p>
+                        </ButtonSmall>
+                    )}
 
-                <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
+                    {/* <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
                     <p>01:35:10</p>
-                </ButtonSmall>
-            </section>
+                </ButtonSmall> */}
+                </section>
+            )}
 
             {/* Footer */}
             {(activities.length > 0 || attachments.length > 0 || users.length > 0) && (
