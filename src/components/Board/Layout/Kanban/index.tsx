@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { arrayMoveImmutable } from "array-move";
+import ScrollContainer from "react-indiana-drag-scroll";
 
 export enum SortableType {
     List = "list",
@@ -123,7 +124,13 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="board" type={SortableType.List} direction="horizontal">
                 {(provided) => (
-                    <div ref={provided.innerRef} className="flex h-full max-h-full w-full max-w-full flex-1 justify-start overflow-auto py-10 px-11" {...provided.droppableProps}>
+                    <ScrollContainer
+                        innerRef={provided.innerRef}
+                        className="flex h-full max-h-full w-full flex-1 justify-start py-10 px-11"
+                        ignoreElements="*[data-prevent-drag-scroll]"
+                        hideScrollbars={false}
+                        {...provided.droppableProps}
+                    >
                         {lists
                             .sort((a, b) => a.order - b.order)
                             .map((list) => {
@@ -131,7 +138,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                             })}
 
                         {provided.placeholder}
-                    </div>
+                    </ScrollContainer>
                 )}
             </Droppable>
         </DragDropContext>
