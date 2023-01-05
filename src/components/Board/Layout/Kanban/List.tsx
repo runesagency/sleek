@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { SortableType } from ".";
 
 import { CardContainer } from "@/components/Board/Layout/Kanban/Card";
+import { Large } from "@/components/Forms/Button";
 
 import { useClickOutside, useLocalStorage } from "@mantine/hooks";
 import { useCallback, useState } from "react";
@@ -65,16 +66,16 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
     return (
         <div ref={ref} className="flex shrink-0 flex-col gap-2">
             <textarea
+                className="rounded-lg bg-dark-500 p-5 focus:outline-none"
                 placeholder="Enter your card title here" //
                 value={value}
                 autoFocus
+                rows={3}
                 onKeyDown={onKeyDown}
                 onChange={onChange}
             />
 
-            <button className="w-full rounded-md bg-dark-700 p-2 duration-200 hover:opacity-75" onClick={onSave}>
-                Save
-            </button>
+            <Large onClick={onSave}>Create New Card</Large>
         </div>
     );
 };
@@ -135,7 +136,7 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
                 </div>
             </div>
 
-            <div className={`flex h-full max-h-full flex-col gap-4 overflow-auto px-5 ${cards.length === 0 ? "py-0" : "py-3"}`}>
+            <div className={`flex h-full max-h-full flex-col gap-4 overflow-auto px-5 ${cards.length === 0 && !isAddingNewCard ? "py-0" : "py-3"}`}>
                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
                 <SortableContext items={cards.flatMap(({ id }) => id)}>
@@ -147,13 +148,15 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
                 {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
             </div>
 
-            <button
-                className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center text-base duration-200 hover:opacity-75"
-                onClick={() => onNewCardClick(NewCardLocation.DOWN)}
-            >
-                <IconPlus height={15} />
-                <p>Add Card</p>
-            </button>
+            {!isAddingNewCard && (
+                <button
+                    className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center text-base duration-200 hover:opacity-75"
+                    onClick={() => onNewCardClick(NewCardLocation.DOWN)}
+                >
+                    <IconPlus height={15} />
+                    <p>Add Card</p>
+                </button>
+            )}
         </div>
     );
 };
