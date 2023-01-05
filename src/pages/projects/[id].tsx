@@ -1,5 +1,5 @@
 import type { GetServerSideProps } from "next";
-import type { activities, cards, card_attachments, card_labels, card_users, labels, lists, users } from "@prisma/client";
+import type { activities, cards, card_attachments, card_checklists, card_checklist_tasks, card_labels, card_users, labels, lists, users } from "@prisma/client";
 import type { ParsedSSRProps } from "@/lib/utils";
 
 import { prisma } from "@/lib/prisma";
@@ -21,6 +21,10 @@ export type PageProps = {
             })[];
             activities: activities[];
             attachments: card_attachments[];
+            cover: card_attachments | null;
+            checklists: (card_checklists & {
+                tasks: card_checklist_tasks[];
+            })[];
         })[]
     >;
 };
