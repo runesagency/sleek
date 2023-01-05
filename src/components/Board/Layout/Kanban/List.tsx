@@ -106,13 +106,19 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
 
     return (
         <Draggable draggableId={id} index={order}>
-            {(provided) => (
+            {(provided, snapshot) => (
                 <div
                     {...provided.draggableProps}
                     ref={provided.innerRef}
                     className="group/container relative mx-3.5 flex h-max max-h-full w-full max-w-sm flex-col overflow-auto rounded-lg border border-dark-600 bg-dark-800 text-sm"
                 >
-                    <div {...provided.dragHandleProps} className="flex w-full items-center justify-between gap-4 bg-dark-900 px-7 py-4 duration-200">
+                    <div
+                        {...provided.dragHandleProps}
+                        className={`
+                            flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600
+                            ${snapshot.isDragging ? "bg-dark-600" : "bg-dark-900"}
+                        `}
+                    >
                         <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{name}</span>
 
                         <div className="flex items-center gap-3">
