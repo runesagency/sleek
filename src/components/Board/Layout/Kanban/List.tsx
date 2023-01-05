@@ -120,14 +120,12 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
 
     return (
         <div
-            {...listeners}
-            {...attributes}
             ref={setNodeRef}
             style={style}
             data-prevent-drag-scroll
             className="group/container relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 text-sm"
         >
-            <div className={`flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600 ${isDragging ? "bg-dark-600" : "bg-dark-900"}`}>
+            <div {...listeners} {...attributes} className={`flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600 ${isDragging ? "bg-dark-600" : "bg-dark-900"}`}>
                 <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{name}</span>
 
                 <div className="flex items-center gap-3">
