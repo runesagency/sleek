@@ -9,7 +9,7 @@ import { Small as ButtonSmall } from "@/components/Forms/Button";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { useCallback, useRef, useState } from "react";
-import { IconCalendar, IconChevronDown, IconDots, IconHourglass, IconMessageDots, IconPaperclip } from "@tabler/icons";
+import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
 
 const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["checklists"] }) => {
     const [open, setOpen] = useState(false);
@@ -118,7 +118,7 @@ export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => 
             {due_date && (
                 <section className="flex items-end justify-between gap-4">
                     {due_date && (
-                        <ButtonSmall className=" overflow-hidden !bg-dark-700" icon={IconCalendar}>
+                        <ButtonSmall className="!w-max overflow-hidden !bg-dark-700" icon={IconCalendar}>
                             <p className="truncate text-xs">{due_date}</p>
                         </ButtonSmall>
                     )}

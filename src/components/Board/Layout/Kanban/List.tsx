@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { SortableType } from ".";
 
 import { CardContainer } from "@/components/Board/Layout/Kanban/Card";
-import { Large } from "@/components/Forms/Button";
+import { Large as ButtonLarge } from "@/components/Forms/Button";
 
 import { useClickOutside, useLocalStorage } from "@mantine/hooks";
 import { useCallback, useState } from "react";
@@ -75,7 +75,7 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
                 onChange={onChange}
             />
 
-            <Large onClick={onSave}>Create New Card</Large>
+            <ButtonLarge onClick={onSave}>Create New Card</ButtonLarge>
         </div>
     );
 };

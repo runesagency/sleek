@@ -3,7 +3,7 @@ import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core"
 
 import { Card } from "@/components/Board/Layout/Kanban/Card";
 import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
-import { Large } from "@/components/Forms/Button";
+import { Large as ButtonLarge } from "@/components/Forms/Button";
 
 import ScrollContainer from "react-indiana-drag-scroll";
 import { useCallback, useState } from "react";
@@ -235,9 +235,9 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                             return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
                         })}
 
-                    <Large className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
+                    <ButtonLarge className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
                         Create New List
-                    </Large>
+                    </ButtonLarge>
                 </ScrollContainer>
             </SortableContext>
 
