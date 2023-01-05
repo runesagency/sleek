@@ -2,11 +2,13 @@ import type { PageProps } from "@/pages/projects/[id]";
 import type { OnDragEndResponder } from "react-beautiful-dnd";
 
 import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
+import { Large } from "@/components/Forms/Button";
 
 import { useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { arrayMoveImmutable } from "array-move";
+import { IconPlus } from "@tabler/icons";
 import ScrollContainer from "react-indiana-drag-scroll";
 
 export enum SortableType {
@@ -14,7 +16,7 @@ export enum SortableType {
     Card = "card",
 }
 
-export default function KanbanLayout({ lists: originalLists, cards: originalCards }: PageProps) {
+export default function KanbanLayout({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
     const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
     const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
 
@@ -120,6 +122,21 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         [cards, lists]
     );
 
+    const onListAdded = useCallback(() => {
+        const newLists = [
+            ...lists,
+            {
+                id: randomId(),
+                name: "My New List",
+                order: lists.length,
+                board_id: boardId,
+                description: null,
+            },
+        ];
+
+        setLists(newLists);
+    }, [boardId, lists]);
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="board" type={SortableType.List} direction="horizontal">
@@ -138,6 +155,10 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                             })}
 
                         {provided.placeholder}
+
+                        <Large className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
+                            Create New List
+                        </Large>
                     </ScrollContainer>
                 )}
             </Droppable>

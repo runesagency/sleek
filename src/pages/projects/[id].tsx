@@ -10,6 +10,7 @@ import { parseSSRProps } from "@/lib/utils";
 import { IconBell, IconUsers } from "@tabler/icons";
 
 export type PageProps = {
+    boardId: string;
     lists: ParsedSSRProps<lists[]>;
     cards: ParsedSSRProps<
         (cards & {
@@ -30,9 +31,14 @@ export type PageProps = {
 };
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
+    const boardId = "f34ad9e7-c676-47bb-a27c-ebdc127d4694";
+
     const lists = await prisma.lists.findMany({
         orderBy: {
             order: "asc",
+        },
+        where: {
+            board_id: boardId,
         },
     });
 
@@ -69,13 +75,14 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
 
     return {
         props: {
+            boardId,
             lists: parseSSRProps(lists),
             cards: parseSSRProps(cards),
         },
     };
 };
 
-export default function BoardPage({ lists, cards }: PageProps) {
+export default function BoardPage({ lists, cards, boardId }: PageProps) {
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-dark-900 text-dark-50">
             <section className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-20 py-5">
@@ -87,7 +94,7 @@ export default function BoardPage({ lists, cards }: PageProps) {
                 </div>
             </section>
 
-            <KanbanLayout cards={cards} lists={lists} />
+            <KanbanLayout cards={cards} lists={lists} boardId={boardId} />
             <TaskModal />
         </main>
     );
