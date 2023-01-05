@@ -81,7 +81,6 @@ export const Card = (props: PageProps["cards"][0]) => {
                     className={`
                         group/card relative my-2 flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border bg-dark-600 px-5 py-4 hover:border-dark-400
                         ${snapshot.isDragging ? "border-dark-400" : "border-dark-500"}
-                        ${!snapshot.isDropAnimating && "duration-200"}
                     `}
                 >
                     {/* Cover Image */}
