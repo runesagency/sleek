@@ -1,12 +1,15 @@
 import type { PageProps } from "@/pages/projects/[id]";
+import type { CSSProperties } from "react";
+
+import { SortableType } from ".";
 
 import useMenu from "@/lib/hooks/use-menu";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 import { Small as ButtonSmall } from "@/components/Forms/Button";
 
+import { useSortable } from "@dnd-kit/sortable";
 import { useCallback, useRef, useState } from "react";
 import { IconCalendar, IconChevronDown, IconDots, IconHourglass, IconMessageDots, IconPaperclip } from "@tabler/icons";
-import { Draggable } from "react-beautiful-dnd";
 
 const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["checklists"] }) => {
     const [open, setOpen] = useState(false);
@@ -45,16 +48,13 @@ const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["chec
     );
 };
 
-export const Card = (props: PageProps["cards"][0]) => {
-    const { name, attachments, id, activities, order, cover, checklists, labels, due_date, users } = props;
+export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => {
+    const { name, attachments, activities, cover, checklists, labels, due_date, users, isDragging } = props;
 
     const menuButtonRef = useRef<HTMLDivElement>(null);
     const { emit } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
-    const { openMenu, closeMenu, toggleMenu } = useMenu({
-        items: () => {
-            return <div>123</div>;
-        },
-    });
+
+    const { openMenu, closeMenu, toggleMenu } = useMenu();
 
     const onCardClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -70,120 +70,136 @@ export const Card = (props: PageProps["cards"][0]) => {
     );
 
     return (
-        <Draggable draggableId={id} index={order}>
-            {(provided, snapshot) => (
-                <div
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    ref={provided.innerRef}
-                    onContextMenu={openMenu}
-                    onClick={onCardClick}
-                    className={`
-                        group/card relative my-2 flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border bg-dark-600 px-5 py-4 hover:border-dark-400
-                        ${snapshot.isDragging ? "border-dark-400" : "border-dark-500"}
-                    `}
-                >
-                    {/* Cover Image */}
-                    {cover && <img src={cover.url} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
+        <div
+            onContextMenu={openMenu}
+            onClick={onCardClick}
+            className={`
+                group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 hover:border-dark-400 
+                ${isDragging && "opacity-30"}
+            `}
+        >
+            {/* Cover Image */}
+            {cover && <img src={cover.url} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
 
-                    {/* Head */}
-                    <div className="flex max-w-full items-start justify-between gap-2">
-                        <span className="flex-1 break-words font-semibold">{name}</span>
+            {/* Head */}
+            <div className="flex max-w-full items-start justify-between gap-2">
+                <span className="flex-1 break-words font-semibold">{name}</span>
 
-                        <div ref={menuButtonRef} className="hidden group-hover/card:block">
-                            <IconDots height={20} width={undefined} onClick={toggleMenu} />
+                <div ref={menuButtonRef} className="hidden group-hover/card:block">
+                    <IconDots height={20} width={undefined} onClick={toggleMenu} />
+                </div>
+            </div>
+
+            {/* Labels */}
+            {labels.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                    {labels.map(({ label }, i) => {
+                        if (!label) return null;
+
+                        return (
+                            <div
+                                key={i}
+                                className="rounded-full bg-dark-800 px-2 py-1 text-xs"
+                                style={{
+                                    backgroundColor: label.color,
+                                }}
+                            >
+                                {label.name}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Progress (Tasks) */}
+            {checklists.length > 0 && <TasksProgress checklists={checklists} />}
+
+            {/* Dates & Timer */}
+            <section className="flex items-end justify-between gap-4">
+                {due_date && (
+                    <ButtonSmall className=" overflow-hidden !bg-dark-700" icon={IconCalendar}>
+                        <p className="truncate text-xs">{due_date}</p>
+                    </ButtonSmall>
+                )}
+
+                <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
+                    <p>01:35:10</p>
+                </ButtonSmall>
+            </section>
+
+            {/* Footer */}
+            {(activities.length > 0 || attachments.length > 0 || users.length > 0) && (
+                <section className="flex items-center justify-between gap-4">
+                    {(activities.length > 0 || attachments.length > 0) && (
+                        <div className="flex items-center gap-4">
+                            {activities.length > 0 && (
+                                <div className="flex items-center gap-2">
+                                    <IconMessageDots height={16} width={undefined} />
+                                    <p className="text-xs">{activities.length}</p>
+                                </div>
+                            )}
+
+                            {attachments.length > 0 && (
+                                <div className="flex items-center gap-2">
+                                    <IconPaperclip height={16} width={undefined} />
+                                    <p className="text-xs">{attachments.length}</p>
+                                </div>
+                            )}
                         </div>
-                    </div>
+                    )}
 
-                    {/* Labels */}
-                    {labels.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2">
-                            {labels.map(({ label }, i) => {
-                                if (!label) return null;
+                    {users.length > 0 && (
+                        <div className="box-border flex shrink-0 flex-wrap items-center -space-x-2">
+                            {users.map(({ user }, i) => {
+                                if (!user || i > 5) return null;
+
+                                const title = i !== 5 ? user.name : `${users.length - 5} more...`;
+                                const initials =
+                                    i !== 5
+                                        ? user.name
+                                              .split(" ")
+                                              .map((name) => name[0])
+                                              .join("")
+                                        : `+${users.length - 5}`;
 
                                 return (
-                                    <div
+                                    <img
                                         key={i}
-                                        className="rounded-full bg-dark-800 px-2 py-1 text-xs"
-                                        style={{
-                                            backgroundColor: label.color,
-                                        }}
-                                    >
-                                        {label.name}
-                                    </div>
+                                        src={`https://ui-avatars.com/api/?background=random&name=${initials}`}
+                                        alt={title}
+                                        title={title}
+                                        loading="lazy"
+                                        className="box-border h-6 w-6 rounded-full border border-dark-600 object-cover object-center"
+                                    />
                                 );
                             })}
                         </div>
                     )}
-
-                    {/* Progress (Tasks) */}
-                    {checklists.length > 0 && <TasksProgress checklists={checklists} />}
-
-                    {/* Dates & Timer */}
-                    <section className="flex items-end justify-between gap-4">
-                        {due_date && (
-                            <ButtonSmall className=" overflow-hidden !bg-dark-700" icon={IconCalendar}>
-                                <p className="truncate text-xs">{due_date}</p>
-                            </ButtonSmall>
-                        )}
-
-                        <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
-                            <p>01:35:10</p>
-                        </ButtonSmall>
-                    </section>
-
-                    {/* Footer */}
-                    {(activities.length > 0 || attachments.length > 0 || users.length > 0) && (
-                        <section className="flex items-center justify-between gap-4">
-                            {(activities.length > 0 || attachments.length > 0) && (
-                                <div className="flex items-center gap-4">
-                                    {activities.length > 0 && (
-                                        <div className="flex items-center gap-2">
-                                            <IconMessageDots height={16} width={undefined} />
-                                            <p className="text-xs">{activities.length}</p>
-                                        </div>
-                                    )}
-
-                                    {attachments.length > 0 && (
-                                        <div className="flex items-center gap-2">
-                                            <IconPaperclip height={16} width={undefined} />
-                                            <p className="text-xs">{attachments.length}</p>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {users.length > 0 && (
-                                <div className="box-border flex shrink-0 flex-wrap items-center -space-x-2">
-                                    {users.map(({ user }, i) => {
-                                        if (!user || i > 5) return null;
-
-                                        const title = i !== 5 ? user.name : `${users.length - 5} more...`;
-                                        const initials =
-                                            i !== 5
-                                                ? user.name
-                                                      .split(" ")
-                                                      .map((name) => name[0])
-                                                      .join("")
-                                                : `+${users.length - 5}`;
-
-                                        return (
-                                            <img
-                                                key={i}
-                                                src={`https://ui-avatars.com/api/?background=random&name=${initials}`}
-                                                alt={title}
-                                                title={title}
-                                                loading="lazy"
-                                                className="box-border h-6 w-6 rounded-full border border-dark-600 object-cover object-center"
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </section>
-                    )}
-                </div>
+                </section>
             )}
-        </Draggable>
+        </div>
+    );
+};
+
+export const CardContainer = (props: PageProps["cards"][0]) => {
+    const { id, order } = props;
+
+    const { setNodeRef, listeners, isDragging, transform } = useSortable({
+        id,
+        data: {
+            id,
+            order,
+            type: SortableType.Card,
+        },
+    });
+
+    const style: CSSProperties = {
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    };
+
+    return (
+        <div {...listeners} ref={setNodeRef} style={style}>
+            <Card {...props} isDragging={isDragging} />
+        </div>
     );
 };
