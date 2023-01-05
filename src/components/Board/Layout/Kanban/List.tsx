@@ -4,8 +4,8 @@ import { SortableType } from ".";
 
 import { Card } from "@/components/Board/Layout/Kanban/Card";
 
-import { useClickOutside, useLocalStorage } from "@mantine/hooks";
-import { useCallback, useState } from "react";
+import { useClickOutside, useLocalStorage, useMergedRef } from "@mantine/hooks";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IconDots, IconPlus } from "@tabler/icons";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -62,7 +62,7 @@ const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponent
     );
 
     return (
-        <div ref={ref} className="flex flex-col gap-2">
+        <div ref={ref} className="flex shrink-0 flex-col gap-2">
             <textarea
                 placeholder="Enter your card title here" //
                 value={value}
@@ -110,7 +110,8 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
                 <div
                     {...provided.draggableProps}
                     ref={provided.innerRef}
-                    className="group/container relative mx-3.5 flex h-max max-h-full w-full max-w-sm flex-col overflow-auto rounded-lg border border-dark-600 bg-dark-800 text-sm"
+                    data-prevent-drag-scroll
+                    className="group/container relative mx-3.5 flex h-max max-h-full w-full max-w-sm shrink-0 flex-col rounded-lg border border-dark-600 bg-dark-800 text-sm"
                 >
                     <div
                         {...provided.dragHandleProps}
@@ -122,10 +123,13 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
                         <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{name}</span>
 
                         <div className="flex items-center gap-3">
-                            <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={() => onNewCardClick(NewCardLocation.UP)} />
+                            {!isAddingNewCard && <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={() => onNewCardClick(NewCardLocation.UP)} />}
+
                             <IconDots height={20} className="duration-200 hover:opacity-75" />
                         </div>
                     </div>
+
+                    {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
                     <Droppable droppableId={id} type={SortableType.Card}>
                         {(provided) => (
@@ -133,13 +137,11 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                                 className={`
-                                    hide-scrollbar flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 duration-200
+                                    flex h-full max-h-full flex-col gap-4 px-5
                                     ${cards.length > 0 || isAddingNewCard ? "py-3" : "bg-dark-900 py-1"}
                                 `}
                             >
-                                {isAddingNewCard === NewCardLocation.UP && addCardComponent}
-
-                                <div className="flex max-h-full flex-col">
+                                <div className="max-h-full overflow-auto">
                                     {cards
                                         .sort((a, b) => a.order - b.order)
                                         .map((card) => {
@@ -148,14 +150,14 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
 
                                     {provided.placeholder}
                                 </div>
-
-                                {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
                             </div>
                         )}
                     </Droppable>
 
+                    {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
+
                     <button
-                        className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center duration-200 hover:opacity-75"
+                        className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center text-base duration-200 hover:opacity-75"
                         onClick={() => onNewCardClick(NewCardLocation.DOWN)}
                     >
                         <IconPlus height={15} />

@@ -15,7 +15,7 @@ const manrope = Manrope({
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
-        <main className={`${manrope.variable} max-h-screen w-screen overflow-auto font-sans`}>
+        <main className={`${manrope.variable} max-h-screen w-screen font-sans`}>
             <RouterTransition />
             <Component {...pageProps} />
             <ContextMenu />
