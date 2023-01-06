@@ -1,25 +1,21 @@
 export type ParsedSSRProps<T extends Record<string, unknown>[] | Record<string, unknown>> = //
     T extends Record<string, unknown>[]
         ? {
-              [key in keyof T]: {
-                  [key2 in keyof T[key]]: T[key][key2] extends Date
-                      ? string //
-                      : T[key][key2] extends Record<string, unknown>
-                      ? ParsedSSRProps<T[key][key2]>
-                      : T[key][key2] extends Record<string, unknown>[]
-                      ? ParsedSSRProps<T[key][key2]>
-                      : T[key][key2];
-              };
+              [key in keyof T]: T[key] extends Record<string, unknown>
+                  ? ParsedSSRProps<T[key]> //
+                  : T[key] extends Record<string, unknown>[]
+                  ? ParsedSSRProps<T[key]>
+                  : T[key];
           }
         : T extends Record<string, unknown>
         ? {
-              [key2 in keyof T]: T[key2] extends Date
+              [key in keyof T]: T[key] extends (Date | null) | Date
                   ? string //
-                  : T[key2] extends Record<string, unknown>
-                  ? ParsedSSRProps<T[key2]>
-                  : T[key2] extends Record<string, unknown>[]
-                  ? ParsedSSRProps<T[key2]>
-                  : T[key2];
+                  : T[key] extends Record<string, unknown>
+                  ? ParsedSSRProps<T[key]>
+                  : T[key] extends Record<string, unknown>[]
+                  ? ParsedSSRProps<T[key]>
+                  : T[key];
           }
         : T;
 

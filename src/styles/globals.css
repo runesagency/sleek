@@ -11,6 +11,21 @@
     * {
         @apply !box-border font-manrope;
     }
+
+    /* width */
+    ::-webkit-scrollbar {
+        @apply w-1.5 h-2;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        @apply bg-dark-500 hover:bg-dark-600 rounded-full;
+    }
 }
 
 @layer components {

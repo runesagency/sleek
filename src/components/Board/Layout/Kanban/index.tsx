@@ -1,75 +1,122 @@
 import type { PageProps } from "@/pages/projects/[id]";
-import type { OnDragEndResponder } from "react-beautiful-dnd";
+import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 
+import { Card } from "@/components/Board/Layout/Kanban/Card";
 import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
+import { Large as ButtonLarge } from "@/components/Forms/Button";
 
+import ScrollContainer from "react-indiana-drag-scroll";
 import { useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import { arrayMoveImmutable } from "array-move";
+import { IconPlus } from "@tabler/icons";
+import { horizontalListSortingStrategy, SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, DndContext } from "@dnd-kit/core";
 
 export enum SortableType {
     List = "list",
     Card = "card",
 }
 
-export default function KanbanLayout({ lists: originalLists, cards: originalCards }: PageProps) {
+export default function KanbanLayout({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
+    const [draggedItem, setDraggedItem] = useState<PageProps["cards"][0] | undefined | null>(null);
     const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
     const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
 
-    const onDragEnd: OnDragEndResponder = useCallback(
-        (result) => {
-            // dropped nowhere
-            if (!result.destination) {
-                return;
+    const sensors = useSensors(
+        useSensor(MouseSensor, {
+            // Require the mouse to move by 'x' pixels before activating
+            activationConstraint: {
+                distance: 5,
+            },
+        }),
+        useSensor(TouchSensor, {
+            // Press delay of 250ms, with tolerance of 5px of movement
+            activationConstraint: {
+                delay: 250,
+                tolerance: 5,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const onDragStart = useCallback(
+        (event: DragStartEvent) => {
+            const current = event.active.data.current;
+
+            if (current?.type === SortableType.Card) {
+                const activeCard = cards.find((card) => card.id === event.active.id);
+
+                if (activeCard) {
+                    setDraggedItem(activeCard);
+                }
+            } else {
+                setDraggedItem(undefined);
             }
+        },
+        [cards]
+    );
 
-            const type = result.type;
-            const source = result.source;
-            const destination = result.destination;
+    const onDragOver = useCallback(
+        (event: DragOverEvent) => {
+            type Data = { type: SortableType; id: string; order: number };
 
-            // did not move anywhere - can bail early
-            if (source.droppableId === destination.droppableId && source.index === destination.index) {
-                return;
-            }
+            const current = event.active.data.current as Data;
+            const target = event.over?.data.current as Data;
 
-            if (type === SortableType.List) {
-                setLists((lists) =>
-                    arrayMoveImmutable(lists, source.index, destination.index).map((list, index) => ({
-                        ...list,
-                        order: index,
-                    }))
-                );
-            } else if (type === SortableType.Card) {
-                const sourceListId = source.droppableId;
-                const destinationListId = destination.droppableId;
+            if (!current || !target) return;
 
-                // same list
-                if (sourceListId === destinationListId) {
-                    // change the card order
-                    const listCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
-                    const newListCards = arrayMoveImmutable(listCards, source.index, destination.index).map((card, index) => ({
-                        ...card,
-                        order: index,
-                    }));
+            // Card to Card (different list) or Card to List
+            if (current.type === SortableType.Card && (target.type === SortableType.Card || target.type === SortableType.List)) {
+                const sourceListId = cards.find((card) => card.id === current.id)?.list_id;
+                const destinationListId = target.type === SortableType.List ? target.id : cards.find((card) => card.id === target.id)?.list_id;
 
-                    setCards((cards) => [
-                        ...cards.filter((card) => card.list_id !== sourceListId), //
-                        ...newListCards,
-                    ]);
-                } else {
-                    // different lists
+                if (!sourceListId || !destinationListId) return;
+
+                if (sourceListId !== destinationListId) {
+                    const currentCard = cards.find((card) => card.id === current.id);
+                    if (!currentCard) return;
+
                     const sourceListCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
                     const destinationListCards = cards.filter((card) => card.list_id === destinationListId).sort((a, b) => a.order - b.order);
 
-                    const [removed] = sourceListCards.splice(source.index, 1);
-                    destinationListCards.splice(destination.index, 0, removed);
+                    // Card to List only works if the list is empty
+                    if (target.type === SortableType.List && destinationListCards.length !== 0) return;
 
-                    const newSourceListCards = sourceListCards.map((card, index) => ({ ...card, order: index }));
-                    const newDestinationListCards = destinationListCards.map((card, index) => ({
+                    const newSourceListCards = sourceListCards
+                        .filter((card) => card.id !== current.id)
+                        .map((card, index) => ({
+                            ...card,
+                            order: index,
+                        }));
+
+                    let newDestinationListCards: PageProps["cards"] = [];
+
+                    if (target.type === SortableType.List) {
+                        newDestinationListCards = [
+                            {
+                                ...currentCard,
+                                list_id: destinationListId,
+                                order: destinationListCards.length,
+                            },
+                            ...destinationListCards,
+                        ];
+                    } else {
+                        newDestinationListCards = [
+                            ...destinationListCards.slice(0, target.order), //
+                            {
+                                ...currentCard,
+                                list_id: destinationListId,
+                                order: target.order,
+                            },
+                            ...destinationListCards.slice(target.order),
+                        ];
+                    }
+
+                    newDestinationListCards = newDestinationListCards.map((card, index) => ({
                         ...card,
                         order: index,
-                        list_id: destinationListId,
                     }));
 
                     setCards((cards) => [
@@ -81,6 +128,50 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
             }
         },
         [cards]
+    );
+
+    const onDragEnd = useCallback(
+        (event: DragEndEvent) => {
+            setDraggedItem(null);
+
+            type Data = { type: SortableType; id: string; order: number };
+
+            const current = event.active.data.current as Data;
+            const target = event.over?.data.current as Data;
+
+            if (!current || !target) return;
+
+            // List to List
+            if (current.type === SortableType.List && target.type === SortableType.List) {
+                const newList = arrayMove(lists, current.order, target.order).map((list, index) => ({
+                    ...list,
+                    order: index,
+                }));
+
+                setLists(newList);
+            }
+
+            // Card to Card (same list)
+            if (current.type === SortableType.Card && target.type === SortableType.Card) {
+                const sourceListId = cards.find((card) => card.id === current.id)?.list_id;
+                const destinationListId = cards.find((card) => card.id === target.id)?.list_id;
+
+                if (!sourceListId || !destinationListId) return;
+
+                if (sourceListId === destinationListId) {
+                    const listCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
+                    const newListCards = arrayMove(listCards, current.order, target.order).map((card, index) => ({
+                        ...card,
+                        order: index,
+                    }));
+                    setCards((cards) => [
+                        ...cards.filter((card) => card.list_id !== sourceListId), //
+                        ...newListCards,
+                    ]);
+                }
+            }
+        },
+        [cards, lists]
     );
 
     const onCardAdded = useCallback(
@@ -119,21 +210,45 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         [cards, lists]
     );
 
-    return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="board" type={SortableType.List} direction="horizontal">
-                {(provided) => (
-                    <div ref={provided.innerRef} className="flex h-full max-h-full w-full max-w-full flex-1 justify-start overflow-auto py-10 px-11" {...provided.droppableProps}>
-                        {lists
-                            .sort((a, b) => a.order - b.order)
-                            .map((list) => {
-                                return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
-                            })}
+    const onListAdded = useCallback(() => {
+        const newLists = [
+            ...lists,
+            {
+                id: randomId(),
+                name: "My New List",
+                order: lists.length,
+                board_id: boardId,
+                description: null,
+            },
+        ];
 
-                        {provided.placeholder}
-                    </div>
-                )}
-            </Droppable>
-        </DragDropContext>
+        setLists(newLists);
+    }, [boardId, lists]);
+
+    return (
+        <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
+            <SortableContext items={lists.flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
+                <ScrollContainer className="flex h-full max-h-full w-full flex-1 justify-start gap-7 py-10 px-11" ignoreElements="*[data-prevent-drag-scroll]" hideScrollbars={false}>
+                    {lists
+                        .sort((a, b) => a.order - b.order)
+                        .map((list) => {
+                            return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
+                        })}
+
+                    <ButtonLarge className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
+                        Create New List
+                    </ButtonLarge>
+                </ScrollContainer>
+            </SortableContext>
+
+            {/* Only hide when anything beside the card is dragged (e.g. List) */}
+            {(draggedItem === null || typeof draggedItem !== "undefined") && (
+                <DragOverlay>
+                    {draggedItem && (
+                        <Card {...(draggedItem as PageProps["cards"][0])} isDragging={false} /> //
+                    )}
+                </DragOverlay>
+            )}
+        </DndContext>
     );
 }
