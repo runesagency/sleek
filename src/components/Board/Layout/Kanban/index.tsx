@@ -4,6 +4,7 @@ import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core"
 import { Card } from "@/components/Board/Layout/Kanban/Card";
 import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
 import { Large as ButtonLarge } from "@/components/Forms/Button";
+import NoSSR from "@/components/NoSSR";
 
 import ScrollContainer from "react-indiana-drag-scroll";
 import { useCallback, useState } from "react";
@@ -226,29 +227,31 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
     }, [boardId, lists]);
 
     return (
-        <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
-            <SortableContext items={lists.flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
-                <ScrollContainer className="flex h-full max-h-full w-full flex-1 justify-start gap-7 py-10 px-11" ignoreElements="*[data-prevent-drag-scroll]" hideScrollbars={false}>
-                    {lists
-                        .sort((a, b) => a.order - b.order)
-                        .map((list) => {
-                            return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
-                        })}
+        <NoSSR>
+            <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
+                <SortableContext items={lists.flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
+                    <ScrollContainer className="flex h-full max-h-full w-full flex-1 justify-start gap-7 py-10 px-11" ignoreElements="*[data-prevent-drag-scroll]" hideScrollbars={false}>
+                        {lists
+                            .sort((a, b) => a.order - b.order)
+                            .map((list) => {
+                                return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
+                            })}
 
-                    <ButtonLarge className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
-                        Create New List
-                    </ButtonLarge>
-                </ScrollContainer>
-            </SortableContext>
+                        <ButtonLarge className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
+                            Create New List
+                        </ButtonLarge>
+                    </ScrollContainer>
+                </SortableContext>
 
-            {/* Only hide when anything beside the card is dragged (e.g. List) */}
-            {(draggedItem === null || typeof draggedItem !== "undefined") && (
-                <DragOverlay>
-                    {draggedItem && (
-                        <Card {...(draggedItem as PageProps["cards"][0])} isDragging={false} /> //
-                    )}
-                </DragOverlay>
-            )}
-        </DndContext>
+                {/* Only hide when anything beside the card is dragged (e.g. List) */}
+                {(draggedItem === null || typeof draggedItem !== "undefined") && (
+                    <DragOverlay>
+                        {draggedItem && (
+                            <Card {...(draggedItem as PageProps["cards"][0])} isDragging={false} /> //
+                        )}
+                    </DragOverlay>
+                )}
+            </DndContext>
+        </NoSSR>
     );
 }
