@@ -118,7 +118,7 @@ export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => 
             {due_date && (
                 <section className="flex items-end justify-between gap-4">
                     {due_date && (
-                        <ButtonSmall className="!w-max overflow-hidden !bg-dark-700" icon={IconCalendar}>
+                        <ButtonSmall className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
                             <p className="truncate text-xs">{due_date}</p>
                         </ButtonSmall>
                     )}
