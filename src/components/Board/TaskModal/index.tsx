@@ -1,6 +1,7 @@
 import type { PageProps } from "@/pages/projects/[id]";
 import type { ReactNode } from "react";
 
+import Checklist from "@/components/Board/TaskModal/Checklist";
 import Label from "@/components/DataDisplay/Label";
 import { Large, Small } from "@/components/Forms/Button";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
@@ -268,11 +269,7 @@ export default function TaskModal() {
 
                 {/* Checklists */}
                 <ModalSection title="Checklists">
-                    <Large icon={IconPlus}>Add New Checklist</Large>
-
-                    {dummyChecklists.map((val, i) => (
-                        <ChecklistsComponent key={i} addFunc={addDummyChecklists} data={dummyChecklists[i]} />
-                    ))}
+                    <Checklist />
 
                     <Large icon={IconPlus}>Add New Checklist</Large>
                 </ModalSection>
@@ -336,122 +333,6 @@ export default function TaskModal() {
     );
 }
 
-// --------------------------------------------------------------------Components
-// ------------------------Checklists Components
-type dummyChecklistT = Array<{
-    id: number;
-    label: string;
-    isChecked: boolean;
-}>;
-
-type ChecklistsComponentProps = {
-    addFunc: (id: number) => void;
-    data: {
-        id: number;
-        title: string;
-        dummyChecklistData: dummyChecklistT;
-    };
-};
-
-function ChecklistsComponent({ data, addFunc }: ChecklistsComponentProps) {
-    const [checkListDummyData, setCheckListDummyData] = useState(data.dummyChecklistData);
-    const [register, setRegister] = useState<{ id: number; checked: boolean }[]>([]);
-
-    const [valueProgress, setValueProgress] = useState((checkListDummyData.filter((val) => val.isChecked).length / checkListDummyData.length) * 100);
-
-    const getStat = useCallback((data: { id: number; checked: boolean }) => {
-        checkListDummyData.forEach((elem) => {
-            if (elem.id === data.id) {
-                elem.isChecked = data.checked;
-            }
-        });
-        setCheckListDummyData(checkListDummyData);
-        setValueProgress((checkListDummyData.filter((val) => val.isChecked).length / checkListDummyData.length) * 100);
-    }, []);
-
-    return (
-        <div className="flex flex-col gap-4">
-            <div className="mb-5 flex justify-between">
-                <h1 className="text-xl font-bold">{data.title}</h1>
-                <div className="flex gap-2">
-                    <button onClick={() => addFunc(data.id)}>
-                        <IconPlus />
-                    </button>
-                    <button onClick={() => console.log(checkListDummyData)}>
-                        <IconDots />
-                    </button>
-                </div>
-            </div>
-            <CheckListProgress valueProgress={valueProgress} />
-            <div className="flex flex-col gap-4">
-                {checkListDummyData.map((val, i) => (
-                    <CheckBox key={i} id={val.id} register={register} getStat={getStat} label={val.label} isChecked={val.isChecked} />
-                ))}
-                <div className="w-1/4">
-                    <button className="items-center justify-center rounded-xl bg-dark-600 px-3 py-1 text-sm">Add New Task</button>
-                </div>
-            </div>
-        </div>
-    );
-}
-// ------------------------End Checklists Components
-
-// ------------------------CheckBox Components
-type CheckBoxProps = {
-    getStat: (data: { id: number; checked: boolean }) => void;
-    id: number;
-    register: Array<{ id: number; checked: boolean }>;
-    label: string;
-    isChecked: boolean;
-};
-
-function CheckBox({ isChecked, label, getStat, register, id }: CheckBoxProps) {
-    const [checked, setChecked] = useState(isChecked);
-
-    const handleClick = useCallback(() => {
-        setChecked(!checked);
-        getStat({ id: id, checked: !checked });
-    }, [checked]);
-
-    useEffect(() => {
-        register.push({ id: id, checked: !checked });
-    }, []);
-
-    return (
-        <div onClick={handleClick} className="inline-block cursor-pointer px-3">
-            <div className="relative flex flex-row gap-2">
-                <input
-                    checked={checked}
-                    className="peer flex h-6 w-6 appearance-none flex-col justify-center rounded-lg bg-dark-50 duration-150 ease-in-out checked:bg-dark-600"
-                    type="checkbox"
-                    id="checkbox1"
-                />
-                <IconCheck className="absolute left-0 hidden peer-checked:block " />
-                <p>{label}</p>
-            </div>
-        </div>
-    );
-}
-// ------------------------End CheckBox Components
-
-// ------------------------Progress Components
-type CheckListProgressProps = {
-    valueProgress: number;
-};
-
-function CheckListProgress({ valueProgress }: CheckListProgressProps) {
-    return (
-        <div className="flex gap-2">
-            <div className="relative flex w-full grow-0 flex-col justify-center">
-                <div className="h-1.5 w-full  rounded-full bg-dark-500" />
-                <div style={{ width: valueProgress + "%" }} className="absolute top-1/3 h-1.5 rounded-full bg-dark-50 duration-150 ease-in-out" />
-            </div>
-            <div className="">
-                <p className="flex grow-0 flex-col justify-center text-xs">{Math.round(valueProgress)}%</p>
-            </div>
-        </div>
-    );
-}
 // -----------------------End Progress Components
 
 // ------------------------Attachment Components
