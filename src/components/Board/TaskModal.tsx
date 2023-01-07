@@ -1,12 +1,51 @@
 import type { PageProps } from "@/pages/projects/[id]";
+import type { ReactNode } from "react";
 
+import Label from "@/components/DataDisplay/Label";
+import { Large, Small } from "@/components/Forms/Button";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
-import { useDebouncedState } from "@mantine/hooks";
-import { IconAt, IconCheck, IconDots, IconMessageDots, IconMoodSmile, IconPaperclip, IconPencil, IconPlus, IconSquare, IconTextCaption, IconTrash } from "@tabler/icons";
+import { useClickOutside, useDebouncedState } from "@mantine/hooks";
+import {
+    IconAt,
+    IconBell,
+    IconCalendar,
+    IconCheck,
+    IconDots,
+    IconHourglass,
+    IconMessageDots,
+    IconMoodSmile,
+    IconPaperclip,
+    IconPencil,
+    IconPlus,
+    IconSquare,
+    IconTextCaption,
+    IconTrash,
+} from "@tabler/icons";
 import { useCallback, useEffect, useState } from "react";
 
+const ModalSection = ({ children, title }: { children: ReactNode; title: string }) => {
+    return (
+        <section className="flex w-full flex-col gap-4">
+            <p className="font-semibold">{title}</p>
+
+            {children}
+        </section>
+    );
+};
+
+const InformationSection = ({ label, children, alignStart }: { label: string; children: ReactNode; alignStart?: boolean }) => {
+    return (
+        <div className={`flex w-full ${alignStart ? "items-start" : "items-center"} justify-start gap-4`}>
+            <p className="flex w-44 shrink-0 flex-col justify-center overflow-hidden break-words py-1 font-semibold">{label}</p>
+
+            {children}
+        </div>
+    );
+};
+
 export default function TaskModal() {
+    const clickOutsideRef = useClickOutside(() => setCard(null));
     const { data: card, setData: setCard } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
     const [updatedTitle, setUpdatedTitle] = useDebouncedState("", 200);
 
@@ -41,9 +80,6 @@ export default function TaskModal() {
         },
         [card]
     );
-
-    const dummyLabels = ["🤑", "Cuan Gede", "Front End 😁", "Pokoknya Kerjain", "( ͡° ͜ʖ ͡°)", "12-04-2026", "Missed IT!", "!!!Important"];
-    const dummyActions = ["Subscribe", "Join", "Archive", "Share", "Move", "Copy"];
 
     const [dummyChecklists, setDummyChecklists] = useState([
         {
@@ -131,41 +167,38 @@ export default function TaskModal() {
     if (!card) return null;
 
     return (
-        <section className="fixed top-0 left-0 flex h-screen w-screen items-center justify-center">
-            <div className="absolute top-0 left-0 h-full w-full bg-dark-900 opacity-50" onClick={() => setCard(null)} />
+        <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto bg-dark-900/50">
+            <br />
 
-            <div className="relative z-20 flex h-full w-full max-w-4xl flex-col gap-8 overflow-y-scroll rounded-md bg-dark-700 p-10">
+            <div ref={clickOutsideRef} className="relative z-20 mt-10 flex h-max w-full max-w-4xl flex-col gap-7 rounded-md bg-dark-700 p-10">
                 {/* Title */}
-                <div className="flex">
+                <section className="flex w-full items-start justify-center gap-5">
                     <textarea
                         placeholder="Enter Your Card Title Here..."
                         rows={1}
-                        className="hide-scrollbar basis-11/12 resize-none bg-transparent text-left text-3xl font-bold focus:outline-none"
+                        className="hide-scrollbar flex-1 resize-none border-b border-b-dark-600 bg-transparent pb-3 text-left text-3xl font-bold focus:outline-none"
                         defaultValue={card.name}
                         autoFocus
                         onFocus={(e) => setCursorPosTitle(e)}
                         onChange={onTitleChange}
                     />
-                    <button className="items-center justify-center rounded-xl bg-dark-600 px-4 py-3">Subscribe</button>
-                </div>
 
-                <hr className="border-dark-600" />
+                    <Large icon={IconBell} fit>
+                        Subscribe
+                    </Large>
+                </section>
+
                 {/* Information */}
-                <div>
-                    <div className="mb-4 flex">
-                        <div className="flex w-1/4">
-                            <p className="flex flex-col justify-center">Created By</p>
-                        </div>
-                        <div className="flex">
+                <section className="flex w-full flex-col gap-4">
+                    <InformationSection label="Created By">
+                        <div className="flex items-center gap-3">
                             <img src="https://ui-avatars.com/api/?name=Asep+Sukamiskin+Sudrajat" alt="avatar" className="h-10 w-10 rounded-full" />
-                            <p className="ml-5 flex flex-col justify-center">Asep Sukamiskin Sudrajat</p>
+                            <p className="flex flex-col justify-center">Asep Sukamiskin Sudrajat</p>
                         </div>
-                    </div>
-                    <div className="mb-4 flex">
-                        <div className="flex w-1/4">
-                            <p className="flex flex-col justify-center">Assigned to</p>
-                        </div>
-                        <div className="flex">
+                    </InformationSection>
+
+                    <InformationSection label="Assigned to">
+                        <div className="flex items-center gap-2">
                             <div className="flex -space-x-2">
                                 {Array(7)
                                     .fill(0)
@@ -174,70 +207,75 @@ export default function TaskModal() {
                                             key={i}
                                             src={`https://picsum.photos/200?random=${i}`}
                                             alt="avatar"
-                                            className="box-border h-10 w-10 rounded-full border border-dark-600 object-cover object-center"
+                                            className="box-border h-10 w-10 shrink-0 rounded-full border-2 border-dark-700 object-cover object-center"
                                         />
                                     ))}
                             </div>
-                            <p className="ml-2 flex flex-col justify-center">+69 Member</p>
-                            <button className="ml-2">
-                                <IconPlus className="rounded-full bg-white p-1" color="black" />
+
+                            <p>+69 Member</p>
+
+                            <button className="shrink-0 rounded-full bg-white p-2">
+                                <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
                             </button>
                         </div>
-                    </div>
-                    <div className="mb-4 flex">
-                        <div className="flex w-1/4">
-                            <p className="flex flex-col justify-center">Start Date &#8594; Due Date</p>
+                    </InformationSection>
+
+                    <InformationSection label="Start Date &#8594; Due Date">
+                        <div className="flex w-full items-center gap-2">
+                            <Small icon={IconCalendar} fit>
+                                01 Jan 2023 - 03:39
+                            </Small>
+
+                            <span>&#8594;</span>
+
+                            <Small icon={IconCalendar} fit>
+                                35 Feb 3069 - 05:44
+                            </Small>
                         </div>
-                        <div className="flex">
-                            <p className="flex flex-col justify-center">Put Button Here</p>
-                        </div>
-                    </div>
-                    <div className="mb-4 flex">
-                        <div className="flex w-1/4">
-                            <p className="flex flex-col justify-center">Timer</p>
-                        </div>
-                        <div className="flex">
-                            <p className="flex flex-col justify-center">Put Button Here</p>
-                        </div>
-                    </div>
-                    <div className="mb-4 flex">
-                        <div className="flex w-1/4">
-                            <p className="flex flex-col">Labels</p>
-                        </div>
-                        <div className="flex w-3/4 flex-wrap items-center gap-2">
-                            {dummyLabels.map((val, i) => (
-                                <span key={i} className="items-center justify-center rounded-full bg-dark-800 px-2 py-1">
-                                    {val}
-                                </span>
+                    </InformationSection>
+
+                    <InformationSection label="Timer">
+                        <Small icon={IconHourglass} fit>
+                            01:34:49
+                        </Small>
+                    </InformationSection>
+
+                    <InformationSection label="Labels" alignStart>
+                        <div className="flex flex-wrap items-center gap-3">
+                            {["🤑", "Cuan Gede", "Front End 😁", "Pokoknya Kerjain", "( ͡° ͜ʖ ͡°)", "12-04-2026", "Missed IT!", "!!!Important"].map((val, i) => (
+                                <Label key={i} name={val} className="!text-sm" />
                             ))}
-                            <button className="ml-2">
-                                <IconPlus className="rounded-full bg-white p-1" color="black" />
+
+                            <button className="shrink-0 rounded-full bg-white p-2">
+                                <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </InformationSection>
+                </section>
 
                 <hr className="border-dark-600" />
+
                 {/* Actions */}
-                <div className="flex w-1/4">
-                    <p className="flex flex-col justify-center">Actions</p>
-                </div>
-                <div className="flex gap-2">
-                    {dummyActions.map((val, i) => (
-                        <button key={i} className="items-center justify-center rounded-xl bg-dark-600 px-4 py-3">
-                            {val}
-                        </button>
-                    ))}
-                </div>
+                <ModalSection title="Actions">
+                    <div className="flex gap-2">
+                        <Large icon={IconBell} fit>
+                            Subscribe
+                        </Large>
+                    </div>
+                </ModalSection>
 
                 <hr className="border-dark-600" />
+
                 {/* Checklists */}
-                <div className="flex w-1/4">
-                    <p className="flex flex-col justify-center">Checklists</p>
-                </div>
-                {dummyChecklists.map((val, i) => (
-                    <ChecklistsComponent key={i} addFunc={addDummyChecklists} data={dummyChecklists[i]} />
-                ))}
+                <ModalSection title="Checklists">
+                    <Large icon={IconPlus}>Add New Checklist</Large>
+
+                    {dummyChecklists.map((val, i) => (
+                        <ChecklistsComponent key={i} addFunc={addDummyChecklists} data={dummyChecklists[i]} />
+                    ))}
+
+                    <Large icon={IconPlus}>Add New Checklist</Large>
+                </ModalSection>
 
                 <hr className="border-dark-600" />
                 {/* Description */}
@@ -292,6 +330,8 @@ export default function TaskModal() {
                 <div />
                 {/* <div className="flex flex-wrap gap-4" /> */}
             </div>
+
+            <br />
         </section>
     );
 }
@@ -435,9 +475,7 @@ function AttachmentComponent({ title, timestamp }: AttachmentComponentProps) {
         </div>
     );
 }
-// ------------------------End Attachment Components
 
-// ------------------------Activities Components
 type ActivityAnnouncementProps = {
     id: number;
     sender: string;
@@ -476,5 +514,3 @@ function ActivityComment({ id, sender, content, timestamp }: ActivityAnnouncemen
         </div>
     );
 }
-// ------------------------End Activities Components
-// --------------------------------------------------------------------End Components
