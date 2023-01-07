@@ -136,7 +136,7 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
                 </div>
             </div>
 
-            <div className={`flex h-full max-h-full flex-col gap-4 overflow-auto px-5 ${cards.length === 0 && !isAddingNewCard ? "py-0" : "py-3"}`}>
+            <div className={`flex h-full max-h-full flex-col gap-4 overflow-auto px-5 ${cards.length === 0 && !isAddingNewCard ? "py-0" : "py-5"}`}>
                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
                 <SortableContext items={cards.flatMap(({ id }) => id)}>

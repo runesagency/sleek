@@ -186,7 +186,7 @@ export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => 
 export const CardContainer = (props: PageProps["cards"][0]) => {
     const { id, order } = props;
 
-    const { setNodeRef, listeners, isDragging, transform } = useSortable({
+    const { setNodeRef, listeners, isDragging, transform, transition } = useSortable({
         id,
         data: {
             id,
@@ -197,6 +197,7 @@ export const CardContainer = (props: PageProps["cards"][0]) => {
 
     const style: CSSProperties = {
         transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        transition,
     };
 
     return (
