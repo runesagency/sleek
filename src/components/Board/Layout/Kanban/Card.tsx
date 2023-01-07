@@ -6,6 +6,7 @@ import { SortableType } from ".";
 import useMenu from "@/lib/hooks/use-menu";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 import { Small as ButtonSmall } from "@/components/Forms/Button";
+import Label from "@/components/DataDisplay/Label";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { useCallback, useRef, useState } from "react";
@@ -96,17 +97,7 @@ export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => 
                     {labels.map(({ label }, i) => {
                         if (!label) return null;
 
-                        return (
-                            <div
-                                key={i}
-                                className="rounded-full bg-dark-800 px-2 py-1 text-xs"
-                                style={{
-                                    backgroundColor: label.color,
-                                }}
-                            >
-                                {label.name}
-                            </div>
-                        );
+                        return <Label key={i} color={label.color} name={label.name} />;
                     })}
                 </div>
             )}
