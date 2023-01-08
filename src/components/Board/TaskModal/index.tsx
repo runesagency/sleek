@@ -60,110 +60,24 @@ export default function TaskModal() {
         [setUpdatedTitle]
     );
 
-    const setCursorPosTitle = useCallback(
-        (e: React.FocusEvent<HTMLTextAreaElement>) => {
-            const valLength = e.currentTarget.value.length;
-            const currentCursor = e.currentTarget.selectionStart;
-            const currentCursorEnd = e.currentTarget.selectionEnd;
-            if (e.currentTarget.selectionStart !== 0) {
-                if (currentCursorEnd) {
-                    e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
-                } else {
-                    e.currentTarget.setSelectionRange(currentCursor, currentCursor);
-                }
+    const setCursorPosTitle = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
+        const valLength = e.currentTarget.value.length;
+        const currentCursor = e.currentTarget.selectionStart;
+        const currentCursorEnd = e.currentTarget.selectionEnd;
+        if (e.currentTarget.selectionStart !== 0) {
+            if (currentCursorEnd) {
+                e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
             } else {
-                if (currentCursorEnd) {
-                    e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
-                } else {
-                    e.currentTarget.setSelectionRange(valLength, valLength);
-                }
+                e.currentTarget.setSelectionRange(currentCursor, currentCursor);
             }
-        },
-        [card]
-    );
-
-    const [dummyChecklists, setDummyChecklists] = useState([
-        {
-            id: 1,
-            title: "Preparation",
-            dummyChecklistData: [
-                {
-                    id: 1,
-                    label: "Create a Figma account",
-                    isChecked: false,
-                },
-                {
-                    id: 2,
-                    label: "Verify the account",
-                    isChecked: true,
-                },
-                {
-                    id: 3,
-                    label: "Kill People",
-                    isChecked: false,
-                },
-                {
-                    id: 4,
-                    label: "Kill God",
-                    isChecked: false,
-                },
-            ],
-        },
-        {
-            id: 2,
-            title: "Concepting",
-            dummyChecklistData: [
-                {
-                    id: 1,
-                    label: "🎈 Find more reference about the design",
-                    isChecked: false,
-                },
-                {
-                    id: 2,
-                    label: "Verify the account",
-                    isChecked: true,
-                },
-            ],
-        },
-    ]);
-
-    const addDummyChecklists = (id: number) => {
-        // dummyChecklists.splice(dummyChecklists.map((e) => e.id).indexOf(id) + 1, 0, {
-        //     id: 3,
-        //     title: "Prep",
-        //     dummyChecklistData: [
-        //         {
-        //             id: 1,
-        //             label: "🎈 Find more reference about the design",
-        //             isChecked: false,
-        //         },
-        //         {
-        //             id: 2,
-        //             label: "Verify the account",
-        //             isChecked: true,
-        //         },
-        //     ],
-        // });
-        setDummyChecklists([
-            ...dummyChecklists,
-            {
-                id: 3,
-                title: "Prep",
-                dummyChecklistData: [
-                    {
-                        id: 1,
-                        label: "🎈 Find more reference about the design",
-                        isChecked: false,
-                    },
-                    {
-                        id: 2,
-                        label: "Verify the account",
-                        isChecked: true,
-                    },
-                ],
-            },
-        ]);
-    };
+        } else {
+            if (currentCursorEnd) {
+                e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
+            } else {
+                e.currentTarget.setSelectionRange(valLength, valLength);
+            }
+        }
+    }, []);
 
     if (!card) return null;
 
@@ -333,9 +247,6 @@ export default function TaskModal() {
     );
 }
 
-// -----------------------End Progress Components
-
-// ------------------------Attachment Components
 type AttachmentComponentProps = {
     title: string;
     timestamp: string;
