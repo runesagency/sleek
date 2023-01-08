@@ -1,6 +1,7 @@
 import type { PageProps } from "@/pages/projects/[id]";
 import type { ReactNode } from "react";
 
+import Attachment from "@/components/Board/TaskModal/Attachment";
 import Description from "@/components/Board/TaskModal/Description";
 import Checklist from "@/components/Board/TaskModal/Checklist";
 import Label from "@/components/DataDisplay/Label";
@@ -9,7 +10,7 @@ import { Large, Small } from "@/components/Forms/Button";
 
 import { useCallback } from "react";
 import { useDebouncedState } from "@mantine/hooks";
-import { IconAt, IconBell, IconCalendar, IconDots, IconHourglass, IconMessageDots, IconMoodSmile, IconPaperclip, IconPencil, IconPlus, IconSquare, IconTextCaption, IconTrash } from "@tabler/icons";
+import { IconAt, IconBell, IconCalendar, IconHourglass, IconMoodSmile, IconPaperclip, IconPlus, IconSquare, IconTextCaption } from "@tabler/icons";
 
 type TitleProps = {
     defaultTitle: string;
@@ -193,19 +194,19 @@ export default function TaskModal() {
                 </Section>
 
                 <hr className="border-dark-600" />
+
                 {/* Attachment */}
-                <div className="flex w-1/4">
-                    <p className="flex flex-col justify-center">Attachments</p>
-                </div>
-                <div>
+                <Section title="Attachments">
                     <div className="mb-4 flex gap-4 overflow-x-auto">
-                        <AttachmentComponent title="filename.exe" timestamp="29 February 3045 - 10:30 PM" />
-                        <AttachmentComponent title="KONSOOOOOOOOOOL.mp4" timestamp="17 August 1945 - 06:09 AM" />
+                        <Attachment title="filename.exe" timestamp="29 February 3045 - 10:30 PM" />
+                        <Attachment title="KONSOOOOOOOOOOL.mp4" timestamp="17 August 1945 - 06:09 AM" />
                     </div>
-                    <button className="items-center justify-center rounded-xl bg-dark-600 px-3 py-1 text-sm">Add New Task</button>
-                </div>
+
+                    <Small fit>Add New Attachment</Small>
+                </Section>
 
                 <hr className="border-dark-600" />
+
                 {/* Activities */}
                 <div className="flex w-1/4">
                     <p className="flex flex-col justify-center">Activities</p>
@@ -241,27 +242,6 @@ export default function TaskModal() {
 
             <br />
         </section>
-    );
-}
-
-type AttachmentComponentProps = {
-    title: string;
-    timestamp: string;
-};
-
-function AttachmentComponent({ title, timestamp }: AttachmentComponentProps) {
-    return (
-        <div className="flex flex-none flex-col gap-2">
-            <img src="https://picsum.photos/200/300" alt="attCover" className="h-32 w-48 rounded-xl" />
-            <p className=" font-medium">{title}</p>
-            <p className="text-sm">{timestamp}</p>
-            <div className="flex gap-2">
-                <IconPencil />
-                <IconMessageDots />
-                <IconTrash />
-                <IconDots />
-            </div>
-        </div>
     );
 }
 
