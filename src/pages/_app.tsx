@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+
 import type { AppProps } from "next/app";
 
 import RouterTransition from "@/components/RouterTransition";
