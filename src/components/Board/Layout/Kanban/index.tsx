@@ -1,4 +1,4 @@
-import type { PageProps } from "@/pages/projects/[id]";
+import type { LayoutProps, PageProps } from "@/pages/projects/[id]";
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 
 import { Card } from "@/components/Board/Layout/Kanban/Card";
@@ -18,10 +18,8 @@ export enum SortableType {
     Card = "card",
 }
 
-export default function KanbanLayout({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
+export default function KanbanLayout({ lists, setLists, cards, setCards, boardId }: LayoutProps) {
     const [draggedItem, setDraggedItem] = useState<PageProps["cards"][0] | undefined | null>(null);
-    const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
-    const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
@@ -128,7 +126,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                 }
             }
         },
-        [cards]
+        [cards, setCards]
     );
 
     const onDragEnd = useCallback(
@@ -172,7 +170,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                 }
             }
         },
-        [cards, lists]
+        [cards, lists, setCards, setLists]
     );
 
     const onCardAdded = useCallback(
@@ -208,7 +206,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
                 ]);
             }
         },
-        [cards, lists]
+        [cards, lists, setCards]
     );
 
     const onListAdded = useCallback(() => {
@@ -224,7 +222,7 @@ export default function KanbanLayout({ lists: originalLists, cards: originalCard
         ];
 
         setLists(newLists);
-    }, [boardId, lists]);
+    }, [boardId, lists, setLists]);
 
     return (
         <NoSSR>

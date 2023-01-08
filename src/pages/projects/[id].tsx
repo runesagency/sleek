@@ -8,6 +8,7 @@ import TaskModal from "@/components/Board/TaskModal";
 import { parseSSRProps } from "@/lib/utils";
 
 import { IconBell, IconUsers } from "@tabler/icons";
+import { useState } from "react";
 
 export type PageProps = {
     boardId: string;
@@ -28,6 +29,11 @@ export type PageProps = {
             })[];
         })[]
     >;
+};
+
+export type LayoutProps = PageProps & {
+    setCards: React.Dispatch<React.SetStateAction<PageProps["cards"]>>;
+    setLists: React.Dispatch<React.SetStateAction<PageProps["lists"]>>;
 };
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
@@ -82,7 +88,10 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
     };
 };
 
-export default function BoardPage({ lists, cards, boardId }: PageProps) {
+export default function BoardPage({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
+    const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
+    const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
+
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
             <section className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-20 py-5">
@@ -94,8 +103,8 @@ export default function BoardPage({ lists, cards, boardId }: PageProps) {
                 </div>
             </section>
 
-            <KanbanLayout cards={cards} lists={lists} boardId={boardId} />
             <TaskModal />
+            <KanbanLayout cards={cards} lists={lists} boardId={boardId} setCards={setCards} setLists={setLists} />
         </main>
     );
 }
