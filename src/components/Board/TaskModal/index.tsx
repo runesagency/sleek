@@ -1,29 +1,15 @@
 import type { PageProps } from "@/pages/projects/[id]";
 import type { ReactNode } from "react";
 
+import Description from "@/components/Board/TaskModal/Description";
 import Checklist from "@/components/Board/TaskModal/Checklist";
 import Label from "@/components/DataDisplay/Label";
-import { Large, Small } from "@/components/Forms/Button";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
+import { Large, Small } from "@/components/Forms/Button";
 
+import { useCallback } from "react";
 import { useClickOutside, useDebouncedState } from "@mantine/hooks";
-import {
-    IconAt,
-    IconBell,
-    IconCalendar,
-    IconCheck,
-    IconDots,
-    IconHourglass,
-    IconMessageDots,
-    IconMoodSmile,
-    IconPaperclip,
-    IconPencil,
-    IconPlus,
-    IconSquare,
-    IconTextCaption,
-    IconTrash,
-} from "@tabler/icons";
-import { useCallback, useEffect, useState } from "react";
+import { IconAt, IconBell, IconCalendar, IconDots, IconHourglass, IconMessageDots, IconMoodSmile, IconPaperclip, IconPencil, IconPlus, IconSquare, IconTextCaption, IconTrash } from "@tabler/icons";
 
 const ModalSection = ({ children, title }: { children: ReactNode; title: string }) => {
     return (
@@ -85,7 +71,7 @@ export default function TaskModal() {
         <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto bg-dark-900/50">
             <br />
 
-            <div ref={clickOutsideRef} className="relative z-20 mt-10 flex h-max w-full max-w-4xl flex-col gap-7 rounded-md bg-dark-700 p-10">
+            <div className="relative z-20 mt-10 flex h-max w-full max-w-4xl flex-col gap-7 rounded-md bg-dark-700 p-10">
                 {/* Title */}
                 <section className="flex w-full items-start justify-center gap-5">
                     <textarea
@@ -189,11 +175,11 @@ export default function TaskModal() {
                 </ModalSection>
 
                 <hr className="border-dark-600" />
+
                 {/* Description */}
-                <div className="flex w-1/4">
-                    <p className="flex flex-col justify-center">Description</p>
-                </div>
-                <div className="flex gap-2">INPUTT</div>
+                <ModalSection title="Description">
+                    <Description text="# 123" />
+                </ModalSection>
 
                 <hr className="border-dark-600" />
                 {/* Attachment */}
