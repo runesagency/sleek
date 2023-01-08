@@ -17,13 +17,13 @@ export enum NewCardLocation {
     DOWN = "DOWN",
 }
 
-type NewCardComponentProps = {
+type AddNewCardProps = {
     listId: string;
     onClose: () => void;
     onSave: (text: string) => void;
 };
 
-const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponentProps) => {
+const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
     const ref = useClickOutside(() => onClose());
     const textarea = useRef<HTMLTextAreaElement>(null);
 
@@ -73,7 +73,7 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
         [id, isAddingNewCard, onCardAdded]
     );
 
-    const addCardComponent = <AddCardComponent listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
+    const addCardComponent = <AddNewCard listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
 
     const style: CSSProperties = {
         transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
