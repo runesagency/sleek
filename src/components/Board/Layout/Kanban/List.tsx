@@ -35,7 +35,7 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
 
     return (
         <div ref={ref} className="flex shrink-0 flex-col gap-2">
-            <Textarea innerRef={textarea} saveToLocalStorage localStorageKey={listId + "-new-card"} onSave={onSave} onClose={onClose} />
+            <Textarea innerRef={textarea} autoFocus saveToLocalStorage localStorageKey={listId + "-new-card"} onSave={onSave} onClose={onClose} />
             <ButtonLarge onClick={onButtonSaveClick}>Create New Card</ButtonLarge>
         </div>
     );

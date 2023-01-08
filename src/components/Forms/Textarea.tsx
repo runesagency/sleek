@@ -91,7 +91,6 @@ export default function Textarea({ defaultValue, saveToLocalStorage, localStorag
             className="rounded-lg bg-dark-500 p-5 focus:outline-none"
             placeholder="Enter your card title here" //
             value={value}
-            autoFocus
             rows={3}
             onKeyDown={onKeyDown}
             onChange={onChange}
