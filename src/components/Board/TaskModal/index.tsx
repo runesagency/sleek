@@ -1,6 +1,7 @@
 import type { PageProps } from "@/pages/projects/[id]";
 import type { ReactNode } from "react";
 
+import Title from "@/components/Board/TaskModal/Title";
 import Activity from "@/components/Board/TaskModal/Activity";
 import Attachment from "@/components/Board/TaskModal/Attachment";
 import Description from "@/components/Board/TaskModal/Description";
@@ -11,44 +12,7 @@ import { Large, Small } from "@/components/Forms/Button";
 import Textarea from "@/components/Forms/Textarea";
 
 import { useCallback } from "react";
-import { useDebouncedState } from "@mantine/hooks";
 import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons";
-
-type TitleProps = {
-    defaultTitle: string;
-};
-
-const Title = ({ defaultTitle }: TitleProps) => {
-    const [updatedTitle, setUpdatedTitle] = useDebouncedState("", 200);
-
-    const onTitleChange = useCallback(
-        (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-            event.target.style.height = "0px";
-            event.target.style.height = event.target.scrollHeight + "px";
-
-            setUpdatedTitle(event.target.value);
-        },
-        [setUpdatedTitle]
-    );
-
-    const setFocusCursor = useCallback((event: React.FocusEvent<HTMLTextAreaElement>) => {
-        const defaultValue = event.target.value;
-        event.target.value = "";
-        event.target.value = defaultValue;
-    }, []);
-
-    return (
-        <textarea
-            placeholder="Enter Your Card Title Here..."
-            rows={1}
-            className="hide-scrollbar flex-1 resize-none border-b border-b-dark-600 bg-transparent pb-3 text-left text-3xl font-bold focus:outline-none"
-            defaultValue={defaultTitle}
-            autoFocus
-            onChange={onTitleChange}
-            onFocus={setFocusCursor}
-        />
-    );
-};
 
 type SectionProps = {
     children: ReactNode;
