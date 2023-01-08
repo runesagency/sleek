@@ -1,16 +1,18 @@
 import type { PageProps } from "@/pages/projects/[id]";
 import type { ReactNode } from "react";
 
+import Activity from "@/components/Board/TaskModal/Activity";
 import Attachment from "@/components/Board/TaskModal/Attachment";
 import Description from "@/components/Board/TaskModal/Description";
 import Checklist from "@/components/Board/TaskModal/Checklist";
 import Label from "@/components/DataDisplay/Label";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 import { Large, Small } from "@/components/Forms/Button";
+import Textarea from "@/components/Forms/Textarea";
 
 import { useCallback } from "react";
 import { useDebouncedState } from "@mantine/hooks";
-import { IconAt, IconBell, IconCalendar, IconHourglass, IconMoodSmile, IconPaperclip, IconPlus, IconSquare, IconTextCaption } from "@tabler/icons";
+import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons";
 
 type TitleProps = {
     defaultTitle: string;
@@ -208,78 +210,40 @@ export default function TaskModal() {
                 <hr className="border-dark-600" />
 
                 {/* Activities */}
-                <div className="flex w-1/4">
-                    <p className="flex flex-col justify-center">Activities</p>
-                </div>
-                <div className="flex flex-col gap-4">
-                    <ActivityAnouncement id={1} sender="Asep Sukamiskin Sudrajat" content="created this card." timestamp="17 Agustus 1945" />
-                    <ActivityAnouncement id={2} sender="Asep Sukamiskin Sudrajat" content="added 76 members to this card." timestamp="20 November 1999" />
-                    <ActivityComment id={1} sender="Jamaluddin" content="Hi Mr. Asep, can you explain how this things works?" timestamp="11 September 2001" />
-                    <ActivityComment
-                        id={2}
-                        sender="Asep Sukamiskin Sudrajat"
-                        content="Thank you for your response Mr. Jamal, so for the authentication things, you only need to use JWT system so the session can be catched on client side, hope you understand what i meant ✌."
-                        timestamp="08 August 2003"
-                    />
-                    <ActivityAnouncement id={3} sender="Budi Septiani" content="added new attachment (JWT Flow) to this card." timestamp="30 Seconds Ago" />
-                    <ActivityComment id={3} sender="Ucup Barbara" content="I think your attachment isn't what Mr. Asep meant, @Budi Septiani." timestamp="Just Now" />
-                </div>
-                <div className="flex flex-col gap-4">
-                    <textarea defaultValue="" placeholder="Write a comment ..." className="hide-scrollbar w-full resize-none rounded-xl bg-dark-500 p-4 text-left text-sm outline-none" rows={3} />
-                    <div className="flex justify-between">
-                        <button className="items-center justify-center rounded-xl bg-dark-600 px-4 py-3">Add Comment</button>
-                        <div className="flex gap-2">
-                            <IconPaperclip />
-                            <IconMoodSmile />
-                            <IconAt />
-                            <IconTextCaption className="h-6 w-6 rounded-md border-2" />
+                <Section title="Activities">
+                    <section className="flex flex-col gap-7">
+                        <div className="flex flex-col gap-4">
+                            <Activity sender="Asep Sukamiskin Sudrajat" details="created this card." timestamp="17 Agustus 1945" />
+                            <Activity sender="Asep Sukamiskin Sudrajat" details="added 76 members to this card." timestamp="20 November 1999" />
+                            <Activity sender="Jamaluddin" content="Hi Mr. Asep, can you explain how this things works?" timestamp="11 September 2001" />
+                            <Activity
+                                sender="Asep Sukamiskin Sudrajat"
+                                content="Thank you for your response Mr. Jamal, so for the authentication things, you only need to use JWT system so the session can be catched on client side, hope you understand what i meant ✌."
+                                timestamp="08 August 2003"
+                            />
+                            <Activity sender="Budi Septiani" details="added new attachment (JWT Flow) to this card." timestamp="30 Seconds Ago" />
+                            <Activity sender="Ucup Barbara" content="I think your attachment isn't what Mr. Asep meant, @Budi Septiani." timestamp="Just Now" />
                         </div>
-                    </div>
-                </div>
-                <div />
-                {/* <div className="flex flex-wrap gap-4" /> */}
+
+                        <div className="flex flex-col gap-4">
+                            <Textarea placeholder="Write a comment..." />
+
+                            <div className="flex items-center justify-between">
+                                <Large fit>Add Comment</Large>
+
+                                <div className="flex items-center gap-4">
+                                    <IconPaperclip height={20} />
+                                    <IconMoodSmile height={20} />
+                                    <IconAt height={20} />
+                                    <IconId height={20} />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </Section>
             </div>
 
             <br />
         </section>
-    );
-}
-
-type ActivityAnnouncementProps = {
-    id: number;
-    sender: string;
-    content: string;
-    timestamp: string;
-};
-
-function ActivityAnouncement({ id, sender, content, timestamp }: ActivityAnnouncementProps) {
-    return (
-        <div className="flex gap-2">
-            <img src="https://picsum.photos/200?" className="h-8 w-8 rounded-full" alt="avatar" />
-            <p className="flex flex-col justify-center">{sender}</p>
-            <p className="flex flex-col justify-center font-light">{content}</p>
-            <span className="flex flex-row gap-2 font-light">
-                <IconSquare className="mt-3.5 h-1 w-1 rounded-full border bg-dark-50 opacity-50" />
-                <p className="flex flex-col justify-center text-xs text-dark-50 opacity-50">{timestamp}</p>
-            </span>
-        </div>
-    );
-}
-
-function ActivityComment({ id, sender, content, timestamp }: ActivityAnnouncementProps) {
-    return (
-        <div className="flex flex-col gap-2">
-            <div className="flex gap-2">
-                <img src="https://picsum.photos/200?" className="h-8 w-8 rounded-full" alt="avatar" />
-                <p className="flex flex-col justify-center">{sender}</p>
-                <span className="flex flex-row justify-center gap-2 font-light">
-                    <IconSquare className="mt-3.5 h-1 w-1 rounded-full border bg-dark-50 opacity-50" />
-                    <p className="flex flex-col justify-center text-xs text-dark-50 opacity-50">{timestamp}</p>
-                </span>
-            </div>
-            <div>
-                <p className="flex flex-col justify-center font-light">{content}</p>
-            </div>
-        </div>
     );
 }
