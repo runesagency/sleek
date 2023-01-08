@@ -11,7 +11,12 @@ import { useCallback } from "react";
 import { useDebouncedState } from "@mantine/hooks";
 import { IconAt, IconBell, IconCalendar, IconDots, IconHourglass, IconMessageDots, IconMoodSmile, IconPaperclip, IconPencil, IconPlus, IconSquare, IconTextCaption, IconTrash } from "@tabler/icons";
 
-const ModalSection = ({ children, title }: { children: ReactNode; title: string }) => {
+type SectionProps = {
+    children: ReactNode;
+    title: string;
+};
+
+const Section = ({ children, title }: SectionProps) => {
     return (
         <section className="flex w-full flex-col gap-4">
             <p className="font-semibold">{title}</p>
@@ -21,7 +26,13 @@ const ModalSection = ({ children, title }: { children: ReactNode; title: string 
     );
 };
 
-const InformationSection = ({ label, children, alignStart }: { label: string; children: ReactNode; alignStart?: boolean }) => {
+type InformationProps = {
+    label: string;
+    children: ReactNode;
+    alignStart?: boolean;
+};
+
+const Information = ({ label, children, alignStart }: InformationProps) => {
     return (
         <div className={`flex w-full ${alignStart ? "items-start" : "items-center"} justify-start gap-4`}>
             <p className="flex w-44 shrink-0 flex-col justify-center overflow-hidden break-words py-1 font-semibold">{label}</p>
@@ -93,14 +104,14 @@ export default function TaskModal() {
 
                 {/* Information */}
                 <section className="flex w-full flex-col gap-4">
-                    <InformationSection label="Created By">
+                    <Information label="Created By">
                         <div className="flex items-center gap-3">
                             <img src="https://ui-avatars.com/api/?name=Asep+Sukamiskin+Sudrajat" alt="avatar" className="h-10 w-10 rounded-full" />
                             <p className="flex flex-col justify-center">Asep Sukamiskin Sudrajat</p>
                         </div>
-                    </InformationSection>
+                    </Information>
 
-                    <InformationSection label="Assigned to">
+                    <Information label="Assigned to">
                         <div className="flex items-center gap-2">
                             <div className="flex -space-x-2">
                                 {Array(7)
@@ -121,9 +132,9 @@ export default function TaskModal() {
                                 <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
                             </button>
                         </div>
-                    </InformationSection>
+                    </Information>
 
-                    <InformationSection label="Start Date &#8594; Due Date">
+                    <Information label="Start Date &#8594; Due Date">
                         <div className="flex w-full items-center gap-2">
                             <Small icon={IconCalendar} fit>
                                 01 Jan 2023 - 03:39
@@ -135,15 +146,15 @@ export default function TaskModal() {
                                 35 Feb 3069 - 05:44
                             </Small>
                         </div>
-                    </InformationSection>
+                    </Information>
 
-                    <InformationSection label="Timer">
+                    <Information label="Timer">
                         <Small icon={IconHourglass} fit>
                             01:34:49
                         </Small>
-                    </InformationSection>
+                    </Information>
 
-                    <InformationSection label="Labels" alignStart>
+                    <Information label="Labels" alignStart>
                         <div className="flex flex-wrap items-center gap-3">
                             {["🤑", "Cuan Gede", "Front End 😁", "Pokoknya Kerjain", "( ͡° ͜ʖ ͡°)", "12-04-2026", "Missed IT!", "!!!Important"].map((val, i) => (
                                 <Label key={i} name={val} className="!text-sm" />
@@ -153,35 +164,35 @@ export default function TaskModal() {
                                 <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
                             </button>
                         </div>
-                    </InformationSection>
+                    </Information>
                 </section>
 
                 <hr className="border-dark-600" />
 
                 {/* Actions */}
-                <ModalSection title="Actions">
+                <Section title="Actions">
                     <div className="flex gap-2">
                         <Large icon={IconBell} fit>
                             Subscribe
                         </Large>
                     </div>
-                </ModalSection>
+                </Section>
 
                 <hr className="border-dark-600" />
 
                 {/* Checklists */}
-                <ModalSection title="Checklists">
+                <Section title="Checklists">
                     <Checklist />
 
                     <Large icon={IconPlus}>Add New Checklist</Large>
-                </ModalSection>
+                </Section>
 
                 <hr className="border-dark-600" />
 
                 {/* Description */}
-                <ModalSection title="Description">
+                <Section title="Description">
                     <Description text="# 123" />
-                </ModalSection>
+                </Section>
 
                 <hr className="border-dark-600" />
                 {/* Attachment */}
