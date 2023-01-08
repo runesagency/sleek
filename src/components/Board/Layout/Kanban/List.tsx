@@ -5,9 +5,10 @@ import { SortableType } from ".";
 
 import { CardContainer } from "@/components/Board/Layout/Kanban/Card";
 import { Large as ButtonLarge } from "@/components/Forms/Button";
+import Textarea from "@/components/Forms/Textarea";
 
-import { useClickOutside, useLocalStorage } from "@mantine/hooks";
-import { useCallback, useState } from "react";
+import { useRef, useCallback, useState } from "react";
+import { useClickOutside } from "@mantine/hooks";
 import { IconDots, IconPlus } from "@tabler/icons";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 
@@ -24,58 +25,18 @@ type NewCardComponentProps = {
 
 const AddCardComponent = ({ listId, onClose, onSave: onAdded }: NewCardComponentProps) => {
     const ref = useClickOutside(() => onClose());
-    const [value, setValue, removeValue] = useLocalStorage({
-        key: listId + "-new-card",
-    });
+    const textarea = useRef<HTMLTextAreaElement>(null);
 
-    const onSave = useCallback(() => {
-        if (value) {
-            onAdded(value);
+    const onButtonSaveClick = useCallback(() => {
+        if (textarea.current) {
+            onSave(textarea.current.value);
         }
-
-        onClose();
-        removeValue();
-    }, [onAdded, onClose, removeValue, value]);
-
-    const onKeyDown = useCallback(
-        (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-            if (event.key === "Enter" && event.shiftKey === false) {
-                event.preventDefault();
-                onSave();
-            }
-
-            if (event.key === "Escape") {
-                event.preventDefault();
-                onClose();
-            }
-        },
-        [onClose, onSave]
-    );
-
-    const onChange = useCallback(
-        (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setValue(event.target.value);
-
-            if (event.target.value === "") {
-                removeValue();
-            }
-        },
-        [removeValue, setValue]
-    );
+    }, [onSave]);
 
     return (
         <div ref={ref} className="flex shrink-0 flex-col gap-2">
-            <textarea
-                className="rounded-lg bg-dark-500 p-5 focus:outline-none"
-                placeholder="Enter your card title here" //
-                value={value}
-                autoFocus
-                rows={3}
-                onKeyDown={onKeyDown}
-                onChange={onChange}
-            />
-
-            <ButtonLarge onClick={onSave}>Create New Card</ButtonLarge>
+            <Textarea innerRef={textarea} saveToLocalStorage localStorageKey={listId + "-new-card"} onSave={onSave} onClose={onClose} />
+            <ButtonLarge onClick={onButtonSaveClick}>Create New Card</ButtonLarge>
         </div>
     );
 };
