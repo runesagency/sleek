@@ -8,7 +8,7 @@ import useCustomEvent from "@/lib/hooks/use-custom-event";
 import { Large, Small } from "@/components/Forms/Button";
 
 import { useCallback } from "react";
-import { useClickOutside, useDebouncedState } from "@mantine/hooks";
+import { useDebouncedState } from "@mantine/hooks";
 import { IconAt, IconBell, IconCalendar, IconDots, IconHourglass, IconMessageDots, IconMoodSmile, IconPaperclip, IconPencil, IconPlus, IconSquare, IconTextCaption, IconTrash } from "@tabler/icons";
 
 const ModalSection = ({ children, title }: { children: ReactNode; title: string }) => {
@@ -32,7 +32,6 @@ const InformationSection = ({ label, children, alignStart }: { label: string; ch
 };
 
 export default function TaskModal() {
-    const clickOutsideRef = useClickOutside(() => setCard(null));
     const { data: card, setData: setCard } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
     const [updatedTitle, setUpdatedTitle] = useDebouncedState("", 200);
 
@@ -68,7 +67,10 @@ export default function TaskModal() {
     if (!card) return null;
 
     return (
-        <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto bg-dark-900/50">
+        <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto">
+            {/* Use this blocker instead useClickOutside hooks to prevent outside click bug when editing description using React SimpleMDE editor */}
+            <div className="fixed top-0 left-0 z-10 h-full w-full bg-dark-900/50" onClick={() => setCard(null)} />
+
             <br />
 
             <div className="relative z-20 mt-10 flex h-max w-full max-w-4xl flex-col gap-7 rounded-md bg-dark-700 p-10">
