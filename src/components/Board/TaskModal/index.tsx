@@ -175,21 +175,19 @@ export default function TaskModal() {
 
                 {/* Activities */}
                 <Section title="Activities">
-                    <section className="flex flex-col gap-7">
-                        <div className="flex flex-col gap-4">
-                            <Activity sender="Asep Sukamiskin Sudrajat" details="created this card." timestamp="17 Agustus 1945" />
-                            <Activity sender="Asep Sukamiskin Sudrajat" details="added 76 members to this card." timestamp="20 November 1999" />
-                            <Activity sender="Jamaluddin" content="Hi Mr. Asep, can you explain how this things works?" timestamp="11 September 2001" />
-                            <Activity
-                                sender="Asep Sukamiskin Sudrajat"
-                                content="Thank you for your response Mr. Jamal, so for the authentication things, you only need to use JWT system so the session can be catched on client side, hope you understand what i meant ✌."
-                                timestamp="08 August 2003"
-                            />
-                            <Activity sender="Budi Septiani" details="added new attachment (JWT Flow) to this card." timestamp="30 Seconds Ago" />
-                            <Activity sender="Ucup Barbara" content="I think your attachment isn't what Mr. Asep meant, @Budi Septiani." timestamp="Just Now" />
-                        </div>
+                    <div className="flex flex-col gap-7">
+                        <Activity sender="Asep Sukamiskin Sudrajat" details="created this card." timestamp="17 Agustus 1945" />
+                        <Activity sender="Asep Sukamiskin Sudrajat" details="added 76 members to this card." timestamp="20 November 1999" />
+                        <Activity sender="Jamaluddin" content="Hi Mr. Asep, can you explain how this things works?" timestamp="11 September 2001" />
+                        <Activity
+                            sender="Asep Sukamiskin Sudrajat"
+                            content="Thank you for your response Mr. Jamal, so for the authentication things, you only need to use JWT system so the session can be catched on client side, hope you understand what i meant ✌."
+                            timestamp="08 August 2003"
+                        />
+                        <Activity sender="Budi Septiani" details="added new attachment (JWT Flow) to this card." timestamp="30 Seconds Ago" />
+                        <Activity sender="Ucup Barbara" content="I think your attachment isn't what Mr. Asep meant, @Budi Septiani." timestamp="Just Now" />
 
-                        <div className="flex flex-col gap-4">
+                        <section className="flex flex-col gap-3">
                             <Textarea placeholder="Write a comment..." />
 
                             <div className="flex items-center justify-between">
@@ -202,8 +200,8 @@ export default function TaskModal() {
                                     <IconId height={20} />
                                 </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
+                    </div>
                 </Section>
             </div>
 
