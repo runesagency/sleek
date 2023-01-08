@@ -11,6 +11,42 @@ import { useCallback } from "react";
 import { useDebouncedState } from "@mantine/hooks";
 import { IconAt, IconBell, IconCalendar, IconDots, IconHourglass, IconMessageDots, IconMoodSmile, IconPaperclip, IconPencil, IconPlus, IconSquare, IconTextCaption, IconTrash } from "@tabler/icons";
 
+type TitleProps = {
+    defaultTitle: string;
+};
+
+const Title = ({ defaultTitle }: TitleProps) => {
+    const [updatedTitle, setUpdatedTitle] = useDebouncedState("", 200);
+
+    const onTitleChange = useCallback(
+        (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+            event.target.style.height = "0px";
+            event.target.style.height = event.target.scrollHeight + "px";
+
+            setUpdatedTitle(event.target.value);
+        },
+        [setUpdatedTitle]
+    );
+
+    const setFocusCursor = useCallback((event: React.FocusEvent<HTMLTextAreaElement>) => {
+        const defaultValue = event.target.value;
+        event.target.value = "";
+        event.target.value = defaultValue;
+    }, []);
+
+    return (
+        <textarea
+            placeholder="Enter Your Card Title Here..."
+            rows={1}
+            className="hide-scrollbar flex-1 resize-none border-b border-b-dark-600 bg-transparent pb-3 text-left text-3xl font-bold focus:outline-none"
+            defaultValue={defaultTitle}
+            autoFocus
+            onChange={onTitleChange}
+            onFocus={setFocusCursor}
+        />
+    );
+};
+
 type SectionProps = {
     children: ReactNode;
     title: string;
@@ -44,36 +80,6 @@ const Information = ({ label, children, alignStart }: InformationProps) => {
 
 export default function TaskModal() {
     const { data: card, setData: setCard } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
-    const [updatedTitle, setUpdatedTitle] = useDebouncedState("", 200);
-
-    const onTitleChange = useCallback(
-        (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-            event.target.style.height = "0px";
-            event.target.style.height = event.target.scrollHeight + "px";
-
-            setUpdatedTitle(event.target.value);
-        },
-        [setUpdatedTitle]
-    );
-
-    const setCursorPosTitle = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
-        const valLength = e.currentTarget.value.length;
-        const currentCursor = e.currentTarget.selectionStart;
-        const currentCursorEnd = e.currentTarget.selectionEnd;
-        if (e.currentTarget.selectionStart !== 0) {
-            if (currentCursorEnd) {
-                e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
-            } else {
-                e.currentTarget.setSelectionRange(currentCursor, currentCursor);
-            }
-        } else {
-            if (currentCursorEnd) {
-                e.currentTarget.setSelectionRange(currentCursor, currentCursorEnd);
-            } else {
-                e.currentTarget.setSelectionRange(valLength, valLength);
-            }
-        }
-    }, []);
 
     if (!card) return null;
 
@@ -87,15 +93,7 @@ export default function TaskModal() {
             <div className="relative z-20 mt-10 flex h-max w-full max-w-4xl flex-col gap-7 rounded-md bg-dark-700 p-10">
                 {/* Title */}
                 <section className="flex w-full items-start justify-center gap-5">
-                    <textarea
-                        placeholder="Enter Your Card Title Here..."
-                        rows={1}
-                        className="hide-scrollbar flex-1 resize-none border-b border-b-dark-600 bg-transparent pb-3 text-left text-3xl font-bold focus:outline-none"
-                        defaultValue={card.name}
-                        autoFocus
-                        onFocus={(e) => setCursorPosTitle(e)}
-                        onChange={onTitleChange}
-                    />
+                    <Title defaultTitle={card.name} />
 
                     <Large icon={IconBell} fit>
                         Subscribe
