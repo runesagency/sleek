@@ -46,3 +46,29 @@
         scrollbar-width: none; /* Firefox */
     }
 }
+
+.EasyMDEContainer .editor-toolbar {
+    @apply !bg-dark-600 !border-none rounded-t-lg;
+}
+
+.EasyMDEContainer .editor-toolbar button.active,
+.EasyMDEContainer .editor-toolbar button:hover {
+    @apply !bg-dark-500 border-none;
+}
+
+.EasyMDEContainer .editor-toolbar button:hover {
+    @apply !opacity-75;
+}
+
+.EasyMDEContainer .CodeMirror,
+.EasyMDEContainer .editor-preview {
+    @apply !bg-dark-500 text-dark-50 !border-none !rounded-b-lg;
+}
+
+.EasyMDEContainer .editor-statusbar {
+    @apply !text-dark-50;
+}
+
+.EasyMDEContainer .editor-preview {
+    @apply prose prose-invert;
+}

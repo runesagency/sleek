@@ -146,10 +146,12 @@
         "@prisma/client": "^4.8.0",
         "@szhsin/react-menu": "^3.3.1",
         "@tabler/icons": "^1.118.0",
+        "easymde": "^2.18.0",
         "next": "13.0.7",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-indiana-drag-scroll": "^2.2.0",
+        "react-simplemde-editor": "^5.2.0",
         "react-top-loading-bar": "^2.3.1"
     },
     "devDependencies": {
