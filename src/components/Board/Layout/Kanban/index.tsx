@@ -130,7 +130,7 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
     );
 
     const onDragEnd = useCallback(
-        (event: DragEndEvent) => {
+        async (event: DragEndEvent) => {
             setDraggedItem(null);
 
             type Data = { type: SortableType; id: string; order: number };
@@ -150,24 +150,39 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
                 setLists(newList);
             }
 
-            // Card to Card (same list)
-            if (current.type === SortableType.Card && target.type === SortableType.Card) {
-                const sourceListId = cards.find((card) => card.id === current.id)?.list_id;
-                const destinationListId = cards.find((card) => card.id === target.id)?.list_id;
+            if (current.type === SortableType.Card) {
+                let updatedCards = cards;
 
-                if (!sourceListId || !destinationListId) return;
+                // Card to Card (same list)
+                if (target.type === SortableType.Card) {
+                    const sourceListId = cards.find((card) => card.id === current.id)?.list_id;
+                    const destinationListId = cards.find((card) => card.id === target.id)?.list_id;
 
-                if (sourceListId === destinationListId) {
-                    const listCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
-                    const newListCards = arrayMove(listCards, current.order, target.order).map((card, index) => ({
-                        ...card,
-                        order: index,
-                    }));
-                    setCards((cards) => [
-                        ...cards.filter((card) => card.list_id !== sourceListId), //
-                        ...newListCards,
-                    ]);
+                    if (!sourceListId || !destinationListId) return;
+
+                    if (sourceListId === destinationListId) {
+                        const listCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
+                        const newListCards = arrayMove(listCards, current.order, target.order).map((card, index) => ({
+                            ...card,
+                            order: index,
+                        }));
+
+                        updatedCards = [
+                            ...cards.filter((card) => card.list_id !== sourceListId), //
+                            ...newListCards,
+                        ];
+
+                        setCards(updatedCards);
+                    }
                 }
+
+                await fetch("/api/cards", {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedCards),
+                });
             }
         },
         [cards, lists, setCards, setLists]

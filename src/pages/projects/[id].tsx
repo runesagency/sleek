@@ -8,7 +8,7 @@ import TaskModal from "@/components/Board/TaskModal";
 import { parseSSRProps } from "@/lib/utils";
 
 import { IconBell, IconUsers } from "@tabler/icons";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export type PageProps = {
     boardId: string;
@@ -92,6 +92,28 @@ export default function BoardPage({ lists: originalLists, cards: originalCards, 
     const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
     const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
 
+    const onCardUpdate = useCallback(
+        async (card: PageProps["cards"][0]) => {
+            const foundCardIndex = cards.findIndex(({ id }) => id === card.id);
+
+            if (foundCardIndex === -1) return;
+
+            const updatedCards = [...cards];
+            updatedCards[foundCardIndex] = card;
+
+            setCards(updatedCards);
+
+            await fetch(`/api/cards/${card.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(card),
+            });
+        },
+        [cards]
+    );
+
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
             <section className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-20 py-5">
@@ -103,8 +125,8 @@ export default function BoardPage({ lists: originalLists, cards: originalCards, 
                 </div>
             </section>
 
-            <TaskModal />
             <KanbanLayout cards={cards} lists={lists} boardId={boardId} setCards={setCards} setLists={setLists} />
+            <TaskModal cards={cards} onUpdate={onCardUpdate} />
         </main>
     );
 }

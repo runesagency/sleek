@@ -45,22 +45,52 @@ const Information = ({ label, children, alignStart }: InformationProps) => {
     );
 };
 
-export default function TaskModal() {
-    const { data: card, setData: setCard } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
+type TaskModalProps = {
+    cards: PageProps["cards"];
+    onUpdate: (card: PageProps["cards"][0]) => void;
+};
+
+export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
+    const { data: cardId, setData: setCardId } = useCustomEvent<string>("card-clicked", false);
+    const card = cards.find((card) => card.id === cardId);
+
+    const updateCard = useCallback(
+        (newData: Partial<PageProps["cards"][0]>) => {
+            if (!card) return;
+            console.log("updated");
+
+            onUpdate({ ...card, ...newData });
+        },
+        [card, onUpdate]
+    );
+
+    const onTitleUpdate = useCallback(
+        (newTitle: string) => {
+            updateCard({ name: newTitle });
+        },
+        [updateCard]
+    );
+
+    const onDescriptionUpdate = useCallback(
+        (newDescription: string | null) => {
+            updateCard({ description: newDescription });
+        },
+        [updateCard]
+    );
 
     if (!card) return null;
 
     return (
         <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto">
             {/* Use this blocker instead useClickOutside hooks to prevent outside click bug when editing description using React SimpleMDE editor */}
-            <div className="fixed top-0 left-0 z-10 h-full w-full bg-dark-900/50" onClick={() => setCard(null)} />
+            <div className="fixed top-0 left-0 z-10 h-full w-full bg-dark-900/50" onClick={() => setCardId(null)} />
 
             <br />
 
             <div className="relative z-20 mt-10 flex h-max w-full max-w-4xl flex-col gap-7 rounded-md bg-dark-700 p-10">
                 {/* Title */}
                 <section className="flex w-full items-start justify-center gap-5">
-                    <Title defaultTitle={card.name} />
+                    <Title defaultTitle={card.name} onUpdate={onTitleUpdate} />
 
                     <Large icon={IconBell} fit>
                         Subscribe
@@ -156,7 +186,7 @@ export default function TaskModal() {
 
                 {/* Description */}
                 <Section title="Description">
-                    <Description text="# 123" />
+                    <Description text={card.description} onUpdate={onDescriptionUpdate} />
                 </Section>
 
                 <hr className="border-dark-600" />
