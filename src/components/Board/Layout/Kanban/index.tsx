@@ -1,4 +1,4 @@
-import type { LayoutProps } from "@/pages/projects/[id]";
+import type { LayoutProps } from "@/pages/boards/[id]";
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 import type { Card as CardType } from "@/lib/types";
 
