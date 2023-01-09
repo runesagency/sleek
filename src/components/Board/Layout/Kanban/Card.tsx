@@ -15,7 +15,7 @@ import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip
 const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["checklists"] }) => {
     const [open, setOpen] = useState(false);
 
-    const tasks = checklists.map(({ tasks }) => tasks).flat();
+    const tasks = checklists.flatMap(({ checklist }) => checklist).flatMap((checklist) => checklist?.tasks ?? []);
     const percentage = Math.round((tasks.filter(({ completed }) => completed).length / tasks.length) * 100);
     const shownTasks = tasks.slice(0, 7);
     const hiddenTasks = tasks.slice(7);
@@ -37,9 +37,9 @@ const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["chec
             </div>
 
             <ul className={`origin-top list-disc ${open ? "h-auto scale-y-100" : "h-0 scale-y-0"} duration-200`}>
-                {shownTasks.map(({ name }, i) => (
+                {shownTasks.map(({ text }, i) => (
                     <li key={i} className="ml-6">
-                        {name}
+                        {text}
                     </li>
                 ))}
 
@@ -49,7 +49,7 @@ const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["chec
     );
 };
 
-export const Card = ({ id, name, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: PageProps["cards"][0] & { isDragging: boolean }) => {
+export const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: PageProps["cards"][0] & { isDragging: boolean }) => {
     const menuButtonRef = useRef<HTMLDivElement>(null);
     const { emit } = useCustomEvent<string>("card-clicked", false);
 
@@ -78,11 +78,11 @@ export const Card = ({ id, name, attachments, activities, cover, checklists, lab
             `}
         >
             {/* Cover Image */}
-            {cover && <img src={cover.url} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
+            {cover && <img src={cover.attachment.filename_disk} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
 
             {/* Head */}
             <div className="flex max-w-full items-start justify-between gap-2">
-                <span className="flex-1 break-words font-semibold">{name}</span>
+                <span className="flex-1 break-words font-semibold">{title}</span>
 
                 <div ref={menuButtonRef} className="hidden group-hover/card:block">
                     <IconDots height={20} width={undefined} onClick={toggleMenu} />

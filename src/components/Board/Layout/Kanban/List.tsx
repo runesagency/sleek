@@ -46,7 +46,7 @@ type ListProps = PageProps["lists"][0] & {
     onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
 };
 
-export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
+export const List = ({ id, title, cards, onCardAdded, order }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
     const { setNodeRef, listeners, transform, transition, attributes, isDragging } = useSortable({
         id,
@@ -88,7 +88,7 @@ export const List = ({ id, name, cards, onCardAdded, order }: ListProps) => {
             className="group/container relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 text-sm"
         >
             <div {...listeners} {...attributes} className={`flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600 ${isDragging ? "bg-dark-600" : "bg-dark-900"}`}>
-                <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{name}</span>
+                <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{title}</span>
 
                 <div className="flex items-center gap-3">
                     {!isAddingNewCard && <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={() => onNewCardClick(NewCardLocation.UP)} />}
