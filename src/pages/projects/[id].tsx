@@ -83,6 +83,23 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
             },
             creator: true,
             timers: true,
+            checklists: {
+                include: {
+                    checklist: {
+                        include: {
+                            tasks: {
+                                include: {
+                                    users: {
+                                        include: {
+                                            user: true,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
     });
 
