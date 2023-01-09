@@ -49,11 +49,9 @@ const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["chec
     );
 };
 
-export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => {
-    const { name, attachments, activities, cover, checklists, labels, due_date, users, isDragging } = props;
-
+export const Card = ({ id, name, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: PageProps["cards"][0] & { isDragging: boolean }) => {
     const menuButtonRef = useRef<HTMLDivElement>(null);
-    const { emit } = useCustomEvent<PageProps["cards"][0]>("card-clicked", false);
+    const { emit } = useCustomEvent<string>("card-clicked", false);
 
     const { openMenu, closeMenu, toggleMenu } = useMenu();
 
@@ -64,10 +62,10 @@ export const Card = (props: PageProps["cards"][0] & { isDragging: boolean }) => 
             // if e.target is menuButtonRef.current or its children, return
             if (menuButtonRef.current?.contains(e.target as Node)) return;
 
-            emit(props);
+            emit(id);
             closeMenu();
         },
-        [closeMenu, emit, props]
+        [closeMenu, emit, id]
     );
 
     return (
