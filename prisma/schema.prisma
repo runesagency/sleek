@@ -20,7 +20,8 @@ datasource db {
 // Instead of using roles, we use a table that lists all the permissions 
 // and map them to users and organizations
 model permissions {
-  id          String @id @default(uuid())
+  id String @id @default(uuid())
+
   name        String
   description String
 
@@ -33,16 +34,40 @@ model permissions {
 }
 
 model labels {
-  id          String @id @default(uuid())
+  id         String @id @default(uuid())
+  creator_id String @map("user_created_id")
+
   name        String
   description String
   color       String
 
-  user_created_id String
-  created_at      DateTime @default(now())
+  created_at DateTime @default(now())
 
-  user_created users?        @relation(fields: [user_created_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  cards        card_labels[]
+  creator users? @relation(fields: [creator_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  cards card_labels[]
+}
+
+model attachments {
+  id          String  @id @default(uuid())
+  uploader_id String
+  modifier_id String?
+
+  title   String
+  storage attachment_storage
+
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  uploader users? @relation(fields: [uploader_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  modifier users? @relation("attachment_modifier", fields: [modifier_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  cards_assigned card_attachments[]
+}
+
+enum attachment_storage {
+  Local
+  S3
 }
 
 // ------------------------------
@@ -53,12 +78,15 @@ model labels {
 // ------------------------------
 
 model organizations {
-  id          String @id @default(uuid())
+  id         String @id @default(uuid())
+  creator_id String
+
   name        String
   description String
 
-  user_created_id String
-  created_at      DateTime @default(now())
+  created_at DateTime @default(now())
+
+  creator users @relation(fields: [creator_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   users_joined    organization_users[]
   projects_joined project_organizations[]
@@ -69,11 +97,12 @@ model organization_users {
   user_id         String
   organization_id String
 
-  created_at DateTime @default(now())
+  added_at DateTime @default(now())
 
-  user         users?                          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  organization organizations?                  @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permissions  organization_user_permissions[]
+  user         users?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  permissions organization_user_permissions[]
 }
 
 model organization_user_permissions {
@@ -81,7 +110,7 @@ model organization_user_permissions {
   organization_user_id String
   permission_id        String
 
-  created_at DateTime @default(now())
+  added_at DateTime @default(now())
 
   organization_user organization_users? @relation(fields: [organization_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   permission        permissions?        @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -106,13 +135,21 @@ model users {
 
   created_at DateTime @default(now())
 
-  projects_joined      project_users[]
-  organizations_joined organization_users[]
-  permissions          user_permissions[]
-  cards_joined         card_users[]
-  labels_created       labels[]
-  card_labels_created  card_labels[]
-  cards_created        cards[]
+  permissions     user_permissions[]
+  labels_created  labels[]
+  projects_joined project_users[]
+
+  organizations_created organizations[]
+  organizations_joined  organization_users[]
+
+  cards_created cards[]
+  cards_joined  card_users[]
+
+  tasks      checklist_task_users[]
+  activities activities[]
+
+  attachments          attachments[]
+  attachment_modifieds attachments[] @relation("attachment_modifier")
 }
 
 model user_permissions {
@@ -120,7 +157,7 @@ model user_permissions {
   user_id       String
   permission_id String
 
-  created_at DateTime @default(now())
+  added_at DateTime @default(now())
 
   user       users?       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   permission permissions? @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -131,13 +168,13 @@ model user_permissions {
 // ------------------------------
 
 model projects {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  description String
+  description String? @db.LongText
 
+  boards               boards[]
   users_joined         project_users[]
   organizations_joined project_organizations[]
-  boards               boards[]
 }
 
 model project_organizations {
@@ -145,18 +182,19 @@ model project_organizations {
   project_id      String
   organization_id String
 
-  project                          projects?                          @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  organization                     organizations?                     @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  project_organization_permissions project_organization_permissions[]
+  project      projects?      @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  permissions project_organization_permissions[]
 }
 
 model project_organization_permissions {
   id                      String @id @default(uuid())
-  project_organization_id String
   permission_id           String
+  project_organization_id String
 
-  project_organization project_organizations? @relation(fields: [project_organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission           permissions?           @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission   permissions?           @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organization project_organizations? @relation(fields: [project_organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model project_users {
@@ -164,18 +202,19 @@ model project_users {
   user_id    String
   project_id String
 
-  user        users?                     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  project     projects?                  @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user    users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project projects? @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   permissions project_user_permissions[]
 }
 
 model project_user_permissions {
   id              String @id @default(uuid())
-  project_user_id String
   permission_id   String
+  project_user_id String
 
-  project_user project_users? @relation(fields: [project_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission   permissions?   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user       project_users? @relation(fields: [project_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission permissions?   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -183,28 +222,30 @@ model project_user_permissions {
 // ------------------------------
 
 model boards {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-
+  id         String @id @default(uuid())
   project_id String
-  project    projects? @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  lists      lists[]
+
+  name        String
+  description String? @db.LongText
+
+  project projects? @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  lists lists[]
 }
 
 // ------------------------------
 // Lists
 // ------------------------------
 model lists {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-
-  order Int @default(0)
-
+  id       String @id @default(uuid())
   board_id String
-  board    boards? @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  cards    cards[]
+
+  title String
+  order Int    @default(0)
+
+  board boards? @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  cards cards[]
 }
 
 // ------------------------------
@@ -212,16 +253,16 @@ model lists {
 // ------------------------------
 
 model cards {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-
-  list_id             String
-  order               Int     @default(0)
+  id                  String  @id @default(uuid())
+  board_id            String
+  list_id             String? // nullable for archived cards or created on any layout beside kanban
   cover_attachment_id String? @unique
 
-  start_date DateTime?
-  due_date   DateTime?
+  title       String
+  description String?   @db.LongText
+  order       Int       @default(0)
+  start_date  DateTime?
+  due_date    DateTime?
 
   created_by String?
   created_at DateTime @default(now())
@@ -235,6 +276,7 @@ model cards {
   labels      card_labels[]
   attachments card_attachments[]
   checklists  card_checklists[]
+  timers      card_timers[]
 }
 
 model card_labels {
@@ -242,12 +284,10 @@ model card_labels {
   card_id  String
   label_id String
 
-  created_by String?
-  created_at DateTime @default(now())
+  added_at DateTime @default(now())
 
-  card    cards?  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  label   labels? @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  creator users?  @relation(fields: [created_by], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  card  cards?  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  label labels? @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model card_users {
@@ -257,48 +297,84 @@ model card_users {
 
   subscribed Boolean @default(false)
 
-  created_at DateTime @default(now())
+  added_at DateTime @default(now())
 
   user users? @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   card cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model card_attachments {
-  id      String @id @default(uuid())
-  card_id String
+  id            String @id @default(uuid())
+  card_id       String
+  attachment_id String
 
-  name String
-  url  String
+  added_at DateTime @default(now())
 
-  created_at DateTime @default(now())
-
-  cards       cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  is_cover_of cards? @relation("card_cover")
+  cards       cards?      @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  attachment  attachments @relation(fields: [attachment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  is_cover_of cards?      @relation("card_cover")
 }
 
 model card_checklists {
+  id           String @id @default(uuid())
+  card_id      String
+  checklist_id String
+
+  card      cards?      @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  checklist checklists? @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model card_timers {
   id      String @id @default(uuid())
   card_id String
 
-  name String
+  started_at DateTime? @default(now())
+  ended_at   DateTime?
 
-  created_at DateTime @default(now())
-
-  card  cards?                 @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  tasks card_checklist_tasks[]
+  card cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-model card_checklist_tasks {
-  id                String @id @default(uuid())
-  card_checklist_id String
+// ------------------------------
+// Checklists
+// ------------------------------
 
-  name        String
-  description String?
-  completed   Boolean @default(false)
+model checklists {
+  id    String @id @default(uuid())
+  title String
 
-  created_at DateTime @default(now())
+  created_at DateTime  @default(now())
+  updated_at DateTime?
 
-  card_checklist card_checklists? @relation(fields: [card_checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tasks          checklist_tasks[]
+  cards_assigned card_checklists[]
+}
+
+model checklist_tasks {
+  id           String @id @default(uuid())
+  checklist_id String
+
+  text       String
+  completed  Boolean   @default(false)
+  start_date DateTime?
+  due_date   DateTime?
+
+  created_at DateTime  @default(now())
+  updated_at DateTime?
+
+  checklist checklists? @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  users checklist_task_users[]
+}
+
+model checklist_task_users {
+  id      String @id @default(uuid())
+  task_id String
+  user_id String
+
+  added_at DateTime @default(now())
+
+  task checklist_tasks? @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user users?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -306,10 +382,15 @@ model card_checklist_tasks {
 // ------------------------------
 
 model activities {
-  id          String @id @default(uuid())
-  name        String
-  description String
-
+  id      String @id @default(uuid())
+  user_id String
   card_id String
-  card    cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  message  String? @db.LongText
+  activity String?
+
+  created_at DateTime @default(now())
+
+  card cards? @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user users? @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
