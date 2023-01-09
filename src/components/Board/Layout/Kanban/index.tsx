@@ -189,7 +189,7 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
     );
 
     const onCardAdded = useCallback(
-        (name: string, listId: string, location: NewCardLocation) => {
+        async (name: string, listId: string, location: NewCardLocation) => {
             const parsedName = name.trim();
             if (parsedName === "") return;
 
@@ -199,27 +199,48 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
             const otherCards = cards.filter((card) => card.list_id !== listId);
             const listCards = cards.filter((card) => card.list_id === listId);
 
-            const newCard = {
-                id: randomId(),
-                name: parsedName,
+            const newCard: Partial<PageProps["cards"][0]> = {
+                title: parsedName,
                 list_id: listId,
-                users: [],
+                board_id: list.board_id,
                 order: location === NewCardLocation.UP ? 0 : listCards.length,
-            } as any;
+            };
+
+            const res = await fetch("/api/cards", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newCard),
+            });
+
+            const card: PageProps["cards"][0] = await res.json();
+
+            let updatedCards: PageProps["cards"] = [];
 
             if (location === NewCardLocation.UP) {
-                setCards([
+                updatedCards = [
                     ...otherCards, //
-                    newCard,
+                    card,
                     ...listCards.map((card) => ({ ...card, order: card.order + 1 })),
-                ]);
+                ];
             } else {
-                setCards([
+                updatedCards = [
                     ...otherCards, //
                     ...listCards,
-                    newCard,
-                ]);
+                    card,
+                ];
             }
+
+            setCards(updatedCards);
+
+            await fetch("/api/cards", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedCards),
+            });
         },
         [cards, lists, setCards]
     );
@@ -229,10 +250,9 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
             ...lists,
             {
                 id: randomId(),
-                name: "My New List",
+                title: "My New List",
                 order: lists.length,
                 board_id: boardId,
-                description: null,
             },
         ];
 

@@ -1,6 +1,4 @@
 import type { GetServerSideProps } from "next";
-import type { activities, cards, card_attachments, card_checklists, card_checklist_tasks, card_labels, card_users, labels, lists, users } from "@prisma/client";
-import type { ParsedSSRProps } from "@/lib/utils";
 
 import { prisma } from "@/lib/prisma";
 import KanbanLayout from "@/components/Board/Layout/Kanban";
@@ -10,25 +8,8 @@ import { parseSSRProps } from "@/lib/utils";
 import { IconBell, IconUsers } from "@tabler/icons";
 import { useCallback, useState } from "react";
 
-export type PageProps = {
+export type PageProps = Awaited<ReturnType<typeof getServerSidePropsData>> & {
     boardId: string;
-    lists: ParsedSSRProps<lists[]>;
-    cards: ParsedSSRProps<
-        (cards & {
-            labels: (card_labels & {
-                label: labels | null;
-            })[];
-            users: (card_users & {
-                user: users | null;
-            })[];
-            activities: activities[];
-            attachments: card_attachments[];
-            cover: card_attachments | null;
-            checklists: (card_checklists & {
-                tasks: card_checklist_tasks[];
-            })[];
-        })[]
-    >;
 };
 
 export type LayoutProps = PageProps & {
@@ -36,10 +17,8 @@ export type LayoutProps = PageProps & {
     setLists: React.Dispatch<React.SetStateAction<PageProps["lists"]>>;
 };
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
-    const boardId = "f34ad9e7-c676-47bb-a27c-ebdc127d4694";
-
-    const lists = await prisma.lists.findMany({
+export const getServerSidePropsData = async (db: typeof prisma, boardId: string) => {
+    const lists = await db.lists.findMany({
         orderBy: {
             order: "asc",
         },
@@ -48,11 +27,9 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
         },
     });
 
-    const cards = await prisma.cards.findMany({
+    const cards = await db.cards.findMany({
         where: {
-            list_id: {
-                in: lists.map(({ id }) => id),
-            },
+            board_id: boardId,
         },
         orderBy: {
             order: "asc",
@@ -68,22 +45,67 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
                     user: true,
                 },
             },
-            activities: true,
-            attachments: true,
-            cover: true,
-            checklists: {
+            activities: {
                 include: {
-                    tasks: true,
+                    user: true,
                 },
             },
+            attachments: {
+                include: {
+                    attachment: true,
+                },
+            },
+            cover: {
+                include: {
+                    attachment: true,
+                },
+            },
+            checklists: {
+                include: {
+                    checklist: {
+                        include: {
+                            tasks: true,
+                        },
+                    },
+                },
+            },
+            creator: true,
+            timers: true,
         },
     });
 
     return {
+        lists: parseSSRProps(lists),
+        cards: parseSSRProps(cards),
+    };
+};
+
+export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]: unknown }> = async ({ query }) => {
+    const boardId = query.id as string;
+
+    const board = await prisma.boards.findUnique({
+        where: {
+            id: boardId,
+        },
+    });
+
+    if (!board) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            },
+            props: {},
+        };
+    }
+
+    const { lists, cards } = await getServerSidePropsData(prisma, boardId);
+
+    return {
         props: {
             boardId,
-            lists: parseSSRProps(lists),
-            cards: parseSSRProps(cards),
+            lists,
+            cards,
         },
     };
 };

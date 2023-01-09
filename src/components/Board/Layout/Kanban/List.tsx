@@ -30,12 +30,13 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
     const onButtonSaveClick = useCallback(() => {
         if (textarea.current) {
             onSave(textarea.current.value);
+            onClose();
         }
-    }, [onSave]);
+    }, [onClose, onSave]);
 
     return (
         <div ref={ref} className="flex shrink-0 flex-col gap-2">
-            <Textarea innerRef={textarea} autoFocus saveToLocalStorage localStorageKey={listId + "-new-card"} onSave={onSave} onClose={onClose} />
+            <Textarea innerRef={textarea} autoFocus saveOnEnter saveToLocalStorage localStorageKey={listId + "-new-card"} onSave={onSave} onClose={onClose} />
             <ButtonLarge onClick={onButtonSaveClick}>Create New Card</ButtonLarge>
         </div>
     );
