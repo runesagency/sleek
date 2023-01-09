@@ -53,8 +53,11 @@ model attachments {
   uploader_id String
   modifier_id String?
 
-  title   String
-  storage attachment_storage
+  title           String
+  filename_disk   String
+  filename_source String
+  type            String
+  storage         attachment_storage
 
   created_at DateTime  @default(now())
   updated_at DateTime?
