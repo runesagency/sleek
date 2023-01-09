@@ -6,14 +6,18 @@ import Checkbox from "@/components/Forms/Checkbox";
 import { IconDots, IconPlus } from "@tabler/icons";
 
 type ChecklistProps = {
-    data?: PageProps["cards"][0]["checklists"][0];
+    data?: PageProps["cards"][0]["checklists"][0]["checklist"];
 };
 
 export default function Checklist({ data }: ChecklistProps) {
+    if (!data) return null;
+
+    const percentage = data.tasks.filter((task) => task.completed).length / data.tasks.length;
+
     return (
         <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-                <h1 className="text-xl font-bold">Preparation</h1>
+                <h1 className="text-xl font-bold">{data.title}</h1>
 
                 <div className="flex items-center gap-5">
                     <IconPlus />
@@ -26,20 +30,17 @@ export default function Checklist({ data }: ChecklistProps) {
                     <div className="h-full w-1/2 rounded-full bg-dark-50" />
                 </section>
 
-                <p className="text-xs">50%</p>
+                <p className="text-xs">{percentage}%</p>
             </div>
 
             <div className="flex flex-col gap-3 pl-3">
-                <div className="flex items-start gap-3">
-                    <Checkbox />
+                {data.tasks.map(({ text, completed }, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                        <Checkbox defaultChecked={completed} />
 
-                    <div className="flex flex-col gap-2">Create a Figma account</div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <Checkbox />
-
-                    <div className="flex flex-col gap-2">Create a Figma account</div>
-                </div>
+                        <div className="flex flex-col gap-2">{text}</div>
+                    </div>
+                ))}
 
                 <Small fit>Add New Task</Small>
             </div>

@@ -1,5 +1,3 @@
-import { Small } from "@/components/Forms/Button";
-
 import { IconArrowBackUp, IconDots, IconPencil, IconSquare, IconTrash } from "@tabler/icons";
 import ReactMarkdown from "react-markdown";
 

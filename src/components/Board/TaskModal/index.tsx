@@ -66,7 +66,7 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
 
     const onTitleUpdate = useCallback(
         (newTitle: string) => {
-            updateCard({ name: newTitle });
+            updateCard({ title: newTitle });
         },
         [updateCard]
     );
@@ -80,6 +80,14 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
 
     if (!card) return null;
 
+    // count total timer from card.timers, count between start and end date, if there's no end date then keep the count going
+    const totalTimer = card.timers.reduce((acc, timer) => {
+        const start = new Date(timer.started_at);
+        const end = timer.ended_at ? new Date(timer.ended_at) : new Date();
+
+        return acc + (end.getTime() - start.getTime());
+    }, 0);
+
     return (
         <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto">
             {/* Use this blocker instead useClickOutside hooks to prevent outside click bug when editing description using React SimpleMDE editor */}
@@ -90,7 +98,7 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
             <div className="relative z-20 mt-10 flex h-max w-full max-w-4xl flex-col gap-7 rounded-md bg-dark-700 p-10">
                 {/* Title */}
                 <section className="flex w-full items-start justify-center gap-5">
-                    <Title defaultTitle={card.name} onUpdate={onTitleUpdate} />
+                    <Title defaultTitle={card.title} onUpdate={onTitleUpdate} />
 
                     <Large icon={IconBell} fit>
                         Subscribe
@@ -101,27 +109,39 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
                 <section className="flex w-full flex-col gap-4">
                     <Information label="Created By">
                         <div className="flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Asep+Sukamiskin+Sudrajat" alt="avatar" className="h-10 w-10 rounded-full" />
-                            <p className="flex flex-col justify-center">Asep Sukamiskin Sudrajat</p>
+                            {card.creator ? (
+                                <>
+                                    <img src={card.creator.image_url || ""} alt={card.creator.name} className="h-10 w-10 rounded-full" />
+                                    <p>{card.creator.name}</p>
+                                </>
+                            ) : (
+                                <p className="italic">User Not Found</p>
+                            )}
                         </div>
                     </Information>
 
                     <Information label="Assigned to">
                         <div className="flex items-center gap-2">
-                            <div className="flex -space-x-2">
-                                {Array(7)
-                                    .fill(0)
-                                    .map((_, i) => (
-                                        <img
-                                            key={i}
-                                            src={`https://picsum.photos/200?random=${i}`}
-                                            alt="avatar"
-                                            className="box-border h-10 w-10 shrink-0 rounded-full border-2 border-dark-700 object-cover object-center"
-                                        />
-                                    ))}
-                            </div>
+                            {card.users.length > 0 && (
+                                <>
+                                    <div className="flex -space-x-2">
+                                        {card.users.map(({ user }, i) => {
+                                            if (!user || i > 10) return null;
 
-                            <p>+69 Member</p>
+                                            return (
+                                                <img
+                                                    key={i}
+                                                    src={user.image_url || ""}
+                                                    alt={user.name}
+                                                    className="box-border h-10 w-10 shrink-0 rounded-full border-2 border-dark-700 object-cover object-center"
+                                                />
+                                            );
+                                        })}
+                                    </div>
+
+                                    {card.users.length > 10 && <p>+{card.users.length - 10} Members</p>}
+                                </>
+                            )}
 
                             <button className="shrink-0 rounded-full bg-white p-2">
                                 <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
@@ -132,28 +152,30 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
                     <Information label="Start Date &#8594; Due Date">
                         <div className="flex w-full items-center gap-2">
                             <Small icon={IconCalendar} fit>
-                                01 Jan 2023 - 03:39
+                                {card.start_date ? card.start_date : "No Start Date"}
                             </Small>
 
                             <span>&#8594;</span>
 
                             <Small icon={IconCalendar} fit>
-                                35 Feb 3069 - 05:44
+                                {card.due_date ? card.due_date : "No Due Date"}
                             </Small>
                         </div>
                     </Information>
 
                     <Information label="Timer">
                         <Small icon={IconHourglass} fit>
-                            01:34:49
+                            {totalTimer}
                         </Small>
                     </Information>
 
                     <Information label="Labels" alignStart>
                         <div className="flex flex-wrap items-center gap-3">
-                            {["🤑", "Cuan Gede", "Front End 😁", "Pokoknya Kerjain", "( ͡° ͜ʖ ͡°)", "12-04-2026", "Missed IT!", "!!!Important"].map((val, i) => (
-                                <Label key={i} name={val} className="!text-sm" />
-                            ))}
+                            {card.labels.map(({ label }, i) => {
+                                if (!label) return null;
+
+                                return <Label key={i} name={label.name} color={label.color} className="!text-sm" />;
+                            })}
 
                             <button className="shrink-0 rounded-full bg-white p-2">
                                 <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
@@ -166,7 +188,9 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
 
                 {/* Checklists */}
                 <Section title="Checklists">
-                    <Checklist />
+                    {card.checklists.map(({ checklist }, i) => (
+                        <Checklist key={i} data={checklist} />
+                    ))}
 
                     <Large icon={IconPlus}>Add New Checklist</Large>
                 </Section>
@@ -182,10 +206,13 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
 
                 {/* Attachment */}
                 <Section title="Attachments">
-                    <div className="mb-4 flex gap-4 overflow-x-auto">
-                        <Attachment title="filename.exe" timestamp="29 February 3045 - 10:30 PM" />
-                        <Attachment title="KONSOOOOOOOOOOL.mp4" timestamp="17 August 1945 - 06:09 AM" />
-                    </div>
+                    {card.attachments.length > 0 && (
+                        <div className="mb-4 flex gap-4 overflow-x-auto">
+                            {card.attachments.map(({ attachment, added_at }, i) => (
+                                <Attachment key={i} title={attachment.title} timestamp={added_at} />
+                            ))}
+                        </div>
+                    )}
 
                     <Small fit>Add New Attachment</Small>
                 </Section>
@@ -195,16 +222,9 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
                 {/* Activities */}
                 <Section title="Activities">
                     <div className="flex flex-col gap-7">
-                        <Activity sender="Asep Sukamiskin Sudrajat" details="created this card." timestamp="17 Agustus 1945" />
-                        <Activity sender="Asep Sukamiskin Sudrajat" details="added 76 members to this card." timestamp="20 November 1999" />
-                        <Activity sender="Jamaluddin" content="Hi Mr. Asep, can you explain how this things works?" timestamp="11 September 2001" />
-                        <Activity
-                            sender="Asep Sukamiskin Sudrajat"
-                            content="Thank you for your response Mr. Jamal, so for the authentication things, you only need to use JWT system so the session can be catched on client side, hope you understand what i meant ✌."
-                            timestamp="08 August 2003"
-                        />
-                        <Activity sender="Budi Septiani" details="added new attachment (JWT Flow) to this card." timestamp="30 Seconds Ago" />
-                        <Activity sender="Ucup Barbara" content="I think your attachment isn't what Mr. Asep meant, @Budi Septiani." timestamp="Just Now" />
+                        {card.activities.map(({ activity, user, message, created_at }, i) => (
+                            <Activity key={i} sender={user.name} details={activity || undefined} content={message || undefined} timestamp={created_at} />
+                        ))}
 
                         <section className="flex flex-col gap-3">
                             <Textarea placeholder="Write a comment..." />
