@@ -9,6 +9,9 @@
         "lint": "next lint",
         "prepare": "husky install"
     },
+    "prisma": {
+        "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    },
     "eslintConfig": {
         "parser": "@typescript-eslint/parser",
         "plugins": [
