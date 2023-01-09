@@ -1,5 +1,5 @@
-import type { PageProps } from "@/pages/projects/[id]";
 import type { CSSProperties } from "react";
+import type { Card as CardType } from "@/lib/types";
 
 import { SortableType } from ".";
 
@@ -12,7 +12,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { useCallback, useRef, useState } from "react";
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
 
-const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["checklists"] }) => {
+const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) => {
     const [open, setOpen] = useState(false);
 
     const tasks = checklists.flatMap(({ checklist }) => checklist).flatMap((checklist) => checklist?.tasks ?? []);
@@ -49,7 +49,7 @@ const TasksProgress = ({ checklists }: { checklists: PageProps["cards"][0]["chec
     );
 };
 
-export const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: PageProps["cards"][0] & { isDragging: boolean }) => {
+export const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: CardType & { isDragging: boolean }) => {
     const menuButtonRef = useRef<HTMLDivElement>(null);
     const { emit } = useCustomEvent<string>("card-clicked", false);
 
@@ -172,7 +172,7 @@ export const Card = ({ id, title, attachments, activities, cover, checklists, la
     );
 };
 
-export const CardContainer = (props: PageProps["cards"][0]) => {
+export const CardContainer = (props: CardType) => {
     const { id, order } = props;
 
     const { setNodeRef, listeners, isDragging, transform, transition } = useSortable({

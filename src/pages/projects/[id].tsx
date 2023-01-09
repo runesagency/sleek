@@ -1,4 +1,5 @@
 import type { GetServerSideProps } from "next";
+import type { Card as CardType, List as ListType } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
 import KanbanLayout from "@/components/Board/Layout/Kanban";
@@ -8,17 +9,37 @@ import { parseSSRProps } from "@/lib/utils";
 import { IconBell, IconUsers } from "@tabler/icons";
 import { useCallback, useState } from "react";
 
-export type PageProps = Awaited<ReturnType<typeof getServerSidePropsData>> & {
+export type PageProps = {
     boardId: string;
+    cards: CardType[];
+    lists: ListType[];
 };
 
 export type LayoutProps = PageProps & {
-    setCards: React.Dispatch<React.SetStateAction<PageProps["cards"]>>;
-    setLists: React.Dispatch<React.SetStateAction<PageProps["lists"]>>;
+    setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
+    setLists: React.Dispatch<React.SetStateAction<ListType[]>>;
 };
 
-export const getServerSidePropsData = async (db: typeof prisma, boardId: string) => {
-    const lists = await db.lists.findMany({
+export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]: unknown }> = async ({ query }) => {
+    const boardId = query.id as string;
+
+    const board = await prisma.boards.findUnique({
+        where: {
+            id: boardId,
+        },
+    });
+
+    if (!board) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            },
+            props: {},
+        };
+    }
+
+    const lists = await prisma.lists.findMany({
         orderBy: {
             order: "asc",
         },
@@ -27,7 +48,7 @@ export const getServerSidePropsData = async (db: typeof prisma, boardId: string)
         },
     });
 
-    const cards = await db.cards.findMany({
+    const cards = await prisma.cards.findMany({
         where: {
             board_id: boardId,
         },
@@ -60,62 +81,26 @@ export const getServerSidePropsData = async (db: typeof prisma, boardId: string)
                     attachment: true,
                 },
             },
-            checklists: {
-                include: {
-                    checklist: {
-                        include: {
-                            tasks: true,
-                        },
-                    },
-                },
-            },
             creator: true,
             timers: true,
         },
     });
 
     return {
-        lists: parseSSRProps(lists),
-        cards: parseSSRProps(cards),
-    };
-};
-
-export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]: unknown }> = async ({ query }) => {
-    const boardId = query.id as string;
-
-    const board = await prisma.boards.findUnique({
-        where: {
-            id: boardId,
-        },
-    });
-
-    if (!board) {
-        return {
-            redirect: {
-                destination: "/",
-                permanent: false,
-            },
-            props: {},
-        };
-    }
-
-    const { lists, cards } = await getServerSidePropsData(prisma, boardId);
-
-    return {
         props: {
             boardId,
-            lists,
-            cards,
+            lists: parseSSRProps(lists),
+            cards: parseSSRProps(cards),
         },
     };
 };
 
 export default function BoardPage({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
     const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
-    const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
+    const [cards, setCards] = useState<CardType[]>(originalCards);
 
     const onCardUpdate = useCallback(
-        async (card: PageProps["cards"][0]) => {
+        async (card: CardType) => {
             const foundCardIndex = cards.findIndex(({ id }) => id === card.id);
 
             if (foundCardIndex === -1) return;

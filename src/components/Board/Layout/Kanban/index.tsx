@@ -1,5 +1,6 @@
-import type { LayoutProps, PageProps } from "@/pages/projects/[id]";
+import type { LayoutProps } from "@/pages/projects/[id]";
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
+import type { Card as CardType } from "@/lib/types";
 
 import { Card } from "@/components/Board/Layout/Kanban/Card";
 import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
@@ -19,7 +20,7 @@ export enum SortableType {
 }
 
 export default function KanbanLayout({ lists, setLists, cards, setCards, boardId }: LayoutProps) {
-    const [draggedItem, setDraggedItem] = useState<PageProps["cards"][0] | undefined | null>(null);
+    const [draggedItem, setDraggedItem] = useState<CardType | undefined | null>(null);
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
@@ -90,7 +91,7 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
                             order: index,
                         }));
 
-                    let newDestinationListCards: PageProps["cards"] = [];
+                    let newDestinationListCards: CardType[] = [];
 
                     if (target.type === SortableType.List) {
                         newDestinationListCards = [
@@ -199,7 +200,7 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
             const otherCards = cards.filter((card) => card.list_id !== listId);
             const listCards = cards.filter((card) => card.list_id === listId);
 
-            const newCard: Partial<PageProps["cards"][0]> = {
+            const newCard: Partial<CardType> = {
                 title: parsedName,
                 list_id: listId,
                 board_id: list.board_id,
@@ -214,9 +215,9 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
                 body: JSON.stringify(newCard),
             });
 
-            const card: PageProps["cards"][0] = await res.json();
+            const card: CardType = await res.json();
 
-            let updatedCards: PageProps["cards"] = [];
+            let updatedCards: CardType[] = [];
 
             if (location === NewCardLocation.UP) {
                 updatedCards = [
@@ -280,7 +281,7 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
                 {(draggedItem === null || typeof draggedItem !== "undefined") && (
                     <DragOverlay>
                         {draggedItem && (
-                            <Card {...(draggedItem as PageProps["cards"][0])} isDragging={false} /> //
+                            <Card {...(draggedItem as CardType)} isDragging={false} /> //
                         )}
                     </DragOverlay>
                 )}

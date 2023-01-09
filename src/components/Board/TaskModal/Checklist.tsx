@@ -1,4 +1,4 @@
-import type { PageProps } from "@/pages/projects/[id]";
+import type { Card as CardType } from "@/lib/types";
 
 import { Small } from "@/components/Forms/Button";
 import Checkbox from "@/components/Forms/Checkbox";
@@ -6,7 +6,7 @@ import Checkbox from "@/components/Forms/Checkbox";
 import { IconDots, IconPlus } from "@tabler/icons";
 
 type ChecklistProps = {
-    data?: PageProps["cards"][0]["checklists"][0]["checklist"];
+    data?: CardType["checklists"][0]["checklist"];
 };
 
 export default function Checklist({ data }: ChecklistProps) {

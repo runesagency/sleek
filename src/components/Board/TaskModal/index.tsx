@@ -1,5 +1,5 @@
-import type { PageProps } from "@/pages/projects/[id]";
 import type { ReactNode } from "react";
+import type { Card as CardType } from "@/lib/types";
 
 import Title from "@/components/Board/TaskModal/Title";
 import Activity from "@/components/Board/TaskModal/Activity";
@@ -46,8 +46,8 @@ const Information = ({ label, children, alignStart }: InformationProps) => {
 };
 
 type TaskModalProps = {
-    cards: PageProps["cards"];
-    onUpdate: (card: PageProps["cards"][0]) => void;
+    cards: CardType[];
+    onUpdate: (card: CardType) => void;
 };
 
 export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
@@ -55,7 +55,7 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
     const card = cards.find((card) => card.id === cardId);
 
     const updateCard = useCallback(
-        (newData: Partial<PageProps["cards"][0]>) => {
+        (newData: Partial<CardType>) => {
             if (!card) return;
             console.log("updated");
 

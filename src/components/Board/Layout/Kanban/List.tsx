@@ -1,5 +1,5 @@
-import type { PageProps } from "@/pages/projects/[id]";
 import type { CSSProperties } from "react";
+import type { Card as CardType, List as ListType } from "@/lib/types";
 
 import { SortableType } from ".";
 
@@ -42,8 +42,8 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
     );
 };
 
-type ListProps = PageProps["lists"][0] & {
-    cards: PageProps["cards"];
+type ListProps = ListType & {
+    cards: CardType[];
     onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
 };
 

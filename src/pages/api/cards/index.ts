@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import type { PageProps } from "@/pages/projects/[id]";
+import type { Card as CardType } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const sourceCards: PageProps["cards"] | PageProps["cards"][0] = req.body;
+    const sourceCards: CardType[] | CardType = req.body;
     const cards = Array.isArray(sourceCards) ? sourceCards : [sourceCards];
 
     switch (req.method) {
