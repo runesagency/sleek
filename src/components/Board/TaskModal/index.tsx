@@ -164,17 +164,6 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
 
                 <hr className="border-dark-600" />
 
-                {/* Actions */}
-                <Section title="Actions">
-                    <div className="flex gap-2">
-                        <Large icon={IconBell} fit>
-                            Subscribe
-                        </Large>
-                    </div>
-                </Section>
-
-                <hr className="border-dark-600" />
-
                 {/* Checklists */}
                 <Section title="Checklists">
                     <Checklist />
