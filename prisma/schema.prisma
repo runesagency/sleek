@@ -120,7 +120,7 @@ model organization_user_permissions {
 }
 
 // ------------------------------
-// Users
+// [Users]
 // ------------------------------
 
 model users {
@@ -167,7 +167,7 @@ model user_permissions {
 }
 
 // ------------------------------
-// Projects
+// [Projects]
 // ------------------------------
 
 model projects {
@@ -221,7 +221,7 @@ model project_user_permissions {
 }
 
 // ------------------------------
-// Boards
+// [Boards]
 // ------------------------------
 
 model boards {
@@ -237,8 +237,9 @@ model boards {
 }
 
 // ------------------------------
-// Lists
+// [Lists]
 // ------------------------------
+
 model lists {
   id       String @id @default(uuid())
   board_id String
@@ -252,7 +253,7 @@ model lists {
 }
 
 // ------------------------------
-// Cards
+// [Cards]
 // ------------------------------
 
 model cards {
@@ -339,7 +340,7 @@ model card_timers {
 }
 
 // ------------------------------
-// Checklists
+// [Checklists]
 // ------------------------------
 
 model checklists {
@@ -382,7 +383,7 @@ model checklist_task_users {
 }
 
 // ------------------------------
-// Activities
+// [Activities]
 // ------------------------------
 
 model activities {
