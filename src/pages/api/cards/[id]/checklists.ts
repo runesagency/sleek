@@ -42,4 +42,4 @@ router.delete(async (req, res) => {
     return res.status(200).json(updatedCard);
 });
 
-export default router;
+export default router.handler();

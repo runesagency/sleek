@@ -58,4 +58,4 @@ router.delete(async (req, res) => {
     return res.status(200).end();
 });
 
-export default router;
+export default router.handler();
