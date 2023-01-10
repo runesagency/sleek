@@ -7,12 +7,12 @@ import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
 import { Large as ButtonLarge } from "@/components/Forms/Button";
 import NoSSR from "@/components/NoSSR";
 
+import { closestCorners, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, DndContext } from "@dnd-kit/core";
 import ScrollContainer from "react-indiana-drag-scroll";
 import { useCallback, useState } from "react";
 import { randomId } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons";
 import { horizontalListSortingStrategy, SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, DndContext } from "@dnd-kit/core";
 
 export enum SortableType {
     List = "list",
@@ -262,7 +262,7 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
 
     return (
         <NoSSR>
-            <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
+            <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} collisionDetection={closestCorners}>
                 <SortableContext items={lists.flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
                     <ScrollContainer className="flex h-full max-h-full w-full flex-1 justify-start gap-7 py-10 px-11" ignoreElements="*[data-prevent-drag-scroll]" hideScrollbars={false}>
                         {lists
