@@ -236,6 +236,8 @@ model boards {
   lists lists[]
 }
 
+// TODO: Add a permission model
+
 // ------------------------------
 // [Lists]
 // ------------------------------
@@ -251,6 +253,8 @@ model lists {
 
   cards cards[]
 }
+
+// TODO: Add a permission model
 
 // ------------------------------
 // [Cards]
