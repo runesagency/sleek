@@ -38,8 +38,8 @@ model labels {
   creator_id String?
 
   name        String
-  description String
-  color       String
+  description String?
+  color       String?
 
   created_at DateTime @default(now())
 
