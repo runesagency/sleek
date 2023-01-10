@@ -3,9 +3,9 @@ import type { Card as CardType } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
 
-import nc from "next-connect";
+import { createRouter } from "next-connect";
 
-const router = nc<NextApiRequest, NextApiResponse>();
+const router = createRouter<NextApiRequest, NextApiResponse>();
 
 /**
  * POST /api/cards
