@@ -85,7 +85,7 @@ model organizations {
   creator_id String
 
   name        String
-  description String
+  description String?
 
   created_at DateTime @default(now())
 
