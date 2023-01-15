@@ -22,7 +22,7 @@ const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) =
 
     return (
         <section className="flex flex-col gap-2">
-            <div className="flex items-center gap-3" onClick={onToggle}>
+            <button ref={innerRef} className="flex items-center gap-3 duration-200 hover:opacity-75" onClick={onToggle}>
                 <section className="h-1.5 w-full rounded-full bg-dark-500">
                     <div className="h-full w-1/2 rounded-full bg-dark-50" />
                 </section>
@@ -30,7 +30,7 @@ const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) =
                 <p className="text-xs">{percentage}</p>
 
                 <IconChevronDown width={undefined} className={open ? "rotate-180" : "rotate-0"} />
-            </div>
+            </button>
 
             <ul className={`origin-top list-disc ${open ? "h-auto scale-y-100" : "h-0 scale-y-0"} duration-200`}>
                 {shownTasks.map(({ text }, i) => (
@@ -52,6 +52,7 @@ type CardProps = CardType & {
 };
 
 const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging, isDragOverlay = false }: CardProps) => {
+    const taskButtonRef = useRef<HTMLButtonElement>(null);
     const { emit } = useCustomEvent<string>("card-clicked", false);
 
     const { openMenu, closeMenu, toggleMenu } = useMenu();
@@ -60,8 +61,9 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         (e: React.MouseEvent<HTMLDivElement>) => {
             e.preventDefault();
 
-            // if e.target is menuButtonRef.current or its children, return
+            // if e.target is Menu or Task List button or its children, return
             if (menuButtonRef.current?.contains(e.target as Node)) return;
+            if (taskButtonRef.current?.contains(e.target as Node)) return;
 
             emit(id);
             closeMenu();
@@ -104,7 +106,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
                     )}
 
                     {/* Progress (Tasks) */}
-                    {checklists.length > 0 && <TasksProgress checklists={checklists} />}
+                    {checklists.length > 0 && <TasksProgress innerRef={taskButtonRef} checklists={checklists} />}
 
                     {/* Dates & Timer */}
                     {due_date && (
