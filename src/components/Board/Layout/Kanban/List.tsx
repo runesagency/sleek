@@ -101,7 +101,7 @@ const List = ({ id, title, cards, onCardAdded, order }: ListProps) => {
     const addCardComponent = <AddNewCard listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
 
     const style: CSSProperties = {
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        transform: transform ? `translate3d(${transform.x}px, 0, 0)` : undefined,
         transition,
     };
 
