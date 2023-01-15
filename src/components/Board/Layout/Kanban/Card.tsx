@@ -85,84 +85,88 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
                 </div>
             </div>
 
-            {/* Labels */}
-            {labels.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2">
-                    {labels.map(({ label }, i) => {
-                        if (!label) return null;
+            {!isDragging && (
+                <>
+                    {/* Labels */}
+                    {labels.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            {labels.map(({ label }, i) => {
+                                if (!label) return null;
 
-                        return <Label key={i} color={label.color} name={label.name} />;
-                    })}
-                </div>
-            )}
-
-            {/* Progress (Tasks) */}
-            {checklists.length > 0 && <TasksProgress checklists={checklists} />}
-
-            {/* Dates & Timer */}
-            {due_date && (
-                <section className="flex items-end justify-between gap-4">
-                    {due_date && (
-                        <Button.Small className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
-                            <p className="truncate text-xs">{due_date}</p>
-                        </Button.Small>
-                    )}
-
-                    {/* <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
-                    <p>01:35:10</p>
-                </ButtonSmall> */}
-                </section>
-            )}
-
-            {/* Footer */}
-            {(activities.length > 0 || attachments.length > 0 || users.length > 0) && (
-                <section className="flex items-center justify-between gap-4">
-                    {(activities.length > 0 || attachments.length > 0) && (
-                        <div className="flex items-center gap-4">
-                            {activities.length > 0 && (
-                                <div className="flex items-center gap-2">
-                                    <IconMessageDots height={16} width={undefined} />
-                                    <p className="text-xs">{activities.length}</p>
-                                </div>
-                            )}
-
-                            {attachments.length > 0 && (
-                                <div className="flex items-center gap-2">
-                                    <IconPaperclip height={16} width={undefined} />
-                                    <p className="text-xs">{attachments.length}</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {users.length > 0 && (
-                        <div className="box-border flex shrink-0 flex-wrap items-center -space-x-2">
-                            {users.map(({ user }, i) => {
-                                if (!user || i > 5) return null;
-
-                                const title = i !== 5 ? user.name : `${users.length - 5} more...`;
-                                const initials =
-                                    i !== 5
-                                        ? user.name
-                                              .split(" ")
-                                              .map((name) => name[0])
-                                              .join("")
-                                        : `+${users.length - 5}`;
-
-                                return (
-                                    <img
-                                        key={i}
-                                        src={`https://ui-avatars.com/api/?background=random&name=${initials}`}
-                                        alt={title}
-                                        title={title}
-                                        loading="lazy"
-                                        className="box-border h-6 w-6 rounded-full border border-dark-600 object-cover object-center"
-                                    />
-                                );
+                                return <Label key={i} color={label.color} name={label.name} />;
                             })}
                         </div>
                     )}
-                </section>
+
+                    {/* Progress (Tasks) */}
+                    {checklists.length > 0 && <TasksProgress checklists={checklists} />}
+
+                    {/* Dates & Timer */}
+                    {due_date && (
+                        <section className="flex items-end justify-between gap-4">
+                            {due_date && (
+                                <Button.Small className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
+                                    <p className="truncate text-xs">{due_date}</p>
+                                </Button.Small>
+                            )}
+
+                            {/* <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
+                    <p>01:35:10</p>
+                </ButtonSmall> */}
+                        </section>
+                    )}
+
+                    {/* Footer */}
+                    {(activities.length > 0 || attachments.length > 0 || users.length > 0) && (
+                        <section className="flex items-center justify-between gap-4">
+                            {(activities.length > 0 || attachments.length > 0) && (
+                                <div className="flex items-center gap-4">
+                                    {activities.length > 0 && (
+                                        <div className="flex items-center gap-2">
+                                            <IconMessageDots height={16} width={undefined} />
+                                            <p className="text-xs">{activities.length}</p>
+                                        </div>
+                                    )}
+
+                                    {attachments.length > 0 && (
+                                        <div className="flex items-center gap-2">
+                                            <IconPaperclip height={16} width={undefined} />
+                                            <p className="text-xs">{attachments.length}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {users.length > 0 && (
+                                <div className="box-border flex shrink-0 flex-wrap items-center -space-x-2">
+                                    {users.map(({ user }, i) => {
+                                        if (!user || i > 5) return null;
+
+                                        const title = i !== 5 ? user.name : `${users.length - 5} more...`;
+                                        const initials =
+                                            i !== 5
+                                                ? user.name
+                                                      .split(" ")
+                                                      .map((name) => name[0])
+                                                      .join("")
+                                                : `+${users.length - 5}`;
+
+                                        return (
+                                            <img
+                                                key={i}
+                                                src={`https://ui-avatars.com/api/?background=random&name=${initials}`}
+                                                alt={title}
+                                                title={title}
+                                                loading="lazy"
+                                                className="box-border h-6 w-6 rounded-full border border-dark-600 object-cover object-center"
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </section>
+                    )}
+                </>
             )}
         </div>
     );
