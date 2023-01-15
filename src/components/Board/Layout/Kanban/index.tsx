@@ -281,7 +281,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                 {(draggedItem === null || typeof draggedItem !== "undefined") && (
                     <DragOverlay>
                         {draggedItem && (
-                            <Card {...(draggedItem as CardType)} isDragging={false} /> //
+                            <Card {...(draggedItem as CardType)} isDragging={false} isDragOverlay /> //
                         )}
                     </DragOverlay>
                 )}
