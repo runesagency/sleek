@@ -1,4 +1,4 @@
-import type { ParsedSSRProps } from "@/lib/utils";
+import type { ParsedSSRProps } from "@/lib/utils/parse-ssr-props";
 import type {
     cards,
     card_attachments,
