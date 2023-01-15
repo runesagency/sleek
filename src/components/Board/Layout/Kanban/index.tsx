@@ -182,7 +182,14 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(updatedCards),
+                    body: JSON.stringify(
+                        updatedCards.filter((card) => {
+                            const currentCard = cards.find((c) => c.id === card.id);
+                            if (!currentCard) return false;
+
+                            return currentCard.order !== card.order || currentCard.list_id !== card.list_id;
+                        })
+                    ),
                 });
             }
         },
