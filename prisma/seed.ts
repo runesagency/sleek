@@ -114,10 +114,13 @@ async function main() {
         },
     });
 
+    console.log(board.id);
+
     const list_todo = await prisma.lists.create({
         data: {
             title: "To Do",
             board_id: board.id,
+            order: 0,
         },
     });
 
@@ -125,6 +128,7 @@ async function main() {
         data: {
             title: "On Going",
             board_id: board.id,
+            order: 1,
         },
     });
 
