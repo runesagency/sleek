@@ -20,7 +20,7 @@ export enum NewCardLocation {
 const CardContainer = (props: CardType) => {
     const { id, order } = props;
 
-    const { setNodeRef, listeners, isDragging, transform, transition } = useSortable({
+    const { setNodeRef, listeners, isDragging, transform, transition, attributes } = useSortable({
         id,
         data: {
             id,
@@ -35,7 +35,7 @@ const CardContainer = (props: CardType) => {
     };
 
     return (
-        <div {...listeners} ref={setNodeRef} style={style}>
+        <div {...listeners} {...attributes} ref={setNodeRef} style={style}>
             <Card {...props} isDragging={isDragging} />
         </div>
     );
