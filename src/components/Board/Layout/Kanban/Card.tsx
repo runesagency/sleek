@@ -45,8 +45,13 @@ const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) =
     );
 };
 
-const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: CardType & { isDragging: boolean }) => {
     const menuButtonRef = useRef<HTMLDivElement>(null);
+type CardProps = CardType & {
+    isDragging: boolean;
+    isDragOverlay?: boolean;
+};
+
+const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging, isDragOverlay = false }: CardProps) => {
     const { emit } = useCustomEvent<string>("card-clicked", false);
 
     const { openMenu, closeMenu, toggleMenu } = useMenu();
@@ -85,7 +90,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
                 </div>
             </div>
 
-            {!isDragging && (
+            {!isDragging && !isDragOverlay && (
                 <>
                     {/* Labels */}
                     {labels.length > 0 && (
