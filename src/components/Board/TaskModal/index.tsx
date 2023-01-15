@@ -1,18 +1,18 @@
-import type { ReactNode } from "react";
 import type { Card as CardType } from "@/lib/types";
+import type { ReactNode } from "react";
 
-import Title from "@/components/Board/TaskModal/Title";
 import Activity from "@/components/Board/TaskModal/Activity";
 import Attachment from "@/components/Board/TaskModal/Attachment";
-import Description from "@/components/Board/TaskModal/Description";
 import Checklist from "@/components/Board/TaskModal/Checklist";
+import Description from "@/components/Board/TaskModal/Description";
+import Title from "@/components/Board/TaskModal/Title";
 import Label from "@/components/DataDisplay/Label";
-import useCustomEvent from "@/lib/hooks/use-custom-event";
-import { Large, Small } from "@/components/Forms/Button";
+import Button from "@/components/Forms/Button";
 import Textarea from "@/components/Forms/Textarea";
+import useCustomEvent from "@/lib/hooks/use-custom-event";
 
-import { useCallback } from "react";
 import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons";
+import { useCallback, memo } from "react";
 
 type SectionProps = {
     children: ReactNode;
@@ -50,7 +50,7 @@ type TaskModalProps = {
     onUpdate: (card: CardType) => void;
 };
 
-export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
+const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
     const { data: cardId, setData: setCardId } = useCustomEvent<string>("card-clicked", false);
     const card = cards.find((card) => card.id === cardId);
 
@@ -100,9 +100,9 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
                 <section className="flex w-full items-start justify-center gap-5">
                     <Title defaultTitle={card.title} onUpdate={onTitleUpdate} />
 
-                    <Large icon={IconBell} fit>
+                    <Button.Large icon={IconBell} fit>
                         Subscribe
-                    </Large>
+                    </Button.Large>
                 </section>
 
                 {/* Information */}
@@ -151,22 +151,22 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
 
                     <Information label="Start Date &#8594; Due Date">
                         <div className="flex w-full items-center gap-2">
-                            <Small icon={IconCalendar} fit>
+                            <Button.Small icon={IconCalendar} fit>
                                 {card.start_date ? card.start_date : "No Start Date"}
-                            </Small>
+                            </Button.Small>
 
                             <span>&#8594;</span>
 
-                            <Small icon={IconCalendar} fit>
+                            <Button.Small icon={IconCalendar} fit>
                                 {card.due_date ? card.due_date : "No Due Date"}
-                            </Small>
+                            </Button.Small>
                         </div>
                     </Information>
 
                     <Information label="Timer">
-                        <Small icon={IconHourglass} fit>
+                        <Button.Small icon={IconHourglass} fit>
                             {totalTimer}
-                        </Small>
+                        </Button.Small>
                     </Information>
 
                     <Information label="Labels" alignStart>
@@ -192,7 +192,7 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
                         <Checklist key={i} data={checklist} />
                     ))}
 
-                    <Large icon={IconPlus}>Add New Checklist</Large>
+                    <Button.Large icon={IconPlus}>Add New Checklist</Button.Large>
                 </Section>
 
                 <hr className="border-dark-600" />
@@ -214,7 +214,7 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
                         </div>
                     )}
 
-                    <Small fit>Add New Attachment</Small>
+                    <Button.Small fit>Add New Attachment</Button.Small>
                 </Section>
 
                 <hr className="border-dark-600" />
@@ -230,7 +230,7 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
                             <Textarea placeholder="Write a comment..." />
 
                             <div className="flex items-center justify-between">
-                                <Large fit>Add Comment</Large>
+                                <Button.Large fit>Add Comment</Button.Large>
 
                                 <div className="flex items-center gap-4">
                                     <IconPaperclip height={20} />
@@ -247,4 +247,6 @@ export default function TaskModal({ onUpdate, cards }: TaskModalProps) {
             <br />
         </section>
     );
-}
+};
+
+export default memo(TaskModal);

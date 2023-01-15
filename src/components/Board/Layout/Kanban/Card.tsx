@@ -1,16 +1,12 @@
-import type { CSSProperties } from "react";
 import type { Card as CardType } from "@/lib/types";
 
-import { SortableType } from ".";
-
-import useMenu from "@/lib/hooks/use-menu";
-import useCustomEvent from "@/lib/hooks/use-custom-event";
-import { Small as ButtonSmall } from "@/components/Forms/Button";
 import Label from "@/components/DataDisplay/Label";
+import Button from "@/components/Forms/Button";
+import useCustomEvent from "@/lib/hooks/use-custom-event";
+import useMenu from "@/lib/hooks/use-menu";
 
-import { useSortable } from "@dnd-kit/sortable";
-import { useCallback, useRef, useState } from "react";
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
+import { useCallback, useRef, useState, memo } from "react";
 
 const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) => {
     const [open, setOpen] = useState(false);
@@ -49,7 +45,7 @@ const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) =
     );
 };
 
-export const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: CardType & { isDragging: boolean }) => {
+const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging }: CardType & { isDragging: boolean }) => {
     const menuButtonRef = useRef<HTMLDivElement>(null);
     const { emit } = useCustomEvent<string>("card-clicked", false);
 
@@ -107,9 +103,9 @@ export const Card = ({ id, title, attachments, activities, cover, checklists, la
             {due_date && (
                 <section className="flex items-end justify-between gap-4">
                     {due_date && (
-                        <ButtonSmall className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
+                        <Button.Small className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
                             <p className="truncate text-xs">{due_date}</p>
-                        </ButtonSmall>
+                        </Button.Small>
                     )}
 
                     {/* <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
@@ -172,26 +168,4 @@ export const Card = ({ id, title, attachments, activities, cover, checklists, la
     );
 };
 
-export const CardContainer = (props: CardType) => {
-    const { id, order } = props;
-
-    const { setNodeRef, listeners, isDragging, transform, transition } = useSortable({
-        id,
-        data: {
-            id,
-            order,
-            type: SortableType.Card,
-        },
-    });
-
-    const style: CSSProperties = {
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-        transition,
-    };
-
-    return (
-        <div {...listeners} ref={setNodeRef} style={style}>
-            <Card {...props} isDragging={isDragging} />
-        </div>
-    );
-};
+export default memo(Card);

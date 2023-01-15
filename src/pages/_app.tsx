@@ -2,8 +2,8 @@ import "@/styles/globals.css";
 
 import type { AppProps } from "next/app";
 
-import RouterTransition from "@/components/RouterTransition";
 import ContextMenu from "@/components/ContextMenu";
+import RouterTransition from "@/components/RouterTransition";
 
 import { Manrope } from "@next/font/google";
 

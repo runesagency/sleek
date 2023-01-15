@@ -1,25 +1,25 @@
+import type { Card as CardType } from "@/lib/types";
 import type { LayoutProps } from "@/pages/boards/[id]";
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
-import type { Card as CardType } from "@/lib/types";
 
-import { Card } from "@/components/Board/Layout/Kanban/Card";
-import { NewCardLocation, List } from "@/components/Board/Layout/Kanban/List";
-import { Large as ButtonLarge } from "@/components/Forms/Button";
+import Card from "@/components/Board/Layout/Kanban/Card";
+import List, { NewCardLocation } from "@/components/Board/Layout/Kanban/List";
+import Button from "@/components/Forms/Button";
 import NoSSR from "@/components/NoSSR";
 
 import { closestCorners, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, DndContext } from "@dnd-kit/core";
-import ScrollContainer from "react-indiana-drag-scroll";
-import { useCallback, useState } from "react";
+import { horizontalListSortingStrategy, SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { randomId } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons";
-import { horizontalListSortingStrategy, SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { memo, useCallback, useState } from "react";
+import ScrollContainer from "react-indiana-drag-scroll";
 
 export enum SortableType {
     List = "list",
     Card = "card",
 }
 
-export default function KanbanLayout({ lists, setLists, cards, setCards, boardId }: LayoutProps) {
+const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps) => {
     const [draggedItem, setDraggedItem] = useState<CardType | undefined | null>(null);
 
     const sensors = useSensors(
@@ -271,9 +271,9 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
                                 return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
                             })}
 
-                        <ButtonLarge className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
+                        <Button.Large className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
                             Create New List
-                        </ButtonLarge>
+                        </Button.Large>
                     </ScrollContainer>
                 </SortableContext>
 
@@ -288,4 +288,6 @@ export default function KanbanLayout({ lists, setLists, cards, setCards, boardId
             </DndContext>
         </NoSSR>
     );
-}
+};
+
+export default memo(KanbanLayout);

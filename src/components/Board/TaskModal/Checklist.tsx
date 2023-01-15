@@ -1,15 +1,16 @@
 import type { Card as CardType } from "@/lib/types";
 
-import { Small } from "@/components/Forms/Button";
+import Button from "@/components/Forms/Button";
 import Checkbox from "@/components/Forms/Checkbox";
 
 import { IconDots, IconPlus } from "@tabler/icons";
+import { memo } from "react";
 
 type ChecklistProps = {
     data?: CardType["checklists"][0]["checklist"];
 };
 
-export default function Checklist({ data }: ChecklistProps) {
+const Checklist = ({ data }: ChecklistProps) => {
     if (!data) return null;
 
     const percentage = data.tasks.filter((task) => task.completed).length / data.tasks.length;
@@ -42,8 +43,10 @@ export default function Checklist({ data }: ChecklistProps) {
                     </div>
                 ))}
 
-                <Small fit>Add New Task</Small>
+                <Button.Small fit>Add New Task</Button.Small>
             </div>
         </div>
     );
-}
+};
+
+export default memo(Checklist);

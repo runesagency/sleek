@@ -1,12 +1,12 @@
 import { IconCheck } from "@tabler/icons";
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 
 type CheckboxProps = {
     defaultChecked?: boolean;
     onChange?: (checked: boolean) => void;
 };
 
-export default function Checkbox({ defaultChecked, onChange }: CheckboxProps) {
+const Checkbox = ({ defaultChecked, onChange }: CheckboxProps) => {
     const [checked, setChecked] = useState(defaultChecked);
 
     const handleClick = useCallback(() => {
@@ -19,4 +19,6 @@ export default function Checkbox({ defaultChecked, onChange }: CheckboxProps) {
             {checked && <IconCheck height={16} width={undefined} className="stroke-dark-50" />}
         </div>
     );
-}
+};
+
+export default memo(Checkbox);

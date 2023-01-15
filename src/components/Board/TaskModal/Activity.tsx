@@ -1,4 +1,5 @@
 import { IconArrowBackUp, IconDots, IconPencil, IconSquare, IconTrash } from "@tabler/icons";
+import { memo } from "react";
 import ReactMarkdown from "react-markdown";
 
 type ActivityProps = {
@@ -8,7 +9,7 @@ type ActivityProps = {
     details?: string;
 };
 
-export default function Activity({ sender, content, timestamp, details }: ActivityProps) {
+const Activity = ({ sender, content, timestamp, details }: ActivityProps) => {
     return (
         <article className="group/activity flex flex-col gap-3">
             <div className="flex items-center gap-2">
@@ -35,4 +36,6 @@ export default function Activity({ sender, content, timestamp, details }: Activi
             {content && <ReactMarkdown className="duration-200 group-hover/activity:opacity-80">{content}</ReactMarkdown>}
         </article>
     );
-}
+};
+
+export default memo(Activity);

@@ -39,6 +39,17 @@
             "import/no-absolute-path": "error",
             "import/no-namespace": "error",
             "import/first": "error",
+            "import/no-anonymous-default-export": [
+                "error",
+                {
+                    "allowArray": false,
+                    "allowArrowFunction": false,
+                    "allowAnonymousClass": false,
+                    "allowAnonymousFunction": false,
+                    "allowLiteral": true,
+                    "allowObject": true
+                }
+            ],
             "import/order": [
                 "error",
                 {
@@ -52,7 +63,11 @@
                         "external",
                         "builtin",
                         "object"
-                    ]
+                    ],
+                    "alphabetize": {
+                        "order": "asc",
+                        "caseInsensitive": true
+                    }
                 }
             ],
             "no-relative-import-paths/no-relative-import-paths": [

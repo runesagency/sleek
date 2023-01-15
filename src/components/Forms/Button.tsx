@@ -1,12 +1,14 @@
-import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import type { TablerIcon } from "@tabler/icons";
+import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
+
+import { memo } from "react";
 
 type ButtonProps = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     icon?: TablerIcon;
     fit?: boolean;
 };
 
-export const Small = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
+const Small = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
     return (
         <button
             className={`
@@ -21,7 +23,7 @@ export const Small = ({ children, className, icon: Icon, fit, ...props }: Button
     );
 };
 
-export const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
+const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
     return (
         <button
             className={`
@@ -34,4 +36,9 @@ export const Large = ({ children, className, icon: Icon, fit, ...props }: Button
             {children}
         </button>
     );
+};
+
+export default {
+    Small: memo(Small),
+    Large: memo(Large),
 };

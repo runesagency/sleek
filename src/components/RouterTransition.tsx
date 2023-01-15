@@ -1,10 +1,10 @@
 import type { LoadingBarRef } from "react-top-loading-bar";
 
-import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
+import { memo, useEffect, useRef } from "react";
 import LoadingBar from "react-top-loading-bar";
 
-export default function RouterTransition() {
+const RouterTransition = () => {
     const router = useRouter();
     const ref = useRef<LoadingBarRef>(null);
 
@@ -31,4 +31,6 @@ export default function RouterTransition() {
     }, [router.asPath, router.events]);
 
     return <LoadingBar ref={ref} color="#FFFFFF" shadow />;
-}
+};
+
+export default memo(RouterTransition);

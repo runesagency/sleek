@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import type { Card as CardType } from "@/lib/types";
 import type { card_timers as CardTimer } from "@prisma/client";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "@/lib/prisma";
 

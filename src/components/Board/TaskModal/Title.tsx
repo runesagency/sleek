@@ -1,12 +1,12 @@
 import { useDebouncedValue } from "@mantine/hooks";
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 
 type TitleProps = {
     defaultTitle: string;
     onUpdate: (title: string) => void;
 };
 
-export default function Title({ defaultTitle, onUpdate }: TitleProps) {
+const Title = ({ defaultTitle, onUpdate }: TitleProps) => {
     const [invalid, setInvalid] = useState(false);
     const [value, setValue] = useState(defaultTitle);
     const [debouncedValue] = useDebouncedValue(value, 200);
@@ -53,4 +53,6 @@ export default function Title({ defaultTitle, onUpdate }: TitleProps) {
             `}
         />
     );
-}
+};
+
+export default memo(Title);

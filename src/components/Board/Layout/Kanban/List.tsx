@@ -1,21 +1,45 @@
-import type { CSSProperties } from "react";
 import type { Card as CardType, List as ListType } from "@/lib/types";
+import type { CSSProperties } from "react";
 
 import { SortableType } from ".";
 
-import { CardContainer } from "@/components/Board/Layout/Kanban/Card";
-import { Large as ButtonLarge } from "@/components/Forms/Button";
+import Card from "@/components/Board/Layout/Kanban/Card";
+import Button from "@/components/Forms/Button";
 import Textarea from "@/components/Forms/Textarea";
 
-import { useRef, useCallback, useState } from "react";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { useClickOutside } from "@mantine/hooks";
 import { IconDots, IconPlus } from "@tabler/icons";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { useRef, useCallback, useState, memo } from "react";
 
 export enum NewCardLocation {
     UP = "UP",
     DOWN = "DOWN",
 }
+
+const CardContainer = (props: CardType) => {
+    const { id, order } = props;
+
+    const { setNodeRef, listeners, isDragging, transform, transition } = useSortable({
+        id,
+        data: {
+            id,
+            order,
+            type: SortableType.Card,
+        },
+    });
+
+    const style: CSSProperties = {
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        transition,
+    };
+
+    return (
+        <div {...listeners} ref={setNodeRef} style={style}>
+            <Card {...props} isDragging={isDragging} />
+        </div>
+    );
+};
 
 type AddNewCardProps = {
     listId: string;
@@ -37,7 +61,7 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
     return (
         <div ref={ref} className="flex shrink-0 flex-col gap-2">
             <Textarea innerRef={textarea} autoFocus saveOnEnter saveToLocalStorage localStorageKey={listId + "-new-card"} onSave={onSave} onClose={onClose} />
-            <ButtonLarge onClick={onButtonSaveClick}>Create New Card</ButtonLarge>
+            <Button.Large onClick={onButtonSaveClick}>Create New Card</Button.Large>
         </div>
     );
 };
@@ -47,7 +71,7 @@ type ListProps = ListType & {
     onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
 };
 
-export const List = ({ id, title, cards, onCardAdded, order }: ListProps) => {
+const List = ({ id, title, cards, onCardAdded, order }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
     const { setNodeRef, listeners, transform, transition, attributes, isDragging } = useSortable({
         id,
@@ -122,3 +146,5 @@ export const List = ({ id, title, cards, onCardAdded, order }: ListProps) => {
         </div>
     );
 };
+
+export default memo(List);

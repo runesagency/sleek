@@ -6,7 +6,7 @@ import useMenu from "@/lib/hooks/use-menu";
 
 import { useClickOutside } from "@mantine/hooks";
 import { ControlledMenu, FocusableItem, MenuDivider, MenuItem } from "@szhsin/react-menu";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 export type ContextMenuItem = {
     subMenu?: ContextMenuItem[];
@@ -37,7 +37,7 @@ export type ContextMenuProps = {
     items: ContextMenuItem[] | ((props: { filter: string }) => JSX.Element);
 };
 
-export default function ContextMenu() {
+const ContextMenu = () => {
     const { data, anchorPoint, menuProps, open, closeMenu, toggleMenuState } = useMenu();
     const [filter, setFilter] = useState("");
     const lastDataReceivedTime = useRef(0);
@@ -88,4 +88,6 @@ export default function ContextMenu() {
             )}
         </ControlledMenu>
     );
-}
+};
+
+export default memo(ContextMenu);

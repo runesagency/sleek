@@ -1,7 +1,7 @@
 import type { DetailedHTMLProps, TextareaHTMLAttributes } from "react";
 
-import { useCallback, useState } from "react";
 import { useLocalStorage } from "@mantine/hooks";
+import { useCallback, useState, memo } from "react";
 
 type UseValueHandlerReturns = {
     value: string;
@@ -47,7 +47,7 @@ type TextareaProps = Omit<DetailedHTMLProps<TextareaHTMLAttributes<HTMLTextAreaE
           }
     );
 
-export default function Textarea({ defaultValue, saveToLocalStorage, localStorageKey, onSave: onValueSaved, onClose, saveOnEnter, innerRef, ...props }: TextareaProps) {
+const Textarea = ({ defaultValue, saveToLocalStorage, localStorageKey, onSave: onValueSaved, onClose, saveOnEnter, innerRef, ...props }: TextareaProps) => {
     const { value, setValue, removeSavedValue } = useValueHandler(saveToLocalStorage || false, localStorageKey, defaultValue ?? "");
 
     const onSave = useCallback(() => {
@@ -97,4 +97,6 @@ export default function Textarea({ defaultValue, saveToLocalStorage, localStorag
             {...props}
         />
     );
-}
+};
+
+export default memo(Textarea);

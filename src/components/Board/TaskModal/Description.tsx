@@ -1,9 +1,9 @@
 import type EasyMDE from "easymde";
 
-import { Large as ButtonLarge } from "@/components/Forms/Button";
+import Button from "@/components/Forms/Button";
 import MarkdownEditor from "@/components/Miscellaneous/MarkdownEditor";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 type DescriptionProps = {
@@ -11,7 +11,7 @@ type DescriptionProps = {
     onUpdate: (description: string | null) => void;
 };
 
-export default function Description({ text, onUpdate }: DescriptionProps) {
+const Description = ({ text, onUpdate }: DescriptionProps) => {
     const editor = useRef<EasyMDE | null>(null);
     const [open, setOpen] = useState(false);
     const [previousValue, setPreviousValue] = useState(text ?? "");
@@ -39,7 +39,9 @@ export default function Description({ text, onUpdate }: DescriptionProps) {
     return (
         <div className="flex flex-col gap-4">
             <MarkdownEditor innerRef={editor} defaultValue={text ?? undefined} options={{ status: false }} />
-            <ButtonLarge onClick={() => setOpen(false)}>Save</ButtonLarge>
+            <Button.Large onClick={() => setOpen(false)}>Save</Button.Large>
         </div>
     );
-}
+};
+
+export default memo(Description);
