@@ -8,7 +8,12 @@ import useMenu from "@/lib/hooks/use-menu";
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
 import { useCallback, useRef, useState, memo } from "react";
 
-const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) => {
+type TasksProgressProps = {
+    checklists: CardType["checklists"];
+    innerRef?: React.Ref<HTMLButtonElement>;
+};
+
+const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
     const [open, setOpen] = useState(false);
 
     const tasks = checklists.flatMap(({ checklist }) => checklist).flatMap((checklist) => checklist?.tasks ?? []);
@@ -45,20 +50,21 @@ const TasksProgress = ({ checklists }: { checklists: CardType["checklists"] }) =
     );
 };
 
-    const menuButtonRef = useRef<HTMLDivElement>(null);
 type CardProps = CardType & {
     isDragging: boolean;
     isDragOverlay?: boolean;
 };
 
 const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, isDragging, isDragOverlay = false }: CardProps) => {
+    const menuButtonRef = useRef<HTMLButtonElement>(null);
     const taskButtonRef = useRef<HTMLButtonElement>(null);
+
     const { emit } = useCustomEvent<string>("card-clicked", false);
 
     const { openMenu, closeMenu, toggleMenu } = useMenu();
 
     const onCardClick = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
+        (e: React.MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault();
 
             // if e.target is Menu or Task List button or its children, return
@@ -72,7 +78,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
     );
 
     return (
-        <div
+        <a
             onContextMenu={openMenu}
             onClick={onCardClick}
             className={`
@@ -87,9 +93,9 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
             <div className="flex max-w-full items-start justify-between gap-2">
                 <span className="flex-1 break-words font-semibold">{title}</span>
 
-                <div ref={menuButtonRef} className="hidden group-hover/card:block">
+                <button ref={menuButtonRef} className="hidden group-hover/card:block">
                     <IconDots height={20} width={undefined} onClick={toggleMenu} />
-                </div>
+                </button>
             </div>
 
             {!isDragging && !isDragOverlay && (
@@ -175,7 +181,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
                     )}
                 </>
             )}
-        </div>
+        </a>
     );
 };
 
