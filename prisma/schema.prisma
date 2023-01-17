@@ -171,7 +171,7 @@ model user_permissions {
 // ------------------------------
 
 model projects {
-  id          String  @id @default(uuid())
+  id          String  @id @default(nanoid(8))
   name        String
   description String? @db.LongText
 
@@ -225,7 +225,7 @@ model project_user_permissions {
 // ------------------------------
 
 model boards {
-  id         String @id @default(uuid())
+  id         String @id @default(nanoid(8))
   project_id String
 
   name        String
@@ -243,7 +243,7 @@ model boards {
 // ------------------------------
 
 model lists {
-  id       String @id @default(uuid())
+  id       String @id @default(nanoid(8))
   board_id String
 
   title String
@@ -261,7 +261,7 @@ model lists {
 // ------------------------------
 
 model cards {
-  id                  String  @id @default(uuid())
+  id                  String  @id @default(nanoid(8))
   board_id            String
   list_id             String
   cover_attachment_id String? @unique
