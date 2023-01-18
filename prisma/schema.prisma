@@ -27,10 +27,10 @@ model permissions {
 
   created_at DateTime @default(now())
 
-  users_map                 user_permissions[]
-  organization_users_map    organization_user_permissions[]
-  project_users_map         project_user_permissions[]
-  project_organizations_map project_organization_permissions[]
+  users                 users[]
+  organization_users    organization_users[]
+  project_users         project_users[]
+  project_organizations project_organizations[]
 }
 
 model labels {
@@ -99,24 +99,13 @@ model organization_users {
   id              String @id @default(uuid())
   user_id         String
   organization_id String
+  permission_id   String
 
   added_at DateTime @default(now())
 
   user         users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  permissions organization_user_permissions[]
-}
-
-model organization_user_permissions {
-  id                   String @id @default(uuid())
-  organization_user_id String
-  permission_id        String
-
-  added_at DateTime @default(now())
-
-  organization_user organization_users @relation(fields: [organization_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission        permissions        @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission   permissions   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -124,12 +113,13 @@ model organization_user_permissions {
 // ------------------------------
 
 model users {
-  id       String  @id @default(uuid())
-  name     String
-  username String? @unique
-  email    String  @unique
-  phone    String?
-  password String
+  id            String  @id @default(uuid())
+  permission_id String
+  name          String
+  username      String? @unique
+  email         String  @unique
+  phone         String?
+  password      String
 
   image_url            String?
   language             String  @default("en-US")
@@ -138,7 +128,7 @@ model users {
 
   created_at DateTime @default(now())
 
-  permissions     user_permissions[]
+  permission      permissions     @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   labels_created  labels[]
   projects_joined project_users[]
 
@@ -153,17 +143,6 @@ model users {
 
   attachments          attachments[]
   attachment_modifieds attachments[] @relation("attachment_modifier")
-}
-
-model user_permissions {
-  id            String @id @default(uuid())
-  user_id       String
-  permission_id String
-
-  added_at DateTime @default(now())
-
-  user       users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -184,40 +163,22 @@ model project_organizations {
   id              String @id @default(uuid())
   project_id      String
   organization_id String
+  permission_id   String
 
   project      projects      @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  permissions project_organization_permissions[]
-}
-
-model project_organization_permissions {
-  id                      String @id @default(uuid())
-  permission_id           String
-  project_organization_id String
-
-  permission   permissions           @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  organization project_organizations @relation(fields: [project_organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission   permissions   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model project_users {
-  id         String @id @default(uuid())
-  user_id    String
-  project_id String
+  id            String @id @default(uuid())
+  user_id       String
+  project_id    String
+  permission_id String
 
-  user    users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  project projects @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  permissions project_user_permissions[]
-}
-
-model project_user_permissions {
-  id              String @id @default(uuid())
-  permission_id   String
-  project_user_id String
-
-  user       project_users @relation(fields: [project_user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission permissions   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user       users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project    projects    @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -236,8 +197,6 @@ model boards {
   lists lists[]
 }
 
-// TODO: Add a permission model
-
 // ------------------------------
 // [Lists]
 // ------------------------------
@@ -253,8 +212,6 @@ model lists {
 
   cards cards[]
 }
-
-// TODO: Add a permission model
 
 // ------------------------------
 // [Cards]
