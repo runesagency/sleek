@@ -2,20 +2,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-    // Clear all data
-
-    const modelNames = Object.keys(prisma).filter((key) => !["_", "$"].includes(key[0]));
-
-    for (let i = 0; i < modelNames.length; i += 1) {
-        const name = modelNames[i];
-        try {
-            // @ts-expect-error https://github.com/prisma/docs/issues/451
-            await prisma[name].deleteMany();
-        } catch (e) {
-            console.error(`Error while deleting ${name}`);
-            throw e;
-        }
-    }
 
     // ------------------------------------------------------------
 
@@ -62,6 +48,8 @@ async function main() {
             creator_id: user.id,
         },
     });
+    const transactions: PrismaPromise<any>[] = [];
+    transactions.push(prisma.$executeRaw`SET FOREIGN_KEY_CHECKS = 0;`);
 
     await prisma.organization_users.create({
         data: {
@@ -74,6 +62,7 @@ async function main() {
             },
         },
     });
+    const tablenames = await prisma.$queryRaw<Array<{ TABLE_NAME: string }>>`SELECT TABLE_NAME from information_schema.TABLES WHERE TABLE_SCHEMA = 'tests';`;
 
     // ------------------------------------------------------------
 
@@ -105,6 +94,15 @@ async function main() {
     });
 
     // ------------------------------------------------------------
+    for (const { TABLE_NAME } of tablenames) {
+        if (TABLE_NAME !== "_prisma_migrations") {
+            try {
+                transactions.push(prisma.$executeRawUnsafe(`TRUNCATE ${TABLE_NAME};`));
+            } catch (error) {
+                console.log({ error });
+            }
+        }
+    }
 
     const board = await prisma.boards.create({
         data: {
@@ -113,8 +111,14 @@ async function main() {
             project_id: project.id,
         },
     });
+    transactions.push(prisma.$executeRaw`SET FOREIGN_KEY_CHECKS = 1;`);
 
     console.log(board.id);
+    try {
+        await prisma.$transaction(transactions);
+    } catch (error) {
+        console.log({ error });
+    }
 
     const list_todo = await prisma.lists.create({
         data: {
