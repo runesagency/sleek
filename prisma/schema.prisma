@@ -10,102 +10,182 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Flows: User -> Organization (optional) -> Project -> Board -> List -> Card -> Activity
+// ------------------------------
+// [FLOWS]
+// 1. Create a User
+// 2. User can create an Organization
+//    - If User create an Organization, User will be the Owner of the Organization
+//    - User can also invite other Users to join the Organization
+//    - User can create a custom Role for the Organization and assign it to other Users
+// 3. User create a Project
+//    - User can invite other Users to join the Project
+//    - User can also invite other Organizations to join the Project, it will invite all Users in the invited Organization
+//    - User can create a custom Role for the Project and assign it to other Users and Organizations, if the role is assigned to an Organization, it will assign the role to all Users in the Organization
+// 4. Inside a Project, User create a Board
+//    - User can invite other Users to join the Board
+//    - User can also invite other Organizations to join the Board, it will invite all Users in the invited Organization
+//    - User can create a custom Role for the Board and assign it to other Users and Organizations, if the role is assigned to an Organization, it will assign the role to all Users in the Organization
+// 5. Inside a Board, there is a set of Lists (e.g. TODO, IN PROGRESS, DONE) which each List has a set of Cards (e.g. Card 1, Card 2, Card 3)
+// 6. Inside a Card, there is a set of Activities (e.g. Activity 1, Activity 2, Activity 3), it can be a comment, a file upload, a label change, etc.
+//    - Activities can be created by Users, or System
+//    - System Activities are created by the System, e.g. when a User is invited to a Project, the System will create an Activity to notify the User
+//    - A card can mirror a Checklist from another card. All changes in the Checklist or in the mirrored one will be reflected to the other one.
+//    - A card can also mirror an Attachment from another card. All changes in the Attachment or in the mirrored one will be reflected to the other one.
+// ------------------------------
 
 // ------------------------------
-// [Globals]
-// 1. This is a global models that are used in multiple places
+// [GLOBAL NOTES]
+// - Junction tables are used to map many-to-many relationships, it only have `added_at` and `adder_id` fields
 // ------------------------------
 
-// Instead of using roles, we use a table that lists all the permissions 
-// and map them to users and organizations
-model permissions {
-  id String @id @default(uuid())
+// ------------------------------
+// [Roles]
+// ------------------------------
 
+enum RoleLevel {
+  USER
+  ORGANIZATION
+  PROJECT
+  BOARD
+}
+
+model roles {
+  id          String    @id @default(uuid())
   name        String
-  description String
+  description String?   @db.MediumText
+  level       RoleLevel
+
+  // Global roles (e.g. Admin, Guest) will NOT have `organization_id`
+  // Custom roles (e.g. Project Manager, Developer) will have `organization_id`
+  organization_id String?
+  organization    organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "roles_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "roles_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  // (User Level Permissions)
+  // - These permissions are internal only, they are not exposed to the User
+  VIEW_USER                     Boolean @default(false)
+  EDIT_USER                     Boolean @default(false)
+  DELETE_USER                   Boolean @default(false)
+  ADD_ORGANIZATION_TO_USER      Boolean @default(false)
+  REMOVE_ORGANIZATION_FROM_USER Boolean @default(false)
+
+  // (Organization Level Permissions)
+  // - Inherits all User Level Permissions
+  // - Internal for organization members only
+  EDIT_ORGANIZATION             Boolean @default(false)
+  DELETE_ORGANIZATION           Boolean @default(false)
+  ADD_USER_TO_ORGANIZATION      Boolean @default(false)
+  REMOVE_USER_FROM_ORGANIZATION Boolean @default(false)
+  CREATE_PROJECT                Boolean @default(false)
+
+  // (Project Level Permissions)
+  // - Applies to all projects within the organization
+  // - Inherits all Organization, and User Level Permissions
+  // - Works for collaborators & organization members
+  VIEW_PROJECT                     Boolean @default(false)
+  EDIT_PROJECT                     Boolean @default(false)
+  DELETE_PROJECT                   Boolean @default(false)
+  ADD_USER_TO_PROJECT              Boolean @default(false)
+  REMOVE_USER_FROM_PROJECT         Boolean @default(false)
+  ADD_ORGANIZATION_TO_PROJECT      Boolean @default(false)
+  REMOVE_ORGANIZATION_FROM_PROJECT Boolean @default(false)
+  CREATE_BOARD                     Boolean @default(false)
+
+  // (Board Level Permissions)
+  // - Applies to all boards within the organization
+  // - Inherits all Project, Organization, and User Level Permissions
+  // - Works for collaborators & organization members
+  VIEW_BOARD                     Boolean @default(false)
+  EDIT_BOARD                     Boolean @default(false)
+  DELETE_BOARD                   Boolean @default(false)
+  ADD_USER_TO_BOARD              Boolean @default(false)
+  REMOVE_USER_FROM_BOARD         Boolean @default(false)
+  ADD_ORGANIZATION_TO_BOARD      Boolean @default(false)
+  REMOVE_ORGANIZATION_FROM_BOARD Boolean @default(false)
+  CREATE_LIST                    Boolean @default(false)
+  DELETE_LIST                    Boolean @default(false)
+  CREATE_CARD                    Boolean @default(false)
+  DELETE_CARD                    Boolean @default(false)
 
   users                 users[]
   organization_users    organization_users[]
   project_users         project_users[]
   project_organizations project_organizations[]
+  board_users           board_users[]
+  board_organizations   board_organizations[]
 }
 
-model labels {
-  id         String  @id @default(uuid())
-  creator_id String?
+// ------------------------------
+// [Labels]
+// ------------------------------
 
+model labels {
+  id          String  @id @default(uuid())
   name        String
   description String?
   color       String?
 
   created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "labels_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  creator users? @relation(fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "labels_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   cards card_labels[]
 }
 
-model attachments {
-  id          String  @id @default(uuid())
-  uploader_id String
-  modifier_id String?
+// ------------------------------
+// [Attachments]
+// ------------------------------
 
-  title           String
-  filename_disk   String
-  filename_source String
-  type            String
-  storage         attachment_storage
-
-  created_at DateTime  @default(now())
-  updated_at DateTime?
-
-  uploader users  @relation(fields: [uploader_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  modifier users? @relation("attachment_modifier", fields: [modifier_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  cards_assigned card_attachments[]
-}
-
-enum attachment_storage {
-  Local
+enum AttachmentProvider {
+  LOCAL
   S3
 }
 
-// ------------------------------
-// [Organizations]
-// 1. Each organization has a list of users and projects
-// 2. If an organization is deleted, all users and projects are deleted
-// 3. If a project is assigned to an organization, all members within the organization are assigned to the project
-// ------------------------------
+model attachment_storage {
+  id       String             @id @default(uuid())
+  provider AttachmentProvider
 
-model organizations {
-  id         String @id @default(uuid())
-  creator_id String
-
-  name        String
-  description String?
-
-  created_at DateTime @default(now())
-
-  creator users @relation(fields: [creator_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  users_joined    organization_users[]
-  projects_joined project_organizations[]
+  attachments attachments[]
 }
 
-model organization_users {
+model attachments {
   id              String @id @default(uuid())
-  user_id         String
-  organization_id String
-  permission_id   String
+  title           String
+  filename_disk   String
+  filename_source String
+  size            Int
+  type            String
 
-  added_at DateTime @default(now())
+  storage_id String
+  storage    attachment_storage @relation(fields: [storage_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  user         users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission   permissions   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  owner_id String
+  owner    users  @relation(name: "attachments_owned", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  uploaded_at DateTime @default(now())
+  uploader_id String?
+  uploader    users?   @relation(name: "attachments_created", fields: [uploader_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "attachments_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  used_as_user_profile_images users[] @relation("user_profile_image")
+  used_as_user_cover_images   users[] @relation("user_cover_image")
+  used_as_card_cover          cards[]
+
+  cards_linked card_attachments[]
 }
 
 // ------------------------------
@@ -113,72 +193,207 @@ model organization_users {
 // ------------------------------
 
 model users {
-  id            String  @id @default(uuid())
-  permission_id String
-  name          String
-  username      String? @unique
-  email         String  @unique
-  phone         String?
-  password      String
+  id       String  @id @default(uuid())
+  name     String
+  username String? @unique
+  email    String  @unique
+  phone    String?
+  password String
 
-  image_url            String?
   language             String  @default("en-US")
   subscribe_by_default Boolean @default(true)
   subscribe_to_email   Boolean @default(true)
 
+  created_at  DateTime @default(now())
+  modified_at DateTime @updatedAt
+
+  profile_image_attachment_id String?
+  profile_image               attachments? @relation(name: "user_profile_image", fields: [profile_image_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  cover_image_attachment_id String?      @unique
+  cover_image               attachments? @relation(name: "user_cover_image", fields: [cover_image_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  role_id String
+  role    roles  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  // Roles
+  roles_created  roles[] @relation("roles_created")
+  roles_modified roles[] @relation("roles_modified")
+
+  // Labels
+  labels_created  labels[] @relation("labels_created")
+  labels_modified labels[] @relation("labels_modified")
+
+  // Attachments
+  attachments          attachments[] @relation("attachments_owned")
+  attachments_created  attachments[] @relation("attachments_created")
+  attachments_modified attachments[] @relation("attachments_modified")
+
+  // Organizations
+  organizations_owned    organizations[] @relation("organizations_owned")
+  organizations_created  organizations[] @relation("organizations_created")
+  organizations_modified organizations[] @relation("organizations_modified")
+
+  organizations            organization_users[] @relation("organizations_joined")
+  organization_users_added organization_users[] @relation("organization_users_added")
+
+  // Projects
+  projects_created  projects[] @relation("projects_created")
+  projects_modified projects[] @relation("projects_modified")
+
+  projects                    project_users[]         @relation("projects_joined")
+  project_users_added         project_users[]         @relation("project_users_added")
+  project_organizations_added project_organizations[] @relation("project_organizations_added")
+
+  // Boards
+  boards_created  boards[] @relation("boards_created")
+  boards_modified boards[] @relation("boards_modifier")
+
+  boards                    board_users[]         @relation("boards_joined")
+  board_users_added         board_users[]         @relation("board_users_added")
+  board_organizations_added board_organizations[] @relation("board_organizations_added")
+
+  // Lists
+  lists_created  lists[] @relation("lists_created")
+  lists_modified lists[] @relation("lists_modified")
+
+  // Cards
+  cards_created  cards[] @relation("cards_created")
+  cards_modified cards[] @relation("cards_modified")
+
+  cards            card_users[] @relation("cards_joined")
+  card_users_added card_users[] @relation("card_users_added")
+
+  card_timers_started card_timers[] @relation("card_timers_started")
+  card_timers_ended   card_timers[] @relation("card_timers_ended")
+
+  card_labels_created      card_labels[]      @relation("card_labels_created")
+  card_attachments_created card_attachments[] @relation("card_attachments_created")
+
+  // Checklists
+  checklist_tasks            checklist_task_users[] @relation("checklist_tasks_joined")
+  checklist_task_users_added checklist_task_users[] @relation("checklist_task_users_added")
+
+  checklists_created  checklists[] @relation("checklists_created")
+  checklists_modified checklists[] @relation("checklists_modified")
+
+  checklist_tasks_created  checklist_tasks[] @relation("checklist_tasks_created")
+  checklist_tasks_modified checklist_tasks[] @relation("checklist_tasks_modified")
+
+  // Activities
+  activities         activities[]
+  activities_created activities[] @relation("activities_created")
+}
+
+// ------------------------------
+// [Organizations]
+// - Each organization has a list of users and projects
+// - If an organization is deleted, all users and projects are deleted
+// - If a project is assigned to an organization, all members within the organization are assigned to the project
+// ------------------------------
+
+model organizations {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  owner_id String
+  owner    users  @relation(name: "organizations_owned", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
   created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "organizations_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  permission      permissions     @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  labels_created  labels[]
-  projects_joined project_users[]
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "organizations_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  organizations_created organizations[]
-  organizations_joined  organization_users[]
+  projects          projects[]
+  users             organization_users[]
+  boards            board_organizations[]
+  external_projects project_organizations[]
+  custom_roles      roles[]
+}
 
-  cards_created cards[]
-  cards_joined  card_users[]
+model organization_users {
+  id String @id @default(uuid())
 
-  tasks      checklist_task_users[]
-  activities activities[]
+  organization_id String
+  organization    organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  attachments          attachments[]
-  attachment_modifieds attachments[] @relation("attachment_modifier")
+  user_id String
+  user    users  @relation(name: "organizations_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  role_id String
+  role    roles  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  added_at DateTime @default(now())
+  adder_id String?
+  adder    users?   @relation(name: "organization_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 // ------------------------------
 // [Projects]
+// - A project can be shared with multiple users and organizations
 // ------------------------------
 
 model projects {
-  id          String  @id @default(nanoid(8))
+  id          String    @id @default(nanoid(8))
   name        String
-  description String? @db.LongText
+  description String?   @db.LongText
+  color       String?
+  start_date  DateTime?
+  due_date    DateTime?
+  password    String?
 
-  boards               boards[]
-  users_joined         project_users[]
-  organizations_joined project_organizations[]
-}
-
-model project_organizations {
-  id              String @id @default(uuid())
-  project_id      String
   organization_id String
-  permission_id   String
+  organization    organizations @relation(fields: [organization_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  project      projects      @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission   permissions   @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "projects_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "projects_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  boards        boards[]
+  users         project_users[]
+  organizations project_organizations[]
 }
 
 model project_users {
-  id            String @id @default(uuid())
-  user_id       String
-  project_id    String
-  permission_id String
+  id String @id @default(uuid())
 
-  user       users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  project    projects    @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project_id String
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  user_id String
+  user    users  @relation(name: "projects_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  role_id String
+  role    roles  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  added_at DateTime @default(now())
+  adder_id String?
+  adder    users?   @relation(name: "project_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+}
+
+model project_organizations {
+  id String @id @default(uuid())
+
+  project_id String
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  organization_id String
+  organization    organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  role_id String
+  role    roles  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  added_at DateTime @default(now())
+  adder_id String?
+  adder    users?   @relation(name: "project_organizations_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -186,15 +401,61 @@ model project_users {
 // ------------------------------
 
 model boards {
-  id         String @id @default(nanoid(8))
-  project_id String
-
+  id          String  @id @default(nanoid(8))
   name        String
   description String? @db.LongText
+  locked      Boolean @default(false)
+  password    String?
 
-  project projects @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project_id String
+  project    projects @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  lists lists[]
+  created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "boards_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "boards_modifier", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  lists         lists[]
+  cards         cards[]
+  users         board_users[]
+  organizations board_organizations[]
+}
+
+model board_users {
+  id String @id @default(uuid())
+
+  board_id String
+  board    boards @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  user_id String
+  user    users  @relation(name: "boards_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  role_id String
+  role    roles  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  added_at DateTime @default(now())
+  adder_id String?
+  adder    users?   @relation(name: "board_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+}
+
+model board_organizations {
+  id String @id @default(uuid())
+
+  board_id String
+  board    boards @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  organization_id String
+  organization    organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  role_id String
+  role    roles  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  added_at DateTime @default(now())
+  adder_id String?
+  adder    users?   @relation(name: "board_organizations_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -202,13 +463,23 @@ model boards {
 // ------------------------------
 
 model lists {
-  id       String @id @default(nanoid(8))
+  id          String  @id @default(nanoid(8))
+  title       String
+  description String? @db.LongText
+  order       Int
+  locked      Boolean @default(false)
+  max_cards   Int?
+
   board_id String
+  board    boards @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  title String
-  order Int    @default(0)
+  created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "lists_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  board boards @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "lists_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   cards cards[]
 }
@@ -218,25 +489,30 @@ model lists {
 // ------------------------------
 
 model cards {
-  id                  String  @id @default(nanoid(8))
-  board_id            String
-  list_id             String
-  cover_attachment_id String? @unique
-
+  id          String    @id @default(nanoid(8))
   title       String
   description String?   @db.LongText
-  order       Int       @default(0)
+  order       Int
   start_date  DateTime?
   due_date    DateTime?
 
-  created_by String?
+  board_id String
+  board    boards @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  list_id String
+  list    lists  @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  cover_attachment_id String?      @unique
+  cover               attachments? @relation(fields: [cover_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
   created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "cards_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  list    lists             @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  creator users?            @relation(fields: [created_by], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  cover   card_attachments? @relation("card_cover", fields: [cover_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "cards_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  activities  activities[]
   users       card_users[]
   labels      card_labels[]
   attachments card_attachments[]
@@ -245,59 +521,73 @@ model cards {
 }
 
 model card_labels {
-  id       String @id @default(uuid())
-  card_id  String
+  id String @id @default(uuid())
+
+  card_id String
+  card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   label_id String
+  label    labels @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   added_at DateTime @default(now())
-
-  card  cards?  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  label labels? @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  adder_id String?
+  adder    users?   @relation(name: "card_labels_created", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model card_users {
-  id      String @id @default(uuid())
-  user_id String
-  card_id String
-
+  id         String  @id @default(uuid())
   subscribed Boolean @default(false)
 
-  added_at DateTime @default(now())
+  user_id String
+  user    users  @relation(name: "cards_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  user users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  card cards @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  card_id String
+  card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  added_at DateTime @default(now())
+  adder_id String?
+  adder    users?   @relation(name: "card_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model card_attachments {
-  id            String @id @default(uuid())
-  card_id       String
+  id String @id @default(uuid())
+
+  card_id String
+  card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   attachment_id String
+  attachment    attachments @relation(fields: [attachment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   added_at DateTime @default(now())
-
-  cards      cards       @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  attachment attachments @relation(fields: [attachment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  is_cover_of cards? @relation("card_cover")
+  adder_id String?
+  adder    users?   @relation(name: "card_attachments_created", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model card_checklists {
-  id           String @id @default(uuid())
-  card_id      String
-  checklist_id String
+  id    String @id @default(uuid())
+  order Int
 
-  card      cards      @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  checklist checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  card_id String
+  card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  checklist_id String
+  checklist    checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model card_timers {
-  id      String @id @default(uuid())
+  id          String  @id @default(uuid())
+  description String? @db.LongText
+
   card_id String
+  card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  started_at DateTime? @default(now())
-  ended_at   DateTime?
+  started_at DateTime @default(now())
+  starter_id String?
+  stater     users?   @relation(name: "card_timers_started", fields: [starter_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  card cards @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ended_at DateTime?
+  ender_id String?
+  ender    users?    @relation(name: "card_timers_ended", fields: [ender_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 // ------------------------------
@@ -308,55 +598,112 @@ model checklists {
   id    String @id @default(uuid())
   title String
 
-  created_at DateTime  @default(now())
-  updated_at DateTime?
+  created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "checklists_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  tasks          checklist_tasks[]
-  cards_assigned card_checklists[]
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "checklists_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  tasks checklist_tasks[]
+  cards card_checklists[]
 }
 
 model checklist_tasks {
-  id           String @id @default(uuid())
-  checklist_id String
-
-  text       String
+  id         String    @id @default(uuid())
+  title      String
   completed  Boolean   @default(false)
   start_date DateTime?
   due_date   DateTime?
+  order      Int
 
-  created_at DateTime  @default(now())
-  updated_at DateTime?
+  checklist_id String
+  checklist    checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  checklist checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parent_checklist_task_id String?
+  parent_checklist_task    checklist_tasks? @relation(name: "parent_checklist_task", fields: [parent_checklist_task_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  users checklist_task_users[]
+  created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "checklist_tasks_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  modified_at DateTime @updatedAt
+  modifier_id String?
+  modifier    users?   @relation(name: "checklist_tasks_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  users           checklist_task_users[]
+  checklist_tasks checklist_tasks[]      @relation(name: "parent_checklist_task")
 }
 
 model checklist_task_users {
-  id      String @id @default(uuid())
+  id String @id @default(uuid())
+
   task_id String
+  task    checklist_tasks @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
   user_id String
+  user    users  @relation(name: "checklist_tasks_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   added_at DateTime @default(now())
-
-  task checklist_tasks @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user users           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  adder_id String?
+  adder    users?   @relation(name: "checklist_task_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 // ------------------------------
 // [Activities]
 // ------------------------------
 
-model activities {
-  id      String @id @default(uuid())
-  user_id String
-  card_id String
+enum ActivityActions {
+  CREATE
+  UPDATE
+  DELETE
+  JOIN
+  LEAVE
+  ADD
+  REMOVE
+  START
+  END
+}
 
-  message  String? @db.LongText
+enum ActivityObjects {
+  USER
+
+  ORGANIZATION
+  PROJECT
+
+  BOARD
+  LIST
+  CARD
+
+  CHECKLIST
+  TASK
+  LABEL
+  ATTACHMENT
+  TIMER
+  COMMENT
+}
+
+model activities {
+  id       String          @id @default(uuid())
+  message  String?         @db.LongText
   activity String?
+  action   ActivityActions
+  old_data String?         @db.LongText
+  new_data String?         @db.LongText
+
+  user_id String
+  user    users  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  // If object is USER, object_id is user_id, if object is ORGANIZATION, object_id is organization_id, etc. 
+  // If object is GLOBAL, object_id is NULL
+  object_id   String
+  object_type ActivityObjects
 
   created_at DateTime @default(now())
+  creator_id String?
+  creator    users?   @relation(name: "activities_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  card cards @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  modified_at DateTime @updatedAt
+  // No need for modifier_id, since activities are only modified by the system or the user who created it
 }
