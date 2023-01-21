@@ -21,12 +21,12 @@ const seedDefaultData = async () => {
 
         if (sure.toLowerCase() === "there is no default data before") {
             const { roles, configurations } = await defaultData(prisma);
-            console.log("Default data seeded successfully 🤘");
+            console.log("> Default data seeded successfully 🤘");
 
             await seedFakeData(roles, configurations);
         } else {
-            console.log("It seems that you have seeded the data before, or have a typo in your answer. 😅");
-            console.log("Damn, aborting default data seeding...");
+            console.log("> It seems that you have seeded the data before, or have a typo in your answer. 😅");
+            console.log("> Damn, aborting default data seeding...");
         }
     }
 };
@@ -39,10 +39,10 @@ const seedFakeData = async (roles: DefaultRoles, configurations: DefaultConfigur
 
         if (sure.toLowerCase() === "i want to insert fake data") {
             await fakeData(prisma, roles, configurations);
-            console.log("You have reached the end of the story, now go and build something awesome! 🚀");
+            console.log("(You have reached the end of the story, now go and build something awesome! 🚀)");
         } else {
-            console.log("I think you are changing your mind, or maybe a typo? 😅");
-            console.log("Alright, have a nice day!");
+            console.log("> I think you are changing your mind, or maybe a typo? 😅");
+            console.log("> Alright, have a nice day!");
         }
     }
 };
