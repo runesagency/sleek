@@ -1,4 +1,6 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
+import type { DefaultConfigurations, DefaultRoles } from "./defaults";
+
 import defaultData from "./defaults";
 import fakeData from "./fakes";
 
@@ -11,36 +13,41 @@ const prisma = new PrismaClient();
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const prompt = (query: string): Promise<string> => new Promise((resolve) => rl.question(query, resolve));
 
-const main = async () => {
-    const doSeedDatabase = await prompt("Do you want to seed the database? (y/N): ");
+const seedDefaultData = async () => {
+    const confirm = await prompt("❓ Seed the default/predefined data (roles, configurations)? (y/N): ");
 
-    if (doSeedDatabase.toLowerCase() === "y") {
-        const confirmDefault = await prompt("Seed the default/predefined data (roles, attachment storage)? (y/N): ");
+    if (confirm.toLowerCase() === "y") {
+        const sure = await prompt('⛔ Make sure you haven\'t seeded the data before. If you are sure, type "there is no DEFAULT data before"\n: ');
 
-        if (confirmDefault.toLowerCase() === "y") {
-            const confirmDefaultSure = await prompt("Are you sure? (y/N): ");
+        if (sure.toLowerCase() === "there is no default data before") {
+            const { roles, configurations } = await defaultData(prisma);
+            console.log("Default data seeded successfully 🤘");
 
-            if (confirmDefaultSure.toLowerCase() === "y") {
-                const { roles, attachment_storage } = await defaultData(prisma);
-
-                console.log("Default data seeded successfully");
-
-                const confirmFake = await prompt("Seed the fake data? (y/N): ");
-
-                if (confirmFake.toLowerCase() === "y") {
-                    const confirmFakeSure = await prompt("Are you sure? (y/N): ");
-
-                    if (confirmFakeSure.toLowerCase() === "y") {
-                        await fakeData(prisma, roles, attachment_storage);
-                        console.log("Fake data seeded successfully");
-                    }
-                }
-            }
+            await seedFakeData(roles, configurations);
+        } else {
+            console.log("It seems that you have seeded the data before, or have a typo in your answer. 😅");
+            console.log("Damn, aborting default data seeding...");
         }
     }
 };
 
-main()
+const seedFakeData = async (roles: DefaultRoles, configurations: DefaultConfigurations) => {
+    const confirm = await prompt("❓ Seed the fake data? (y/N): ");
+
+    if (confirm.toLowerCase() === "y") {
+        const sure = await prompt('⛔ This action should only be done in development environment. If you are sure, type "i want to insert FAKE data"\n: ');
+
+        if (sure.toLowerCase() === "i want to insert fake data") {
+            await fakeData(prisma, roles, configurations);
+            console.log("You have reached the end of the story, now go and build something awesome! 🚀");
+        } else {
+            console.log("I think you are changing your mind, or maybe a typo? 😅");
+            console.log("Alright, have a nice day!");
+        }
+    }
+};
+
+seedDefaultData()
     .then(async () => {
         await prisma.$disconnect();
         rl.close();
