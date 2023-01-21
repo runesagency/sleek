@@ -247,23 +247,29 @@ const defaultRoles = async (prisma: PrismaClient) => {
     };
 };
 
-export type DefaultAttachmentStorage = Awaited<ReturnType<typeof defaultAttachmentStorage>>;
+export type DefaultConfigurations = Awaited<ReturnType<typeof defaultConfigurations>>;
 
-const defaultAttachmentStorage = async (prisma: PrismaClient) => {
-    const LOCAL = await prisma.attachment_storage.create({
-        data: {
-            provider: "LOCAL",
-        },
-    });
+const defaultConfigurations = async (prisma: PrismaClient) => {
+    const attachmentStorage = async () => {
+        const LOCAL = await prisma.attachment_storage.create({
+            data: {
+                provider: "LOCAL",
+            },
+        });
+
+        return {
+            LOCAL,
+        };
+    };
 
     return {
-        LOCAL,
+        attachmentStorage: await attachmentStorage(),
     };
 };
 
 export default async function defaultData(prisma: PrismaClient) {
     return {
         roles: await defaultRoles(prisma),
-        attachment_storage: await defaultAttachmentStorage(prisma),
+        configurations: await defaultConfigurations(prisma),
     };
 }

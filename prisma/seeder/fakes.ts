@@ -1,5 +1,5 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import type { DefaultAttachmentStorage, DefaultRoles } from "./defaults";
+import type { DefaultConfigurations, DefaultRoles } from "./defaults";
 import type { boards, lists, organizations, PrismaClient, projects, users } from "@prisma/client";
 
 import { faker } from "@faker-js/faker";
@@ -330,7 +330,7 @@ const fakeCards = async (prisma: PrismaClient, user: users, board: boards, list:
     }
 };
 
-export default async function fakesData(prisma: PrismaClient, roles: DefaultRoles, storage: DefaultAttachmentStorage) {
+export default async function fakesData(prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations) {
     console.log("Once upon a time...");
 
     const usersLength = faker.datatype.number({ min: 4, max: 10 });
