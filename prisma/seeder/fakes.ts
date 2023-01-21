@@ -4,7 +4,7 @@ import type { boards, lists, organizations, PrismaClient, projects, users } from
 
 import { faker } from "@faker-js/faker";
 
-const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, user: users) => {
+const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users) => {
     const length = faker.datatype.number({ min: 0, max: 3 });
     if (length === 0) return;
 
@@ -59,12 +59,12 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, user
         }
 
         members.map(async (user) => {
-            await fakeProjects(prisma, roles, user, organization);
+            await fakeProjects(prisma, roles, configurations, user, organization);
         });
     }
 };
 
-const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, user: users, organization: organizations) => {
+const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users, organization: organizations) => {
     const length = faker.datatype.number({ min: 0, max: 5 });
     if (length === 0) return;
 
@@ -169,12 +169,12 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, user: use
         }
 
         members.map(async (user) => {
-            await fakeBoards(prisma, roles, user, project);
+            await fakeBoards(prisma, roles, configurations, user, project);
         });
     }
 };
 
-const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, user: users, project: projects) => {
+const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users, project: projects) => {
     const length = faker.datatype.number({ min: 0, max: 3 });
     if (length === 0) return;
 
@@ -278,12 +278,12 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, user: users
         }
 
         members.map(async (user) => {
-            await fakeLists(prisma, user, board);
+            await fakeLists(prisma, configurations, user, board);
         });
     }
 };
 
-const fakeLists = async (prisma: PrismaClient, user: users, board: boards) => {
+const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: users, board: boards) => {
     const length = faker.datatype.number({ min: 1, max: 10 });
 
     console.log(`${user.name} is planning to create ${length} lists for the board ${board.name}...`);
@@ -303,11 +303,11 @@ const fakeLists = async (prisma: PrismaClient, user: users, board: boards) => {
             },
         });
 
-        await fakeCards(prisma, user, board, list);
+        await fakeCards(prisma, configurations, user, board, list);
     }
 };
 
-const fakeCards = async (prisma: PrismaClient, user: users, board: boards, list: lists) => {
+const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: users, board: boards, list: lists) => {
     const length = faker.datatype.number({ min: 0, max: 12 });
     if (length === 0) return;
 
@@ -356,6 +356,6 @@ export default async function fakesData(prisma: PrismaClient, roles: DefaultRole
             console.log(`(Assuming that ${user.name} was the first user to be created, ${user.name} then assigned the user role "${roles.user.SUPER_ADMIN.name}" by the system)`);
         }
 
-        await fakeOrganizations(prisma, roles, user);
+        await fakeOrganizations(prisma, roles, configurations, user);
     }
 }
