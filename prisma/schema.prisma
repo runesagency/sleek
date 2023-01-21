@@ -181,9 +181,15 @@ model attachments {
   modifier_id String?
   modifier    users?   @relation(name: "attachments_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  used_as_user_profile_images users[] @relation("user_profile_image")
-  used_as_user_cover_images   users[] @relation("user_cover_image")
-  used_as_card_cover          cards[]
+  user_images users[] @relation("user_images")
+  user_covers users[] @relation("user_covers")
+
+  organizations organizations[] @relation("organization_logos")
+
+  project_logos  projects[] @relation("project_logos")
+  project_covers projects[] @relation("project_covers")
+
+  card_covers cards[]
 
   cards_linked card_attachments[]
 }
@@ -207,11 +213,11 @@ model users {
   created_at  DateTime @default(now())
   modified_at DateTime @updatedAt
 
-  profile_image_attachment_id String?
-  profile_image               attachments? @relation(name: "user_profile_image", fields: [profile_image_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  image_attachment_id String?
+  image               attachments? @relation(name: "user_images", fields: [image_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  cover_image_attachment_id String?      @unique
-  cover_image               attachments? @relation(name: "user_cover_image", fields: [cover_image_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  cover_attachment_id String?      @unique
+  cover               attachments? @relation(name: "user_covers", fields: [cover_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   role_id String
   role    roles  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -300,6 +306,9 @@ model organizations {
   owner_id String
   owner    users  @relation(name: "organizations_owned", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
+  logo_attachment_id String?
+  logo               attachments? @relation(name: "organization_logos", fields: [logo_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
   created_at DateTime @default(now())
   creator_id String?
   creator    users?   @relation(name: "organizations_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
@@ -340,11 +349,16 @@ model organization_users {
 model projects {
   id          String    @id @default(nanoid(8))
   name        String
-  color       String?
   description String?
   start_date  DateTime?
   due_date    DateTime?
   password    String?
+
+  cover_attachment_id String?
+  cover               attachments? @relation(name: "project_covers", fields: [cover_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  logo_attachment_id String?
+  logo               attachments? @relation(name: "project_logos", fields: [logo_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   organization_id String
   organization    organizations @relation(fields: [organization_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
@@ -465,6 +479,7 @@ model board_organizations {
 model lists {
   id          String  @id @default(nanoid(8))
   title       String
+  color       String?
   description String?
   order       Int
   locked      Boolean @default(false)
