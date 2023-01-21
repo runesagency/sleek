@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -52,7 +52,7 @@ enum RoleLevel {
 model roles {
   id          String    @id @default(uuid())
   name        String
-  description String?   @db.MediumText
+  description String?
   level       RoleLevel
 
   // Global roles (e.g. Admin, Guest) will NOT have `organization_id`
@@ -340,8 +340,8 @@ model organization_users {
 model projects {
   id          String    @id @default(nanoid(8))
   name        String
-  description String?   @db.LongText
   color       String?
+  description String?
   start_date  DateTime?
   due_date    DateTime?
   password    String?
@@ -403,7 +403,7 @@ model project_organizations {
 model boards {
   id          String  @id @default(nanoid(8))
   name        String
-  description String? @db.LongText
+  description String?
   locked      Boolean @default(false)
   password    String?
 
@@ -465,7 +465,7 @@ model board_organizations {
 model lists {
   id          String  @id @default(nanoid(8))
   title       String
-  description String? @db.LongText
+  description String?
   order       Int
   locked      Boolean @default(false)
   max_cards   Int?
@@ -491,7 +491,7 @@ model lists {
 model cards {
   id          String    @id @default(nanoid(8))
   title       String
-  description String?   @db.LongText
+  description String?
   order       Int
   start_date  DateTime?
   due_date    DateTime?
@@ -576,7 +576,7 @@ model card_checklists {
 
 model card_timers {
   id          String  @id @default(uuid())
-  description String? @db.LongText
+  description String?
 
   card_id String
   card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -686,11 +686,11 @@ enum ActivityObjects {
 
 model activities {
   id       String          @id @default(uuid())
-  message  String?         @db.LongText
+  message  String?
   activity String?
   action   ActivityActions
-  old_data String?         @db.LongText
-  new_data String?         @db.LongText
+  old_data String?
+  new_data String?
 
   user_id String
   user    users  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
