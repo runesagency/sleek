@@ -1,42 +1,67 @@
-import Link from "next/link";
+import AppShell from "@/components/Dashboard/AppShell";
+import Button from "@/components/Forms/Button";
 
-export default function Home() {
+import { IconCalendar, IconCards } from "@tabler/icons";
+
+export default function DashboardPage() {
     return (
-        <main className="flex h-full max-h-screen min-h-screen w-screen flex-col items-center overflow-auto bg-slate-900 text-white">
-            <div className="flex w-full items-center justify-between bg-slate-800/75 px-20 py-5">
-                <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-8" />
+        <AppShell className="flex flex-col">
+            <img src="https://picsum.photos/1080" alt="banner" className="h-60 w-full object-cover object-center" />
 
-                <div className="flex items-center gap-8">
-                    <span>people</span>
-                    <span>notifications</span>
+            <nav className="flex flex-col border-b border-b-dark-600 bg-dark-800 px-12">
+                <div className="flex items-center gap-5 py-5">
+                    <img src="https://picsum.photos/200" alt="logo" className="h-12 w-12 rounded-full object-cover object-center" />
+                    <h1 className="text-xl font-bold">PT Mencari Cinta Abadi</h1>
+                </div>
 
-                    <div className="flex items-center gap-4 rounded-md bg-slate-700 px-3.5 py-2">
-                        <img src="https://picsum.photos/200" alt="User Image" className="h-7 rounded-full" />
-                        <p className="text-sm font-semibold">John Doe</p>
-                    </div>
+                <div className="flex">
+                    <a href="#" className="px-4 py-2 text-sm font-medium hover:border-b-dark-500">
+                        About
+                    </a>
+
+                    <a href="#" className="border-b-2 border-b-dark-400 px-4 py-2 text-sm font-bold">
+                        Projects
+                    </a>
+
+                    <a href="#" className="px-4 py-2 text-sm font-medium">
+                        Members
+                    </a>
+
+                    <a href="#" className="px-4 py-2 text-sm font-medium">
+                        Settings
+                    </a>
+                </div>
+            </nav>
+
+            <div className="flex flex-col gap-10 px-36 py-9">
+                {/* Folders (Future Development) */}
+
+                {/* Project List */}
+                <div className="grid grid-cols-3 gap-5">
+                    <a className="flex items-start gap-4 rounded-lg border border-dark-500 bg-dark-600 p-4">
+                        <img src="https://picsum.photos/1080" alt="banner" className="h-full w-1/3 shrink-0 rounded-lg object-cover object-center" />
+
+                        <div className="flex flex-col gap-4 overflow-hidden">
+                            <div className="flex items-center gap-2">
+                                <img src="https://picsum.photos/1080" alt="banner" className="h-6 w-6 shrink-0 rounded-full object-cover object-center" />
+                                <h3 className="text-base font-bold">Untitled Project</h3>
+                            </div>
+
+                            <p className="text-xs font-medium line-clamp-2">Oat cake danish pie croissant jujubes pastry. Dragée macaroon pastry toffee macaroon gummies gummi bears</p>
+
+                            <div className="flex flex-wrap gap-1">
+                                <Button.Small fit className="bg-dark-700 text-xs" icon={IconCards}>
+                                    69 Boards
+                                </Button.Small>
+
+                                <Button.Small fit className="bg-dark-700 text-xs" icon={IconCalendar}>
+                                    12 Jan 2023 - 35 Feb 3069
+                                </Button.Small>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
-
-            <div className="grid w-full grid-cols-5 gap-8 py-5 px-20">
-                {Array(16)
-                    .fill(0)
-                    .map((_, i) => (
-                        <Link
-                            key={i}
-                            href={`/projects/${i + 1}`}
-                            className="relative flex aspect-square w-full flex-col justify-end gap-2 rounded-md bg-cover bg-center p-5 duration-200 hover:opacity-75"
-                            style={{
-                                backgroundImage: `url(https://picsum.photos/200?random=${i}1)`,
-                            }}
-                        >
-                            <div className="absolute top-0 left-0 h-full w-full rounded-md bg-black/20" />
-
-                            <img src={`https://picsum.photos/200?random=${i}`} alt="Company Logo" className="h-14 w-14 rounded-full" />
-
-                            <h1 className="text-xl font-bold">Company Name</h1>
-                        </Link>
-                    ))}
-            </div>
-        </main>
+        </AppShell>
     );
 }
