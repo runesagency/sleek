@@ -19,7 +19,7 @@ export default function AppShell({ children, className }: AppShellProps) {
                 </div>
             </section>
 
-            <main className="flex h-full w-full items-start">
+            <main className="flex h-full w-full items-start overflow-auto">
                 {/* Sidebar */}
                 <section className="flex h-full w-72 shrink-0 flex-col gap-10 border-r border-r-dark-600 bg-dark-800 py-10">
                     <div className="flex flex-col gap-6 px-5">
@@ -54,7 +54,7 @@ export default function AppShell({ children, className }: AppShellProps) {
                 </section>
 
                 {/* Content */}
-                <section className={`flex-1 ${className}`}>{children}</section>
+                <section className={`max-h-full flex-1 overflow-auto ${className}`}>{children}</section>
             </main>
         </main>
     );
