@@ -9,6 +9,7 @@ specifiers:
   '@prisma/client': ^4.9.0
   '@szhsin/react-menu': ^3.3.1
   '@tabler/icons': ^1.119.0
+  '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.9
   '@types/node': 18.11.17
   '@types/react': 18.0.26
@@ -51,6 +52,7 @@ dependencies:
   '@prisma/client': 4.9.0_prisma@4.9.0
   '@szhsin/react-menu': 3.3.1_biqbaboplfbrettd7655fr4n2y
   '@tabler/icons': 1.119.0_biqbaboplfbrettd7655fr4n2y
+  '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.4
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.4
   easymde: 2.18.0
   next: 13.0.7_biqbaboplfbrettd7655fr4n2y
@@ -425,6 +427,14 @@ packages:
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@tailwindcss/line-clamp/0.4.2_tailwindcss@3.2.4:
+    resolution: {integrity: sha512-HFzAQuqYCjyy/SX9sLGB1lroPzmcnWv1FHkIpmypte10hptf4oPUfucryMKovZh2u0uiS9U5Ty3GghWfEJGwVw==}
+    peerDependencies:
+      tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
+    dependencies:
+      tailwindcss: 3.2.4_aesdjsunmf4wiehhujt67my7tu
     dev: false
 
   /@tailwindcss/typography/0.5.9_tailwindcss@3.2.4:
