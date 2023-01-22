@@ -35,11 +35,11 @@ const Checklist = ({ data }: ChecklistProps) => {
             </div>
 
             <div className="flex flex-col gap-3 pl-3">
-                {data.tasks.map(({ text, completed }, i) => (
+                {data.tasks.map(({ title, completed }, i) => (
                     <div key={i} className="flex items-start gap-3">
                         <Checkbox defaultChecked={completed} />
 
-                        <div className="flex flex-col gap-2">{text}</div>
+                        <div className="flex flex-col gap-2">{title}</div>
                     </div>
                 ))}
 

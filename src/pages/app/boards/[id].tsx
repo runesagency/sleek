@@ -66,21 +66,12 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
                     user: true,
                 },
             },
-            activities: {
-                include: {
-                    user: true,
-                },
-            },
             attachments: {
                 include: {
                     attachment: true,
                 },
             },
-            cover: {
-                include: {
-                    attachment: true,
-                },
-            },
+            cover: true,
             creator: true,
             timers: true,
             checklists: {

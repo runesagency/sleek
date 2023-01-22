@@ -1,5 +1,5 @@
 import type { Card as CardType } from "@/lib/types";
-import type { LayoutProps } from "@/pages/boards/[id]";
+import type { LayoutProps } from "@/pages/app/boards/[id]";
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 
 import Card from "@/components/Board/Layout/Kanban/Card";
@@ -254,15 +254,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
     );
 
     const onListAdded = useCallback(() => {
-        const newLists = [
-            ...lists,
-            {
-                id: randomId(),
-                title: "My New List",
-                order: lists.length,
-                board_id: boardId,
-            },
-        ];
+        const newLists = [...lists];
 
         setLists(newLists);
     }, [boardId, lists, setLists]);

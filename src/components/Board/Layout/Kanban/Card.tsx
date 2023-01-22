@@ -38,9 +38,9 @@ const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
             </button>
 
             <ul className={`origin-top list-disc ${open ? "h-auto scale-y-100" : "h-0 scale-y-0"} duration-200`}>
-                {shownTasks.map(({ text }, i) => (
+                {shownTasks.map(({ title }, i) => (
                     <li key={i} className="ml-6">
-                        {text}
+                        {title}
                     </li>
                 ))}
 

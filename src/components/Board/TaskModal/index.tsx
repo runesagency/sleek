@@ -111,7 +111,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                         <div className="flex items-center gap-3">
                             {card.creator ? (
                                 <>
-                                    <img src={card.creator.image_url || ""} alt={card.creator.name} className="h-10 w-10 rounded-full" />
+                                    <img src={card.creator.image_attachment_id || ""} alt={card.creator.name} className="h-10 w-10 rounded-full" />
                                     <p>{card.creator.name}</p>
                                 </>
                             ) : (
@@ -131,7 +131,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                                             return (
                                                 <img
                                                     key={i}
-                                                    src={user.image_url || ""}
+                                                    src={user.image_attachment_id || ""}
                                                     alt={user.name}
                                                     className="box-border h-10 w-10 shrink-0 rounded-full border-2 border-dark-700 object-cover object-center"
                                                 />
