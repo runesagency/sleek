@@ -1,15 +1,15 @@
 import type { ReactNode } from "react";
 
-import AppPageShell from "@/components/Dashboard/AppPageShell";
+import AppPageLayout from "@/components/Dashboard/AppPageLayout";
 
 type OrganizationPageShellProps = {
     children: ReactNode;
     className?: string;
 };
 
-export default function OrganizationPageShell({ children }: OrganizationPageShellProps) {
+export default function OrganizationPageLayout({ children }: OrganizationPageShellProps) {
     return (
-        <AppPageShell className="flex flex-col">
+        <AppPageLayout className="flex flex-col">
             <img src="https://picsum.photos/1080" alt="banner" className="h-60 w-full object-cover object-center" />
 
             <nav className="flex flex-col border-b border-b-dark-600 bg-dark-800 px-12">
@@ -38,6 +38,6 @@ export default function OrganizationPageShell({ children }: OrganizationPageShel
             </nav>
 
             <div className="px-36 py-9">{children}</div>
-        </AppPageShell>
+        </AppPageLayout>
     );
 }

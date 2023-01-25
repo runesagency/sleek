@@ -3,7 +3,7 @@ import type { GetServerSideProps } from "next";
 
 import KanbanLayout from "@/components/Board/Layout/Kanban";
 import TaskModal from "@/components/Board/TaskModal";
-import AppPageShell from "@/components/Dashboard/AppPageShell";
+import AppPageLayout from "@/components/Dashboard/AppPageLayout";
 import { prisma } from "@/lib/prisma";
 import { parseSSRProps } from "@/lib/utils/parse-ssr-props";
 
@@ -130,9 +130,9 @@ export default function BoardPage({ lists: originalLists, cards: originalCards, 
     );
 
     return (
-        <AppPageShell>
+        <AppPageLayout>
             <KanbanLayout cards={cards} lists={lists} boardId={boardId} setCards={setCards} setLists={setLists} />
             <TaskModal cards={cards} onUpdate={onCardUpdate} />
-        </AppPageShell>
+        </AppPageLayout>
     );
 }

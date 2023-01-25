@@ -1,11 +1,11 @@
-import OrganizationPageShell from "@/components/Dashboard/OrganizationPageShell";
+import OrganizationPageLayout from "@/components/Dashboard/OrganizationPageLayout";
 import Button from "@/components/Forms/Button";
 
 import { IconCalendar, IconCards } from "@tabler/icons";
 
 export default function DashboardPage() {
     return (
-        <OrganizationPageShell className="flex flex-col gap-10 ">
+        <OrganizationPageLayout className="flex flex-col gap-10 ">
             {/* Folders (Future Development) */}
 
             {/* Project List */}
@@ -33,6 +33,6 @@ export default function DashboardPage() {
                     </div>
                 </a>
             </div>
-        </OrganizationPageShell>
+        </OrganizationPageLayout>
     );
 }

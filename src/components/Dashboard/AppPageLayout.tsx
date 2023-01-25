@@ -7,7 +7,7 @@ type AppShellProps = {
     className?: string;
 };
 
-export default function AppPageShell({ children, className }: AppShellProps) {
+export default function AppPageLayout({ children, className }: AppShellProps) {
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
             <section className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-20 py-5">
