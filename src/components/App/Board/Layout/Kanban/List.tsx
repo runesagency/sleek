@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 
 import { SortableType } from ".";
 
-import Card from "@/components/Board/Layout/Kanban/Card";
+import Card from "@/components/App/Board/Layout/Kanban/Card";
 import Button from "@/components/Forms/Button";
 import Textarea from "@/components/Forms/Textarea";
 

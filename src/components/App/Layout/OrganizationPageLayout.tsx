@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import AppPageLayout from "@/components/Dashboard/AppPageLayout";
+import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 
 type OrganizationPageShellProps = {
     children: ReactNode;

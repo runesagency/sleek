@@ -1,11 +1,11 @@
 import type { Card as CardType } from "@/lib/types";
 import type { ReactNode } from "react";
 
-import Activity from "@/components/Board/TaskModal/Activity";
-import Attachment from "@/components/Board/TaskModal/Attachment";
-import Checklist from "@/components/Board/TaskModal/Checklist";
-import Description from "@/components/Board/TaskModal/Description";
-import Title from "@/components/Board/TaskModal/Title";
+import Activity from "@/components/App/Board/TaskModal/Activity";
+import Attachment from "@/components/App/Board/TaskModal/Attachment";
+import Checklist from "@/components/App/Board/TaskModal/Checklist";
+import Description from "@/components/App/Board/TaskModal/Description";
+import Title from "@/components/App/Board/TaskModal/Title";
 import Label from "@/components/DataDisplay/Label";
 import Button from "@/components/Forms/Button";
 import Textarea from "@/components/Forms/Textarea";

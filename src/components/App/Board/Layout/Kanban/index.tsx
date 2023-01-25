@@ -2,10 +2,10 @@ import type { Card as CardType } from "@/lib/types";
 import type { LayoutProps } from "@/pages/app/boards/[id]";
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 
-import Card from "@/components/Board/Layout/Kanban/Card";
-import List, { NewCardLocation } from "@/components/Board/Layout/Kanban/List";
+import Card from "@/components/App/Board/Layout/Kanban/Card";
+import List, { NewCardLocation } from "@/components/App/Board/Layout/Kanban/List";
 import Button from "@/components/Forms/Button";
-import NoSSR from "@/components/NoSSR";
+import NoSSR from "@/components/Miscellaneous/NoSSR";
 
 import { closestCorners, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, DndContext } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";

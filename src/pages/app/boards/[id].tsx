@@ -1,9 +1,9 @@
 import type { Card as CardType, List as ListType } from "@/lib/types";
 import type { GetServerSideProps } from "next";
 
-import KanbanLayout from "@/components/Board/Layout/Kanban";
-import TaskModal from "@/components/Board/TaskModal";
-import AppPageLayout from "@/components/Dashboard/AppPageLayout";
+import KanbanLayout from "@/components/App/Board/Layout/Kanban";
+import TaskModal from "@/components/App/Board/TaskModal";
+import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 import { prisma } from "@/lib/prisma";
 import { parseSSRProps } from "@/lib/utils/parse-ssr-props";
 
