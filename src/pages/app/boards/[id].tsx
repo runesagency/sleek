@@ -94,11 +94,33 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
         },
     });
 
+    const activities = await prisma.activities.findMany({
+        where: {
+            object_type: {
+                in: ["CARD"],
+            },
+            object_id: {
+                in: [...cards.map(({ id }) => id)],
+            },
+        },
+        include: {
+            user: true,
+        },
+        orderBy: {
+            created_at: "desc",
+        },
+    });
+
     return {
         props: {
             boardId,
             lists: parseSSRProps(lists),
-            cards: parseSSRProps(cards),
+            cards: parseSSRProps(
+                cards.map((card) => ({
+                    ...card,
+                    activities: activities.filter(({ object_id }) => object_id === card.id),
+                }))
+            ),
         },
     };
 };
