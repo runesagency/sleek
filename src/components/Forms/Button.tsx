@@ -38,7 +38,9 @@ const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) 
     );
 };
 
-export default {
+const Button = {
     Small: memo(Small),
     Large: memo(Large),
 };
+
+export default Button;
