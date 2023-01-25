@@ -38,17 +38,7 @@
             "import/no-absolute-path": "error",
             "import/no-namespace": "error",
             "import/first": "error",
-            "import/no-anonymous-default-export": [
-                "error",
-                {
-                    "allowArray": false,
-                    "allowArrowFunction": false,
-                    "allowAnonymousClass": false,
-                    "allowAnonymousFunction": false,
-                    "allowLiteral": true,
-                    "allowObject": true
-                }
-            ],
+            "import/no-anonymous-default-export": "error",
             "import/order": [
                 "error",
                 {
