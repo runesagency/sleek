@@ -19,11 +19,13 @@ export type List = lists;
 
 export type Card = ParsedSSRProps<
     cards & {
+        timers: card_timers[];
+        creator: users;
         labels: (card_labels & {
-            label: labels | null;
+            label: labels;
         })[];
         users: (card_users & {
-            user: users | null;
+            user: users;
         })[];
         activities: (activities & {
             user: users;
@@ -31,19 +33,13 @@ export type Card = ParsedSSRProps<
         attachments: (card_attachments & {
             attachment: attachments;
         })[];
-        cover:
-            | (card_attachments & {
-                  attachment: attachments;
-              })
-            | null;
+        cover: attachments | null;
         checklists: (card_checklists & {
             tasks: (card_checklist_tasks & {
                 users: (card_checklist_task_users & {
-                    user: users | null;
+                    user: users;
                 })[];
             })[];
         })[];
-        timers: card_timers[];
-        creator: users;
     }
 >;

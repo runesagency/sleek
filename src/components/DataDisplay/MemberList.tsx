@@ -1,3 +1,4 @@
+import type { ParsedSSRProps } from "@/lib/utils/parse-ssr-props";
 import type { users as User } from "@prisma/client";
 
 import Avatar from "@/components/Miscellaneous/Avatar";
@@ -5,7 +6,7 @@ import Avatar from "@/components/Miscellaneous/Avatar";
 import { memo } from "react";
 
 type MemberListProps = {
-    users: User[];
+    users: ParsedSSRProps<User[]>;
     max?: number;
     className?: string;
 };

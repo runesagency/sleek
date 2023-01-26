@@ -148,7 +148,7 @@ export default function BoardPage({ lists: originalLists, cards: originalCards, 
     );
 
     return (
-        <AppPageLayout>
+        <AppPageLayout useSidebar={false} className="box-border flex">
             <KanbanLayout cards={cards} lists={lists} boardId={boardId} setCards={setCards} setLists={setLists} />
             <TaskModal cards={cards} onUpdate={onCardUpdate} />
         </AppPageLayout>
