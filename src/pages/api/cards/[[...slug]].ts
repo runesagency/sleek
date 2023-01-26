@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 import { createRouter } from "next-connect";
 
-const router = createRouter<NextApiRequest, NextApiResponse>();
+const router = createRouter<NextApiRequest & { params: Record<string, string> }, NextApiResponse>();
 
 /**
  * POST /api/cards
@@ -40,26 +40,21 @@ router.post("/api/cards", async (req, res) => {
                         user: true,
                     },
                 },
-                activities: {
-                    include: {
-                        user: true,
-                    },
-                },
                 attachments: {
                     include: {
                         attachment: true,
                     },
                 },
-                cover: {
-                    include: {
-                        attachment: true,
-                    },
-                },
+                cover: true,
                 checklists: {
                     include: {
-                        checklist: {
+                        tasks: {
                             include: {
-                                tasks: true,
+                                users: {
+                                    include: {
+                                        user: true,
+                                    },
+                                },
                             },
                         },
                     },
@@ -121,7 +116,7 @@ router.delete("/api/cards", async (req, res) => {
  * @summary Get a card
  */
 router.get("/api/cards/:id", async (req, res) => {
-    const { id } = req.query as { id: string };
+    const { id } = req.params as { id: string };
 
     const card = await prisma.cards.findUnique({
         where: { id },
@@ -140,11 +135,13 @@ router.get("/api/cards/:id", async (req, res) => {
  * @param {CardType} card - A card object with updated data
  */
 router.patch("/api/cards/:id", async (req, res) => {
-    const { id } = req.query as { id: string };
+    const { id } = req.params as { id: string };
     const card: CardType = req.body;
 
-    const newCard = await prisma.cards.update({
-        where: { id },
+    await prisma.cards.update({
+        where: {
+            id,
+        },
         data: {
             title: card.title,
             description: card.description,
@@ -157,7 +154,7 @@ router.patch("/api/cards/:id", async (req, res) => {
         },
     });
 
-    return res.status(200).json(newCard);
+    return res.status(200).end();
 });
 
 /**
@@ -165,7 +162,7 @@ router.patch("/api/cards/:id", async (req, res) => {
  * @summary Delete a card
  */
 router.delete("/api/cards/:id", async (req, res) => {
-    const { id } = req.query as { id: string };
+    const { id } = req.params as { id: string };
 
     await prisma.cards.delete({
         where: { id },
@@ -175,75 +172,67 @@ router.delete("/api/cards/:id", async (req, res) => {
 });
 
 /**
- * POST /api/cards/:id/checklists
- * @summary Create a new checklist or connect to available checklist
- * @param {string} - `checklist` ID
+ * POST /api/cards/:id/checklists/:checklistId
+ * @summary Connect card to available checklist
  */
-router.post("/api/cards/:id/checklists", async (req, res) => {
-    const { id } = req.query as { id: string };
-    const checklistId: string = req.body;
+router.post("/api/cards/:id/checklists/:title", async (req, res) => {
+    const { id, title } = req.params as { id: string; title: string };
 
-    const updatedCard = await prisma.card_checklists.create({
+    await prisma.card_checklists.create({
         data: {
             card_id: id,
-            checklist_id: checklistId,
+            title,
         },
-    });
-
-    return res.status(200).json(updatedCard);
-});
-
-/**
- * DELETE /api/cards/:id/checklists
- * @summary Delete a checklist from a card
- * @param {string} - `card_checklist` ID
- */
-router.delete("/api/cards/:id/checklists", async (req, res) => {
-    const cardChecklistId: string = req.body;
-
-    const updatedCard = await prisma.card_checklists.delete({
-        where: {
-            id: cardChecklistId,
-        },
-    });
-
-    return res.status(200).json(updatedCard);
-});
-
-/**
- * POST /api/cards/:id/labels
- * @summary Add multiple labels or create new label to a card
- * @param {string[]} labelsId - An array of the `labels` ID
- */
-router.post("/api/cards/:id/labels", async (req, res) => {
-    const { id } = req.query as { id: string };
-    const labelsId: string[] = req.body;
-
-    labelsId.map(async (labelId: string) => {
-        await prisma.card_labels.create({
-            data: {
-                card_id: id,
-                label_id: labelId,
-            },
-        });
     });
 
     return res.status(200).end();
 });
 
 /**
- * DELETE /api/cards/:id/labels
- * @summary Delete multiple labels from a card
- * @param {string[]} - An array of the `card_labels` ID
+ * DELETE /api/cards/:id/checklists/:checklistId
+ * @summary Disconnect a checklist from a card
  */
-router.delete("/api/cards/:id/labels", async (req, res) => {
-    const labelsId: string[] = req.body;
+router.delete("/api/cards/:id/checklists/:checklistId", async (req, res) => {
+    const { id, checklistId } = req.params as { id: string; checklistId: string };
+
+    await prisma.card_checklists.deleteMany({
+        where: {
+            id: checklistId,
+            card_id: id,
+        },
+    });
+
+    return res.status(200).end();
+});
+
+/**
+ * POST /api/cards/:id/labels/:labelId
+ * @summary Connect a label to a card
+ */
+router.post("/api/cards/:id/labels/:labelId", async (req, res) => {
+    const { id, labelId } = req.params as { id: string; labelId: string };
+
+    await prisma.card_labels.create({
+        data: {
+            card_id: id,
+            label_id: labelId,
+        },
+    });
+
+    return res.status(200).end();
+});
+
+/**
+ * DELETE /api/cards/:id/labels/:labelId
+ * @summary Disconnect a label from a card
+ */
+router.delete("/api/cards/:id/labels/:labelId", async (req, res) => {
+    const { id, labelId } = req.params as { id: string; labelId: string };
 
     await prisma.card_labels.deleteMany({
         where: {
-            id: {
-                in: labelsId,
-            },
+            card_id: id,
+            label_id: labelId,
         },
     });
 
@@ -255,7 +244,7 @@ router.delete("/api/cards/:id/labels", async (req, res) => {
  * @summary Create a new timer for the card
  */
 router.post("/api/cards/:id/timers", async (req, res) => {
-    const { id } = req.query as { id: string };
+    const { id } = req.params as { id: string };
 
     await prisma.card_timers.create({
         data: {
@@ -267,17 +256,19 @@ router.post("/api/cards/:id/timers", async (req, res) => {
 });
 
 /**
- * PATCH /api/cards/:id/timers
+ * PATCH /api/cards/:id/timers/:timerId
  * @summary Edit a timer of the card
  * @param {CardTimer} timer - The timer to edit
  */
-router.patch("/api/cards/:id/timers", async (req, res) => {
-    const timer: CardTimer = req.body;
+router.patch("/api/cards/:id/timers/:timerId", async (req, res) => {
+    const { id, timerId } = req.params as { id: string; timerId: string };
+    const body: CardTimer = req.body;
 
-    await prisma.card_timers.update({
-        data: timer,
+    await prisma.card_timers.updateMany({
+        data: body,
         where: {
-            id: timer.id,
+            id: timerId,
+            card_id: id,
         },
     });
 
@@ -285,16 +276,17 @@ router.patch("/api/cards/:id/timers", async (req, res) => {
 });
 
 /**
- * DELETE /api/cards/:id/timers
+ * DELETE /api/cards/:id/timers/:timerId
  * @summary Delete a timer of the card
  * @param {string} timerId - The timer id
  */
-router.delete("/api/cards/:id/timers", async (req, res) => {
-    const { timerId } = req.body;
+router.delete("/api/cards/:id/timers/:timerId", async (req, res) => {
+    const { id, timerId } = req.params as { id: string; timerId: string };
 
-    await prisma.card_timers.delete({
+    await prisma.card_timers.deleteMany({
         where: {
             id: timerId,
+            card_id: id,
         },
     });
 
@@ -307,7 +299,7 @@ router.delete("/api/cards/:id/timers", async (req, res) => {
  * @param {string[]} usersId - An array of the `users` ID
  */
 router.post("/api/cards/:id/users", async (req, res) => {
-    const { id } = req.query as { id: string };
+    const { id } = req.params as { id: string };
     const usersId: string[] = req.body;
 
     usersId.map(async (userId) => {
