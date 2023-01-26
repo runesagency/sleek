@@ -333,6 +333,148 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
 
         console.log(`Card: *${i + 1}. ${card.title}*`);
 
+        const availableBoardMembers = await prisma.users.findMany({
+            where: {
+                boards: {
+                    some: {
+                        board_id: board.id,
+                    },
+                },
+            },
+        });
+
+        // Add labels to the card
+        const addLabel = faker.datatype.boolean();
+
+        if (addLabel) {
+            const availableLabels = await prisma.labels.findMany({
+                where: {
+                    OR: {
+                        cards: {
+                            some: {
+                                card: {
+                                    board_id: board.id,
+                                },
+                            },
+                        },
+                        creator_id: user.id,
+                    },
+                },
+            });
+
+            if (availableLabels.length > 0) {
+                const label = faker.helpers.arrayElement(availableLabels);
+
+                await prisma.card_labels.create({
+                    data: {
+                        card_id: card.id,
+                        label_id: label.id,
+                    },
+                });
+
+                console.log(`> ${user.name} then add a multiple label to the card ${card.title}...`);
+            } else {
+                const label = await prisma.labels.create({
+                    data: {
+                        name: faker.random.word(),
+                        description: faker.commerce.productDescription(),
+                        color: faker.color.rgb({ format: "hex" }),
+                        creator_id: user.id,
+                        cards: {
+                            create: {
+                                card_id: card.id,
+                            },
+                        },
+                    },
+                });
+
+                console.log(`> ${user.name} then create a label ${label.name} and add it to the card ${card.title}...`);
+            }
+        }
+
+        // Add members to the card
+        const addMember = faker.datatype.boolean();
+
+        if (addMember && availableBoardMembers.length > 0) {
+            const member = faker.helpers.arrayElement(availableBoardMembers);
+
+            await prisma.card_users.create({
+                data: {
+                    card_id: card.id,
+                    user_id: member.id,
+                },
+            });
+
+            console.log(`> ${user.name} then add a multiple member to the card ${card.title}...`);
+        }
+
+        // Add timer to the card
+        const addTimer = faker.datatype.boolean();
+
+        if (addTimer) {
+            const isEnded = faker.datatype.boolean();
+            await prisma.card_timers.create({
+                data: {
+                    card_id: card.id,
+                    description: faker.commerce.productDescription(),
+                    started_at: faker.date.recent(2),
+                    starter_id: user.id,
+                    ended_at: isEnded ? faker.date.recent(1) : null,
+                    ender_id: isEnded ? user.id : null,
+                },
+            });
+
+            console.log(`> ${user.name} then add a timer to the card ${card.title}...`);
+        }
+
+        // Add checklist to the card
+        const checklistTotal = faker.datatype.number({ min: 0, max: 5 });
+
+        for (let i = 0; i < checklistTotal; i++) {
+            const checklist = await prisma.card_checklists.create({
+                data: {
+                    title: faker.commerce.productName(),
+                    card_id: card.id,
+                    creator_id: user.id,
+                },
+            });
+
+            console.log(`> ${user.name} then add a checklist ${checklist.title} to the card ${card.title}...`);
+
+            const checklistItemTotal = faker.datatype.number({ min: 0, max: 5 });
+
+            for (let i = 0; i < checklistItemTotal; i++) {
+                const checklistItem = await prisma.card_checklist_tasks.create({
+                    data: {
+                        title: faker.commerce.productName(),
+                        checklist_id: checklist.id,
+                        order: i,
+                        completed: faker.datatype.boolean(),
+                        creator_id: user.id,
+                    },
+                });
+
+                console.log(`> ${user.name} then add a checklist item ${checklistItem.title} to the checklist ${checklist.title}...`);
+
+                if (availableBoardMembers.length > 0) {
+                    const checklistUserTotal = faker.datatype.number({ min: 0, max: 7 });
+
+                    for (let i = 0; i < checklistUserTotal; i++) {
+                        const member = faker.helpers.arrayElement(availableBoardMembers);
+
+                        await prisma.card_checklist_task_users.create({
+                            data: {
+                                task_id: checklistItem.id,
+                                user_id: member.id,
+                            },
+                        });
+
+                        console.log(`> ${user.name} then add a multiple member to the checklist item ${checklistItem.title}...`);
+                    }
+                }
+            }
+        }
+
         await wait(100);
     }
 };
