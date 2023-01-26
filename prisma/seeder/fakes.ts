@@ -4,8 +4,6 @@ import type { boards, lists, organizations, PrismaClient, projects, users } from
 
 import { faker } from "@faker-js/faker";
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users) => {
     const length = faker.datatype.number({ min: 0, max: 3 });
     if (length === 0) return;
@@ -63,7 +61,6 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
         // Done, now create projects
         members.map(async (user) => {
             await fakeProjects(prisma, roles, configurations, user, organization);
-            await wait(100);
         });
     }
 };
@@ -174,7 +171,6 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
         // Done, now create boards
         members.map(async (user) => {
             await fakeBoards(prisma, roles, configurations, user, project);
-            await wait(100);
         });
     }
 };
@@ -284,7 +280,6 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
         // Done, now create lists
         members.map(async (user) => {
             await fakeLists(prisma, configurations, user, board);
-            await wait(100);
         });
     }
 };
@@ -309,7 +304,6 @@ const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurat
         console.log(`List: *${index + 1}. ${list.title}*`);
 
         await fakeCards(prisma, configurations, user, board, list);
-        await wait(100);
     }
 };
 
@@ -474,8 +468,6 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                 }
             }
         }
-
-        await wait(100);
     }
 };
 
@@ -505,6 +497,5 @@ export default async function fakeData(prisma: PrismaClient, roles: DefaultRoles
         }
 
         await fakeOrganizations(prisma, roles, configurations, user);
-        await wait(100);
     }
 }
