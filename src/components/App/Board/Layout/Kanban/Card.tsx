@@ -16,7 +16,7 @@ type TasksProgressProps = {
 const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
     const [open, setOpen] = useState(false);
 
-    const tasks = checklists.flatMap(({ checklist }) => checklist).flatMap((checklist) => checklist?.tasks ?? []);
+    const tasks = checklists.flatMap((checklist) => checklist?.tasks ?? []);
     const percentage = Math.round((tasks.filter(({ completed }) => completed).length / tasks.length) * 100);
     const shownTasks = tasks.slice(0, 7);
     const hiddenTasks = tasks.slice(7);

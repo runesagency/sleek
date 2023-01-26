@@ -7,7 +7,7 @@ import { IconDots, IconPlus } from "@tabler/icons";
 import { memo } from "react";
 
 type ChecklistProps = {
-    data?: CardType["checklists"][0]["checklist"];
+    data?: CardType["checklists"][0];
 };
 
 const Checklist = ({ data }: ChecklistProps) => {

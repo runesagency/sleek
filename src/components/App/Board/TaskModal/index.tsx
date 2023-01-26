@@ -188,7 +188,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
 
                 {/* Checklists */}
                 <Section title="Checklists">
-                    {card.checklists.map(({ checklist }, i) => (
+                    {card.checklists.map((checklist, i) => (
                         <Checklist key={i} data={checklist} />
                     ))}
 

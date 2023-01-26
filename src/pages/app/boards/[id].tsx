@@ -76,15 +76,11 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
             timers: true,
             checklists: {
                 include: {
-                    checklist: {
+                    tasks: {
                         include: {
-                            tasks: {
+                            users: {
                                 include: {
-                                    users: {
-                                        include: {
-                                            user: true,
-                                        },
-                                    },
+                                    user: true,
                                 },
                             },
                         },

@@ -6,9 +6,8 @@ import type {
     card_labels,
     card_timers,
     card_users,
-    checklists,
-    checklist_tasks,
-    checklist_task_users,
+    card_checklist_tasks,
+    card_checklist_task_users,
     users,
     labels,
     activities,
@@ -38,13 +37,11 @@ export type Card = ParsedSSRProps<
               })
             | null;
         checklists: (card_checklists & {
-            checklist: checklists & {
-                tasks: (checklist_tasks & {
-                    users: (checklist_task_users & {
-                        user: users | null;
-                    })[];
+            tasks: (card_checklist_tasks & {
+                users: (card_checklist_task_users & {
+                    user: users | null;
                 })[];
-            };
+            })[];
         })[];
         timers: card_timers[];
         creator: users;

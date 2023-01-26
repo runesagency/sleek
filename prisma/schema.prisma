@@ -277,14 +277,14 @@ model users {
   card_attachments_created card_attachments[] @relation("card_attachments_created")
 
   // Checklists
-  checklist_tasks            checklist_task_users[] @relation("checklist_tasks_joined")
-  checklist_task_users_added checklist_task_users[] @relation("checklist_task_users_added")
+  checklist_tasks            card_checklist_task_users[] @relation("checklist_tasks_joined")
+  checklist_task_users_added card_checklist_task_users[] @relation("checklist_task_users_added")
 
-  checklists_created  checklists[] @relation("checklists_created")
-  checklists_modified checklists[] @relation("checklists_modified")
+  checklists_created  card_checklists[] @relation("checklists_created")
+  checklists_modified card_checklists[] @relation("checklists_modified")
 
-  checklist_tasks_created  checklist_tasks[] @relation("checklist_tasks_created")
-  checklist_tasks_modified checklist_tasks[] @relation("checklist_tasks_modified")
+  checklist_tasks_created  card_checklist_tasks[] @relation("checklist_tasks_created")
+  checklist_tasks_modified card_checklist_tasks[] @relation("checklist_tasks_modified")
 
   // Activities
   activities         activities[]
@@ -578,17 +578,6 @@ model card_attachments {
   adder    users?   @relation(name: "card_attachments_created", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
-model card_checklists {
-  id    String @id @default(uuid())
-  order Int
-
-  card_id String
-  card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  checklist_id String
-  checklist    checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
 model card_timers {
   id          String  @id @default(uuid())
   description String?
@@ -605,13 +594,12 @@ model card_timers {
   ender    users?    @relation(name: "card_timers_ended", fields: [ender_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
-// ------------------------------
-// [Checklists]
-// ------------------------------
-
-model checklists {
+model card_checklists {
   id    String @id @default(uuid())
   title String
+
+  card_id String
+  card    cards  @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   created_at DateTime @default(now())
   creator_id String?
@@ -621,11 +609,10 @@ model checklists {
   modifier_id String?
   modifier    users?   @relation(name: "checklists_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  tasks checklist_tasks[]
-  cards card_checklists[]
+  tasks card_checklist_tasks[]
 }
 
-model checklist_tasks {
+model card_checklist_tasks {
   id         String    @id @default(uuid())
   title      String
   completed  Boolean   @default(false)
@@ -634,10 +621,10 @@ model checklist_tasks {
   order      Int
 
   checklist_id String
-  checklist    checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  checklist    card_checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   parent_checklist_task_id String?
-  parent_checklist_task    checklist_tasks? @relation(name: "parent_checklist_task", fields: [parent_checklist_task_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  parent_checklist_task    card_checklist_tasks? @relation(name: "parent_checklist_task", fields: [parent_checklist_task_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   created_at DateTime @default(now())
   creator_id String?
@@ -647,15 +634,15 @@ model checklist_tasks {
   modifier_id String?
   modifier    users?   @relation(name: "checklist_tasks_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  users           checklist_task_users[]
-  checklist_tasks checklist_tasks[]      @relation(name: "parent_checklist_task")
+  users    card_checklist_task_users[]
+  subtasks card_checklist_tasks[]      @relation(name: "parent_checklist_task")
 }
 
-model checklist_task_users {
+model card_checklist_task_users {
   id String @id @default(uuid())
 
   task_id String
-  task    checklist_tasks @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  task    card_checklist_tasks @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   user_id String
   user    users  @relation(name: "checklist_tasks_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
