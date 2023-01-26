@@ -1,4 +1,4 @@
-import OrganizationPageLayout from "@/components/App/OrganizationPageLayout";
+import OrganizationPageLayout from "@/components/App/Layout/OrganizationPageLayout";
 import Button from "@/components/Forms/Button";
 
 import { IconCalendar, IconCards, IconFolder } from "@tabler/icons";
