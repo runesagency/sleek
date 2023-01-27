@@ -13,7 +13,7 @@ type ChecklistProps = {
 const Checklist = ({ data }: ChecklistProps) => {
     if (!data) return null;
 
-    const percentage = data.tasks.filter((task) => task.completed).length / data.tasks.length;
+    const percentage = Math.round((data.tasks.filter((task) => task.completed).length / data.tasks.length) * 100);
 
     return (
         <div className="flex flex-col gap-4">

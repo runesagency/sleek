@@ -7,8 +7,10 @@ import Checklist from "@/components/App/Board/TaskModal/Checklist";
 import Description from "@/components/App/Board/TaskModal/Description";
 import Title from "@/components/App/Board/TaskModal/Title";
 import Label from "@/components/DataDisplay/Label";
+import MemberList from "@/components/DataDisplay/MemberList";
 import Button from "@/components/Forms/Button";
 import Textarea from "@/components/Forms/Textarea";
+import Avatar from "@/components/Miscellaneous/Avatar";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
 import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons";
@@ -111,7 +113,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                         <div className="flex items-center gap-3">
                             {card.creator ? (
                                 <>
-                                    <img src={card.creator.image_attachment_id || ""} alt={card.creator.name} className="h-10 w-10 rounded-full" />
+                                    <Avatar config={{ seed: card.creator.name }} alt={card.creator.name} className="h-10 w-10 rounded-full" />
                                     <p>{card.creator.name}</p>
                                 </>
                             ) : (
@@ -124,20 +126,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                         <div className="flex items-center gap-2">
                             {card.users.length > 0 && (
                                 <>
-                                    <div className="flex -space-x-2">
-                                        {card.users.map(({ user }, i) => {
-                                            if (!user || i > 10) return null;
-
-                                            return (
-                                                <img
-                                                    key={i}
-                                                    src={user.image_attachment_id || ""}
-                                                    alt={user.name}
-                                                    className="box-border h-10 w-10 shrink-0 rounded-full border-2 border-dark-700 object-cover object-center"
-                                                />
-                                            );
-                                        })}
-                                    </div>
+                                    <MemberList.Large users={card.users.map(({ user }) => user)} max={10} />
 
                                     {card.users.length > 10 && <p>+{card.users.length - 10} Members</p>}
                                 </>
