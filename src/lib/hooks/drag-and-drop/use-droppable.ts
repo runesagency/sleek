@@ -18,6 +18,15 @@ export type useDroppableOptions = {
       }
 );
 
+export const constants = {
+    dataAttribute: {
+        droppable: "data-droppable",
+        sortable: "data-sortable",
+        sortableDirection: "data-sortable-direction",
+        accepts: "data-accepts",
+    },
+};
+
 export default function useDroppable<T extends HTMLElement = HTMLDivElement>({ accepts, sortable, sortableDirection }: useDroppableOptions) {
     const ref = useRef<T>(null);
 
@@ -25,29 +34,29 @@ export default function useDroppable<T extends HTMLElement = HTMLDivElement>({ a
         const current = ref.current;
 
         if (current) {
-            current.dataset.droppable = "true";
+            current.setAttribute(constants.dataAttribute.droppable, "true");
 
             if (sortable) {
-                current.dataset.sortable = "true";
-                current.dataset.sortableDirection = sortableDirection;
+                current.setAttribute(constants.dataAttribute.sortable, "true");
+                current.setAttribute(constants.dataAttribute.sortableDirection, sortableDirection);
             } else {
-                current.removeAttribute("data-sortable");
-                current.removeAttribute("data-sortable-direction");
+                current.removeAttribute(constants.dataAttribute.sortable);
+                current.removeAttribute(constants.dataAttribute.sortableDirection);
             }
 
             if (accepts) {
-                current.dataset.accepts = accepts.join(",");
+                current.setAttribute(constants.dataAttribute.accepts, accepts.join(","));
             } else {
-                current.removeAttribute("data-accepts");
+                current.removeAttribute(constants.dataAttribute.accepts);
             }
         }
 
         return () => {
             if (current) {
-                current.removeAttribute("data-droppable");
-                current.removeAttribute("data-sortable");
-                current.removeAttribute("data-sortable-direction");
-                current.removeAttribute("data-accepts");
+                current.removeAttribute(constants.dataAttribute.droppable);
+                current.removeAttribute(constants.dataAttribute.sortable);
+                current.removeAttribute(constants.dataAttribute.sortableDirection);
+                current.removeAttribute(constants.dataAttribute.accepts);
             }
         };
     }, [accepts, ref, sortable, sortableDirection]);

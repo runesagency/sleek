@@ -1,10 +1,17 @@
-import { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
+import { SortableDirection, constants as droppableConstants } from "@/lib/hooks/drag-and-drop/use-droppable";
 
 import { useCallback, useRef, useState, useEffect } from "react";
 
 export type useDraggableOptions = {
     type: string;
     useClone?: boolean;
+};
+
+export const constants = {
+    dataAttribute: {
+        draggable: "data-draggable",
+        draggableType: "data-draggable-type",
+    },
 };
 
 export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ type, useClone = true }: useDraggableOptions) {
@@ -87,7 +94,8 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
         const handleCurrent = handleRef.current;
 
         if (current) {
-            current.dataset.draggable = "true";
+            current.setAttribute(constants.dataAttribute.draggable, "true");
+
             current.addEventListener("mouseup", onDragEnd);
             current.addEventListener("touchend", onDragEnd);
 
@@ -102,6 +110,8 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
 
         return () => {
             if (current) {
+                current.removeAttribute(constants.dataAttribute.draggable);
+
                 current.removeEventListener("mouseup", onDragEnd);
                 current.removeEventListener("touchend", onDragEnd);
 
@@ -179,16 +189,16 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
                 const hovered = elements.find((element) => {
                     const { top, left, bottom, right } = element.getBoundingClientRect();
 
-                    const acceptList = element.getAttribute("data-accepts");
+                    const acceptList = element.getAttribute(droppableConstants.dataAttribute.accepts);
                     const accepts = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
 
                     return accepts && clientX > left && clientX < right && clientY > top && clientY < bottom;
                 });
 
                 if (hovered) {
-                    const isSortable = hovered.getAttribute("data-sortable") === "true";
+                    const isSortable = !!hovered.getAttribute(droppableConstants.dataAttribute.sortable);
 
-                    const droppableChilds = hovered.querySelectorAll("[data-droppable=true]");
+                    const droppableChilds = hovered.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
 
                     if (droppableChilds.length > 0) {
                         const droppableInside = getHoveredElement(Array.from(droppableChilds), HoveredType.Droppable);
@@ -217,7 +227,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
             hoverCheckInterval = setInterval(() => {
                 if (!hasMove || !current) return;
 
-                const allDroppableElements = document.querySelectorAll("[data-droppable=true]");
+                const allDroppableElements = document.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
                 const [hoveredElement, elementType] = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
 
                 if (hoveredElement && hoveredElement !== current && hoveredElement !== clone && hoveredElement !== clonePreviewElement) {
@@ -232,10 +242,10 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
                         isLastHoverAreaOnLeft = isOnLeft;
 
                         const container = elementType === HoveredType.Droppable ? hoveredElement : (hoveredElement.parentElement as HTMLElement);
-                        const isContainerSortable = container.getAttribute("data-sortable") === "true";
+                        const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
 
                         if (isContainerSortable) {
-                            const sortableDirection = container.getAttribute("data-sortable-direction");
+                            const sortableDirection = container.getAttribute(droppableConstants.dataAttribute.sortableDirection) as SortableDirection;
                             const prepend = (sortableDirection === SortableDirection.Vertical && isOnTop) || (sortableDirection === SortableDirection.Horizontal && isOnLeft);
 
                             if (!clonePreviewElement) {
