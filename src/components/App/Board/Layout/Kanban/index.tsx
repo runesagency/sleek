@@ -1,18 +1,13 @@
 import type { Card as CardType } from "@/lib/types";
 import type { LayoutProps } from "@/pages/app/boards/[id]";
-import type { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 
-import Card from "@/components/App/Board/Layout/Kanban/Card";
 import List, { NewCardLocation } from "@/components/App/Board/Layout/Kanban/List";
 import Button from "@/components/Forms/Button";
-import NoSSR from "@/components/Miscellaneous/NoSSR";
+import useDroppable, { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
+import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
-import { closestCorners, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, DndContext } from "@dnd-kit/core";
-import { horizontalListSortingStrategy, SortableContext, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { randomId } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons";
 import { memo, useCallback, useState } from "react";
-import ScrollContainer from "react-indiana-drag-scroll";
 
 export enum SortableType {
     List = "list",
@@ -22,27 +17,14 @@ export enum SortableType {
 const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps) => {
     const [draggedItem, setDraggedItem] = useState<CardType | undefined | null>(null);
 
-    const sensors = useSensors(
-        useSensor(MouseSensor, {
-            // Require the mouse to move by 'x' pixels before activating
-            activationConstraint: {
-                distance: 5,
-            },
-        }),
-        useSensor(TouchSensor, {
-            // Press delay of 250ms, with tolerance of 5px of movement
-            activationConstraint: {
-                delay: 250,
-                tolerance: 5,
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
+    const { ref } = useDroppable({
+        accepts: [SortableType.List],
+        sortable: true,
+        sortableDirection: SortableDirection.Horizontal,
+    });
 
     const onDragStart = useCallback(
-        (event: DragStartEvent) => {
+        (event: any) => {
             const current = event.active.data.current;
 
             if (current?.type === SortableType.Card) {
@@ -59,7 +41,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
     );
 
     const onDragOver = useCallback(
-        (event: DragOverEvent) => {
+        (event: any) => {
             type Data = { type: SortableType; id: string; order: number };
 
             const current = event.active.data.current as Data;
@@ -131,7 +113,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
     );
 
     const onDragEnd = useCallback(
-        async (event: DragEndEvent) => {
+        async (event: any) => {
             setDraggedItem(null);
 
             type Data = { type: SortableType; id: string; order: number };
@@ -143,7 +125,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
 
             // List to List
             if (current.type === SortableType.List && target.type === SortableType.List) {
-                const newList = arrayMove(lists, current.order, target.order).map((list, index) => ({
+                const newList = arrayMoveImmutable(lists, current.order, target.order).map((list, index) => ({
                     ...list,
                     order: index,
                 }));
@@ -163,7 +145,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
 
                     if (sourceListId === destinationListId) {
                         const listCards = cards.filter((card) => card.list_id === sourceListId).sort((a, b) => a.order - b.order);
-                        const newListCards = arrayMove(listCards, current.order, target.order).map((card, index) => ({
+                        const newListCards = arrayMoveImmutable(listCards, current.order, target.order).map((card, index) => ({
                             ...card,
                             order: index,
                         }));
@@ -257,35 +239,22 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
         const newLists = [...lists];
 
         setLists(newLists);
-    }, [boardId, lists, setLists]);
+    }, [lists, setLists]);
 
     return (
-        <NoSSR>
-            <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} collisionDetection={closestCorners}>
-                <SortableContext items={lists.flatMap(({ id }) => id)} strategy={horizontalListSortingStrategy}>
-                    <ScrollContainer className="flex h-full max-h-full w-full flex-1 justify-start gap-7 py-10 px-11" ignoreElements="*[data-prevent-drag-scroll]" hideScrollbars={false}>
-                        {lists
-                            .sort((a, b) => a.order - b.order)
-                            .map((list) => {
-                                return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
-                            })}
+        <div className="h-full w-full">
+            <div ref={ref} className="flex h-full w-full flex-1 justify-start gap-7 overflow-auto py-10 px-11">
+                {lists
+                    .sort((a, b) => a.order - b.order)
+                    .map((list) => {
+                        return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
+                    })}
 
-                        <Button.Large className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
-                            Create New List
-                        </Button.Large>
-                    </ScrollContainer>
-                </SortableContext>
-
-                {/* Only hide when anything beside the card is dragged (e.g. List) */}
-                {(draggedItem === null || typeof draggedItem !== "undefined") && (
-                    <DragOverlay>
-                        {draggedItem && (
-                            <Card {...(draggedItem as CardType)} isDragging={false} isDragOverlay /> //
-                        )}
-                    </DragOverlay>
-                )}
-            </DndContext>
-        </NoSSR>
+                <Button.Large className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
+                    Create New List
+                </Button.Large>
+            </div>
+        </div>
     );
 };
 
