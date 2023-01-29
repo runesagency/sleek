@@ -11,18 +11,18 @@ type AppShellProps = {
 export default function AppPageLayout({ children, className, useSidebar = true }: AppShellProps) {
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
-            <section className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-20 py-5">
+            <nav className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-20 py-5">
                 <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-6" />
 
                 <div className="flex items-center gap-4">
                     <IconUsers height={20} />
                     <IconBell height={20} />
                 </div>
-            </section>
+            </nav>
 
             <main className="flex h-full w-full items-start overflow-auto">
                 {useSidebar && (
-                    <section className="flex h-full w-72 shrink-0 flex-col gap-10 border-r border-r-dark-600 bg-dark-800 py-10">
+                    <aside className="flex h-full w-72 shrink-0 flex-col gap-10 border-r border-r-dark-600 bg-dark-800 py-10">
                         <div className="flex flex-col gap-6 px-5">
                             <span className="text-xs font-medium opacity-50">Personal</span>
 
@@ -52,10 +52,10 @@ export default function AppPageLayout({ children, className, useSidebar = true }
                                 Create New Organization
                             </Button.Small>
                         </div>
-                    </section>
+                    </aside>
                 )}
 
-                <section className={`max-h-full flex-1 overflow-auto ${className}`}>{children}</section>
+                <section className={`h-full max-h-full w-full flex-1 overflow-auto ${className}`}>{children}</section>
             </main>
         </main>
     );
