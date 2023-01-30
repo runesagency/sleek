@@ -7,6 +7,7 @@ export type useDraggableOptions = {
     id: string;
     type: string;
     useClone?: boolean;
+    activatorDistance?: number;
 };
 
 export const constants = {
@@ -17,7 +18,7 @@ export const constants = {
     },
 };
 
-export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ id, type, useClone = true }: useDraggableOptions) {
+export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ id, type, useClone = true, activatorDistance = 10 }: useDraggableOptions) {
     // The element that is being dragged
     const ref = useRef<T>(null);
 
@@ -25,18 +26,13 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
     const handleRef = useRef<T>(null);
 
     // Is the element being dragged?
+    const [hasStartDragging, setHasStartDragging] = useState(false);
+
+    // Is the element has been counted as a drag? (After it was moved X pixels)
     const [isDragging, setIsDragging] = useState(false);
 
     // The original position of the cursor when the drag started
-    const [originalCursorPos, setOriginalCursorPos] = useState({ x: 0, y: 0 });
-
-    // Clone of the current element that is following the cursor (portal)
-    const [clone, setClone] = useState<T | null>(null);
-
-    const dragStartTimeout = useRef<number | null>(null);
-    // Timeout to determine if the user is dragging or clicking
-    // const dragStartTimeout = useRef<number | null>(null);
-
+    const originalCursorPos = useRef<Record<"x" | "y", number>>({ x: 0, y: 0 });
 
     /**
      * @description
@@ -44,49 +40,23 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
      *
      * @param e a mouse or touch event
      */
-    const onDragStart = useCallback(
-        (e: MouseEvent | TouchEvent) => {
-            e.preventDefault();
+    const onDragStart = useCallback((e: MouseEvent | TouchEvent) => {
+        e.preventDefault();
 
-            let clientX = 0;
-            let clientY = 0;
+        let clientX = 0;
+        let clientY = 0;
 
-            if (e instanceof MouseEvent) {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            } else if (e instanceof TouchEvent) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            }
+        if (e instanceof MouseEvent) {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        } else if (e instanceof TouchEvent) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
 
-            setOriginalCursorPos({ x: clientX, y: clientY });
-
-            dragStartTimeout.current = window.setTimeout(() => {
-                setIsDragging(true);
-
-                if (useClone && ref.current) {
-                    const { width, height, left, top } = ref.current.getBoundingClientRect();
-
-                    const transformX = clientX - (clientX - left);
-                    const transformY = clientY - (clientY - top);
-
-                    // create a clone of the element (portal)
-                    const clone = ref.current?.cloneNode(true) as T;
-                    setClone(clone);
-                    document.body.appendChild(clone);
-
-                    clone.style.position = "fixed";
-                    clone.style.top = `0px`;
-                    clone.style.left = `0px`;
-                    clone.style.width = `${width}px`;
-                    clone.style.height = `${height}px`;
-                    clone.style.zIndex = "9999";
-                    clone.style.transform = `translate(${transformX}px, ${transformY}px)`;
-                }
-            }, 100);
-        },
-        [useClone]
-    );
+        originalCursorPos.current = { x: clientX, y: clientY };
+        setHasStartDragging(true);
+    }, []);
 
     /**
      * @description
@@ -98,20 +68,15 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
 
-            if (clone) clone.remove();
-
-            if (dragStartTimeout.current) {
-                if (!isDragging) {
-                    // if the element is not being dragged, then it's a click
-                    ref.current?.onclick?.(e as MouseEvent);
-                }
-
-                clearTimeout(dragStartTimeout.current);
+            if (!isDragging) {
+                // if the element is not being dragged, then it's a click
+                ref.current?.onclick?.(e as MouseEvent);
             }
 
+            setHasStartDragging(false);
             setIsDragging(false);
         },
-        [clone, isDragging]
+        [isDragging]
     );
 
     /**
@@ -183,6 +148,9 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         // The element which is used to preview the new position of the dragged element (only used when the droppable is sortable)
         let placeholder: T | null = null;
 
+        // Clone of the current element that is following the cursor (portal)
+        let clone: T | null = null;
+
         // The original display style of the element
         // When the element is being dragged, the display style is set to none
         // It will be set back to the original value when the element is not being dragged anymore
@@ -196,7 +164,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
          */
         const onDragMove = (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
-            if (!current || !clone) return;
+            if (!current) return;
 
             const { top, left } = current.getBoundingClientRect();
 
@@ -209,8 +177,30 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }
 
             // check if card is being moved
-            if (!hasMove && (Math.abs(clientX - originalCursorPos.x) > 10 || Math.abs(clientY - originalCursorPos.y) > 10)) {
+            if (!hasMove && (Math.abs(clientX - originalCursorPos.current.x) > activatorDistance || Math.abs(clientY - originalCursorPos.current.y) > activatorDistance)) {
                 hasMove = true;
+                setIsDragging(true);
+
+                if (useClone && ref.current) {
+                    const { width, height, left, top } = ref.current.getBoundingClientRect();
+
+                    const transformX = clientX - (clientX - left);
+                    const transformY = clientY - (clientY - top);
+
+                    // create a clone of the element (portal)
+                    clone = ref.current.cloneNode(true) as T;
+
+                    clone.style.position = "fixed";
+                    clone.style.top = `0px`;
+                    clone.style.left = `0px`;
+                    clone.style.width = `${width}px`;
+                    clone.style.height = `${height}px`;
+                    clone.style.zIndex = "9999";
+                    clone.style.transform = `translate(${transformX}px, ${transformY}px)`;
+                    clone.style.transition = "none";
+
+                    document.body.appendChild(clone);
+                }
             }
 
             if (!offsetX) offsetX = clientX - left;
@@ -474,7 +464,8 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }
 
             if (clone) {
-                clone.remove();
+                clone?.remove();
+                clone = null;
             }
 
             if (placeholder) {
@@ -483,8 +474,9 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }
 
             current.style.display = originalElementDisplay;
+            setIsDragging(false);
         };
-    }, [clone, hasStartDragging, id, onDragEnd, originalCursorPos.x, originalCursorPos.y, type, useClone]);
+    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance]);
 
     return {
         ref,
