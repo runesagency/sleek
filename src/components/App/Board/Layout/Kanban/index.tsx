@@ -3,6 +3,7 @@ import type { LayoutProps } from "@/pages/app/boards/[id]";
 
 import List, { NewCardLocation } from "@/components/App/Board/Layout/Kanban/List";
 import Button from "@/components/Forms/Button";
+import useDragDropContext from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
 import useDroppable, { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
 import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
@@ -17,7 +18,10 @@ export enum SortableType {
 const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps) => {
     const [draggedItem, setDraggedItem] = useState<CardType | undefined | null>(null);
 
-    const { ref } = useDroppable({
+    const { ref: dndContextRef } = useDragDropContext();
+
+    const { ref: droppableRef } = useDroppable({
+        id: "board",
         accepts: [SortableType.List],
         sortable: true,
         sortableDirection: SortableDirection.Horizontal,
@@ -153,8 +157,8 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
     }, [lists, setLists]);
 
     return (
-        <div className="h-full w-full">
-            <div ref={ref} className="flex h-full w-full flex-1 justify-start gap-7 overflow-auto py-10 px-11">
+        <section ref={dndContextRef} className="h-full w-full">
+            <div ref={droppableRef} className="flex h-full w-full flex-1 justify-start gap-7 overflow-auto py-10 px-11">
                 {lists
                     .sort((a, b) => a.order - b.order)
                     .map((list) => {
@@ -165,7 +169,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                     Create New List
                 </Button.Large>
             </div>
-        </div>
+        </section>
     );
 };
 

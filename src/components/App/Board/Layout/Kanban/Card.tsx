@@ -104,9 +104,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         [isActuallyDragging, onCardClick]
     );
 
-    useEffect(() => {
-        setIsDragging(isDragging);
-    }, [isDragging, setIsDragging]);
+    useEffect(() => setIsDragging(isDragging), [isDragging, setIsDragging]);
 
     return (
         <a
