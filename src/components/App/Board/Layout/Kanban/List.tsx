@@ -50,7 +50,7 @@ type ListProps = ListType & {
 const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
     const [isAnyCardDragging, setIsAnyCardDragging] = useState(false);
-    const [isOnView, setIsOnView] = useState(true);
+    const [isOnView, setIsOnView] = useState(false);
 
     const {
         ref: draggableRef,
