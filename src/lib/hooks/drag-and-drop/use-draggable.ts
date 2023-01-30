@@ -15,16 +15,32 @@ export const constants = {
 };
 
 export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ type, useClone = true }: useDraggableOptions) {
+    // The element that is being dragged
     const ref = useRef<T>(null);
+
+    // If specified, it was the element that started the drag
     const handleRef = useRef<T>(null);
 
+    // Is the element being dragged?
     const [isDragging, setIsDragging] = useState(false);
+
+    // The original position of the cursor when the drag started
     const [originalCursorPos, setOriginalCursorPos] = useState({ x: 0, y: 0 });
 
+    // Clone of the current element that is following the cursor (portal)
     const [clone, setClone] = useState<T | null>(null);
 
     const dragStartTimeout = useRef<number | null>(null);
+    // Timeout to determine if the user is dragging or clicking
+    // const dragStartTimeout = useRef<number | null>(null);
 
+
+    /**
+     * @description
+     * Handle when user starts dragging an element
+     *
+     * @param e a mouse or touch event
+     */
     const onDragStart = useCallback(
         (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
@@ -69,6 +85,12 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
         [useClone]
     );
 
+    /**
+     * @description
+     * Handle when user stops dragging an element
+     *
+     * @param e a mouse or touch event
+     */
     const onDragEnd = useCallback(
         (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
@@ -89,6 +111,10 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
         [clone, isDragging]
     );
 
+    /**
+     * @description
+     * Handle component when mounted and unmounted
+     */
     useEffect(() => {
         const current = ref.current;
         const handleCurrent = handleRef.current;
@@ -126,21 +152,41 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
         };
     }, [onDragStart, onDragEnd, ref]);
 
+    /**
+     * @description
+     * Handle when user is dragging an element, most of the logic goes here
+     */
     useEffect(() => {
+        // If the component is not mounted yet, don't go further
         const current = ref.current;
         if (!current) return;
 
+        // The current coordinates of the cursor or touch
         let clientX = 0;
         let clientY = 0;
 
+        // The offset of the cursor or touch from the top left corner of the dragged element
         let offsetX = 0;
         let offsetY = 0;
 
         let clonePreviewElement: T | null = null;
+        // Has element moved 10px from the original position?
+        // Used to prevent auto scrolling when the element is not being dragged
         let hasMove = false;
         let currentElementOriginalDisplay = current.style.display;
 
-        // handle clone movement and other stuff
+        // The element which is used to preview the new position of the dragged element (only used when the droppable is sortable)
+
+        // The original display style of the element
+        // When the element is being dragged, the display style is set to none
+        // It will be set back to the original value when the element is not being dragged anymore
+
+        /**
+         * @description
+         * Handle when user is dragging an element
+         *
+         * @param e a mouse or touch event
+         */
         const onDragMove = (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
             if (!current || !clone) return;
@@ -169,21 +215,46 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
             clone.style.transform = `translate(${transformX}px, ${transformY}px)`;
         };
 
-        // get hovered element recursively until no more droppable or draggable element are found
+        // An interval to check if the cursor or touch is hovering over a droppable or its children (if it was a sortable)
         let hoverCheckInterval: NodeJS.Timeout | null = null;
 
+        /**
+         * @description
+         * Handle when the cursor is hovering over a droppable or its children (if it was a sortable) while dragging an element
+         */
         const handleHoverCheck = () => {
             if (!current) return;
 
+            // The element which is being hovered
             let lastHoveredElement: Element | null = null;
+
+            // Is the hover area of the hovered element on top?
             let isLastHoverAreaOnTop = false;
+
+            // Is the hover area of the hovered element on left?
             let isLastHoverAreaOnLeft = false;
 
             enum HoveredType {
                 None,
                 Droppable,
-                Children,
+                Children, // only used when the droppable is sortable
             }
+
+            const findContext = (element: Element): Element | null => {
+                const context = element.getAttribute(contextConstants.dataAttribute.dragDropContext);
+
+                if (context) {
+                    return element;
+                } else {
+                    const parent = element.parentElement;
+
+                    if (parent) {
+                        return findContext(parent);
+                    } else {
+                        return null;
+                    }
+                }
+            };
 
             const getHoveredElement = (elements: Element[], elementType: HoveredType): [Element, HoveredType] | [null, HoveredType.None] => {
                 const hovered = elements.find((element) => {
@@ -228,6 +299,14 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
                 if (!hasMove || !current) return;
 
                 const allDroppableElements = document.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
+                // Get near element with data-drag-drop-context, if not found, log an error
+                const context = findContext(current);
+                if (!context) return console.error("No drag and drop context found");
+
+                // Find all droppable elements inside the context
+                const allDroppableElements = context.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
+
+                // Get the hovered element
                 const [hoveredElement, elementType] = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
 
                 if (hoveredElement && hoveredElement !== current && hoveredElement !== clone && hoveredElement !== clonePreviewElement) {
