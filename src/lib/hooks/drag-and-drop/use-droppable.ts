@@ -6,6 +6,7 @@ export enum SortableDirection {
 }
 
 export type useDroppableOptions = {
+    id: string;
     accepts?: string[];
 } & (
     | {
@@ -21,13 +22,14 @@ export type useDroppableOptions = {
 export const constants = {
     dataAttribute: {
         droppable: "data-droppable",
+        droppableId: "data-droppable-id",
         sortable: "data-sortable",
         sortableDirection: "data-sortable-direction",
         accepts: "data-accepts",
     },
 };
 
-export default function useDroppable<T extends HTMLElement = HTMLDivElement>({ accepts, sortable, sortableDirection }: useDroppableOptions) {
+export default function useDroppable<T extends HTMLElement = HTMLDivElement>({ id, accepts, sortable, sortableDirection }: useDroppableOptions) {
     const ref = useRef<T>(null);
 
     useEffect(() => {
@@ -35,6 +37,7 @@ export default function useDroppable<T extends HTMLElement = HTMLDivElement>({ a
 
         if (current) {
             current.setAttribute(constants.dataAttribute.droppable, "true");
+            current.setAttribute(constants.dataAttribute.droppableId, id);
 
             if (sortable) {
                 current.setAttribute(constants.dataAttribute.sortable, "true");
@@ -54,12 +57,13 @@ export default function useDroppable<T extends HTMLElement = HTMLDivElement>({ a
         return () => {
             if (current) {
                 current.removeAttribute(constants.dataAttribute.droppable);
+                current.removeAttribute(constants.dataAttribute.droppableId);
                 current.removeAttribute(constants.dataAttribute.sortable);
                 current.removeAttribute(constants.dataAttribute.sortableDirection);
                 current.removeAttribute(constants.dataAttribute.accepts);
             }
         };
-    }, [accepts, ref, sortable, sortableDirection]);
+    }, [accepts, id, ref, sortable, sortableDirection]);
 
     return {
         ref,
