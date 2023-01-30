@@ -99,7 +99,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
             setTimeout(() => {
                 if (isActuallyDragging.current) return;
                 onCardClick(e as unknown as React.MouseEvent<HTMLAnchorElement>);
-            }, 200);
+            }, 100);
         },
         [isActuallyDragging, onCardClick]
     );
