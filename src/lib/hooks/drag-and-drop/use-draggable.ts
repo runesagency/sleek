@@ -3,6 +3,7 @@ import { SortableDirection, constants as droppableConstants } from "@/lib/hooks/
 import { useCallback, useRef, useState, useEffect } from "react";
 
 export type useDraggableOptions = {
+    id: string;
     type: string;
     useClone?: boolean;
 };
@@ -10,11 +11,12 @@ export type useDraggableOptions = {
 export const constants = {
     dataAttribute: {
         draggable: "data-draggable",
+        draggableId: "data-draggable-id",
         draggableType: "data-draggable-type",
     },
 };
 
-export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ type, useClone = true }: useDraggableOptions) {
+export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ id, type, useClone = true }: useDraggableOptions) {
     // The element that is being dragged
     const ref = useRef<T>(null);
 
@@ -121,6 +123,8 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
 
         if (current) {
             current.setAttribute(constants.dataAttribute.draggable, "true");
+            current.setAttribute(constants.dataAttribute.draggableId, id);
+            current.setAttribute(constants.dataAttribute.draggableType, type);
 
             current.addEventListener("mouseup", onDragEnd);
             current.addEventListener("touchend", onDragEnd);
@@ -137,6 +141,8 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
         return () => {
             if (current) {
                 current.removeAttribute(constants.dataAttribute.draggable);
+                current.removeAttribute(constants.dataAttribute.draggableId);
+                current.removeAttribute(constants.dataAttribute.draggableType);
 
                 current.removeEventListener("mouseup", onDragEnd);
                 current.removeEventListener("touchend", onDragEnd);
@@ -150,7 +156,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ t
                 }
             }
         };
-    }, [onDragStart, onDragEnd, ref]);
+    }, [onDragStart, onDragEnd, ref, id, type]);
 
     /**
      * @description
