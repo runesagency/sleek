@@ -66,6 +66,7 @@ type CardProps = CardType & {
 
 const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, setIsDragging }: CardProps) => {
     const { ref: cardRef, isDragging } = useDraggable<HTMLAnchorElement>({
+        id,
         type: SortableType.Card,
     });
 

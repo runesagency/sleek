@@ -57,10 +57,12 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
         handleRef,
         isDragging,
     } = useDraggable<HTMLDivElement>({
+        id,
         type: SortableType.List,
     });
 
     const { ref: droppableRef } = useDroppable({
+        id,
         accepts: [SortableType.Card],
         sortable: true,
         sortableDirection: SortableDirection.Vertical,
