@@ -175,17 +175,17 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         let offsetX = 0;
         let offsetY = 0;
 
-        let clonePreviewElement: T | null = null;
         // Has element moved 10px from the original position?
         // Used to prevent auto scrolling when the element is not being dragged
         let hasMove = false;
-        let currentElementOriginalDisplay = current.style.display;
 
         // The element which is used to preview the new position of the dragged element (only used when the droppable is sortable)
+        let placeholder: T | null = null;
 
         // The original display style of the element
         // When the element is being dragged, the display style is set to none
         // It will be set back to the original value when the element is not being dragged anymore
+        const originalElementDisplay = current.style.display;
 
         /**
          * @description
@@ -218,7 +218,9 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             const transformX = clientX - offsetX;
             const transformY = clientY - offsetY;
 
-            clone.style.transform = `translate(${transformX}px, ${transformY}px)`;
+            if (clone) {
+                clone.style.transform = `translate(${transformX}px, ${transformY}px)`;
+            }
         };
 
         // An interval to check if the cursor or touch is hovering over a droppable or its children (if it was a sortable)
@@ -315,7 +317,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 // Get the hovered element
                 const [hoveredElement, elementType] = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
 
-                if (hoveredElement && hoveredElement !== current && hoveredElement !== clone && hoveredElement !== clonePreviewElement) {
+                if (hoveredElement && hoveredElement !== current && hoveredElement !== clone && hoveredElement !== placeholder) {
                     const { top, bottom, left, right } = hoveredElement.getBoundingClientRect();
 
                     const isOnTop = clientY < top + (bottom - top) / 2;
@@ -333,22 +335,22 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                             const sortableDirection = container.getAttribute(droppableConstants.dataAttribute.sortableDirection) as SortableDirection;
                             const prepend = (sortableDirection === SortableDirection.Vertical && isOnTop) || (sortableDirection === SortableDirection.Horizontal && isOnLeft);
 
-                            if (!clonePreviewElement) {
-                                clonePreviewElement = current.cloneNode(true) as T;
+                            if (!placeholder) {
+                                placeholder = current.cloneNode(true) as T;
                                 current.style.display = "none";
                             }
 
                             if (elementType === HoveredType.Droppable) {
                                 if (prepend) {
-                                    hoveredElement.prepend(clonePreviewElement);
+                                    hoveredElement.prepend(placeholder);
                                 } else {
-                                    hoveredElement.append(clonePreviewElement);
+                                    hoveredElement.append(placeholder);
                                 }
                             } else if (elementType === HoveredType.Children) {
                                 if (prepend) {
-                                    hoveredElement.before(clonePreviewElement);
+                                    hoveredElement.before(placeholder);
                                 } else {
-                                    hoveredElement.after(clonePreviewElement);
+                                    hoveredElement.after(placeholder);
                                 }
                             }
                         }
@@ -443,7 +445,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }, 10);
         };
 
-        if (isDragging) {
+        if (hasStartDragging) {
             window.addEventListener("mousemove", onDragMove);
             window.addEventListener("mouseup", onDragEnd);
             window.addEventListener("touchmove", onDragMove);
@@ -475,14 +477,14 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 clone.remove();
             }
 
-            if (clonePreviewElement) {
-                clonePreviewElement.remove();
-                clonePreviewElement = null;
+            if (placeholder) {
+                placeholder.remove();
+                placeholder = null;
             }
 
-            current.style.display = currentElementOriginalDisplay;
+            current.style.display = originalElementDisplay;
         };
-    }, [clone, isDragging, onDragEnd, originalCursorPos.x, originalCursorPos.y, type]);
+    }, [clone, hasStartDragging, id, onDragEnd, originalCursorPos.x, originalCursorPos.y, type, useClone]);
 
     return {
         ref,
