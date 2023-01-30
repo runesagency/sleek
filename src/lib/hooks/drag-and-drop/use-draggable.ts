@@ -1,3 +1,4 @@
+import { constants as contextConstants } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
 import { SortableDirection, constants as droppableConstants } from "@/lib/hooks/drag-and-drop/use-droppable";
 
 import { useCallback, useRef, useState, useEffect } from "react";
@@ -306,7 +307,6 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             hoverCheckInterval = setInterval(() => {
                 if (!hasMove || !current) return;
 
-                const allDroppableElements = document.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
                 // Get near element with data-drag-drop-context, if not found, log an error
                 const context = findContext(current);
                 if (!context) return console.error("No drag and drop context found");
