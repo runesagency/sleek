@@ -1,3 +1,5 @@
+import type { DragEvent } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
+
 import { constants as contextConstants } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
 import { SortableDirection, constants as droppableConstants } from "@/lib/hooks/drag-and-drop/use-droppable";
 
@@ -379,7 +381,15 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                         }
                     }
                 } else if (!hoveredElement && lastHoveredElement) {
-                    lastHoveredElement = null;
+                    const container = lastHoveredType === HoveredType.Droppable ? lastHoveredElement : (lastHoveredElement.parentElement as HTMLElement);
+                    const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
+
+                    if (!isContainerSortable) {
+                        lastHoveredElement = null;
+                        lastHoveredType = HoveredType.None;
+                        isLastHoverAreaOnTop = false;
+                        isLastHoverAreaOnLeft = false;
+                    }
                 }
             }, 100);
         };
@@ -496,40 +506,90 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 clearInterval(autoContainerScrollIntervals);
             }
 
-            if (clone) {
-                if (isDragging) {
-                    let originX = 0;
-                    let originY = 0;
+            if (isDragging && clone) {
+                let originX = 0;
+                let originY = 0;
 
+                if (placeholder) {
+                    const { x, y } = placeholder.getBoundingClientRect();
+                    originX = x;
+                    originY = y;
+                } else {
+                    const { x, y } = current.getBoundingClientRect();
+                    originX = x;
+                    originY = y;
+                }
+
+                clone.style.transition = "transform 0.2s ease-in-out";
+                clone.style.transform = `translate(${originX}px, ${originY}px)`;
+
+                const onTransitionEnd = () => {
                     if (placeholder) {
-                        const { x, y } = placeholder.getBoundingClientRect();
-                        originX = x;
-                        originY = y;
-                    } else {
-                        const { x, y } = current.getBoundingClientRect();
-                        originX = x;
-                        originY = y;
+                        placeholder.remove();
                     }
 
-                    clone.style.transition = "transform 0.2s ease-in-out";
-                    clone.style.transform = `translate(${originX}px, ${originY}px)`;
+                    if (clone) {
+                        clone.removeEventListener("transitionend", onTransitionEnd);
+                        clone.remove();
+                    }
+                };
 
-                    const onTransitionEnd = () => {
-                        clone?.removeEventListener("transitionend", onTransitionEnd);
-                        clone?.remove();
-                        clone = null;
-                    };
-
-                    clone.addEventListener("transitionend", onTransitionEnd);
-                } else {
+                clone.addEventListener("transitionend", onTransitionEnd);
+            } else {
+                if (clone) {
                     clone.remove();
-                    clone = null;
+                }
+
+                if (placeholder) {
+                    placeholder.remove();
                 }
             }
 
-            if (placeholder) {
-                placeholder.remove();
-                placeholder = null;
+            if (lastHoveredElement) {
+                const container = lastHoveredType === HoveredType.Children ? lastHoveredElement.parentElement : lastHoveredElement;
+                if (!container) return;
+
+                let newIndex = -1;
+
+                if (lastHoveredType === HoveredType.Children) {
+                    newIndex = Array.from(container.children)
+                        .filter((child) => child !== placeholder && child !== clone && child !== current)
+                        .indexOf(lastHoveredElement);
+
+                    // If the last hovered element area is on bottom, we need to add 1 to the index
+                    // since we are inserting the element after the last hovered element
+                    if (!isLastHoverAreaOnTop) {
+                        newIndex += 1;
+                    }
+                } else if (lastHoveredType === HoveredType.Droppable) {
+                    if (isLastHoverAreaOnTop) {
+                        newIndex = 0;
+                    } else {
+                        newIndex = container.children.length;
+                    }
+                }
+
+                const endEvent = new CustomEvent<DragEvent>(contextConstants.events.dragEnd, {
+                    detail: {
+                        dragged: {
+                            id,
+                            type,
+                        },
+                        dropped: {
+                            id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
+                            sortable: !!container.getAttribute(droppableConstants.dataAttribute.sortable),
+                            index: newIndex,
+                        },
+                    },
+                });
+
+                context?.dispatchEvent(endEvent);
+
+                if (lastHoveredType === HoveredType.Children) {
+                    lastHoveredElement.parentElement?.dispatchEvent(endEvent);
+                } else {
+                    lastHoveredElement.dispatchEvent(endEvent);
+                }
             }
 
             current.style.display = originalElementDisplay;
