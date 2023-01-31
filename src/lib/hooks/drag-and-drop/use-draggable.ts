@@ -156,6 +156,9 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         // It will be set back to the original value when the element is not being dragged anymore
         const originalElementDisplay = current.style.display;
 
+        // The context of the drag and drop that the dragged element is in
+        let context: Element | null = null;
+
         /**
          * @description
          * Handle when user is dragging an element
@@ -214,8 +217,27 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }
         };
 
+        // List of droppable elements that the dragged element is hovering over
+        enum HoveredType {
+            None,
+            Droppable,
+            Children, // only used when the droppable is sortable
+        }
+
         // An interval to check if the cursor or touch is hovering over a droppable or its children (if it was a sortable)
         let hoverCheckInterval: NodeJS.Timeout | null = null;
+
+        // The element which is being hovered
+        let lastHoveredElement: Element | null = null;
+
+        // The type of the hovered element
+        let lastHoveredType: HoveredType = HoveredType.None;
+
+        // Is the hover area of the hovered element on top?
+        let isLastHoverAreaOnTop = false;
+
+        // Is the hover area of the hovered element on left?
+        let isLastHoverAreaOnLeft = false;
 
         /**
          * @description
@@ -223,21 +245,6 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
          */
         const handleHoverCheck = () => {
             if (!current) return;
-
-            // The element which is being hovered
-            let lastHoveredElement: Element | null = null;
-
-            // Is the hover area of the hovered element on top?
-            let isLastHoverAreaOnTop = false;
-
-            // Is the hover area of the hovered element on left?
-            let isLastHoverAreaOnLeft = false;
-
-            enum HoveredType {
-                None,
-                Droppable,
-                Children, // only used when the droppable is sortable
-            }
 
             const findContext = (element: Element): Element | null => {
                 const context = element.getAttribute(contextConstants.dataAttribute.dragDropContext);
@@ -298,7 +305,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 if (!hasMove || !current) return;
 
                 // Get near element with data-drag-drop-context, if not found, log an error
-                const context = findContext(current);
+                context = findContext(current);
                 if (!context) return console.error("No drag and drop context found");
 
                 // Find all droppable elements inside the context
@@ -315,6 +322,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
 
                     if (hoveredElement !== lastHoveredElement || isLastHoverAreaOnTop !== isOnTop || isLastHoverAreaOnLeft !== isOnLeft) {
                         lastHoveredElement = hoveredElement;
+                        lastHoveredType = elementType;
                         isLastHoverAreaOnTop = isOnTop;
                         isLastHoverAreaOnLeft = isOnLeft;
 
