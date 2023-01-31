@@ -464,8 +464,34 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }
 
             if (clone) {
-                clone?.remove();
-                clone = null;
+                if (isDragging) {
+                    let originX = 0;
+                    let originY = 0;
+
+                    if (placeholder) {
+                        const { x, y } = placeholder.getBoundingClientRect();
+                        originX = x;
+                        originY = y;
+                    } else {
+                        const { x, y } = current.getBoundingClientRect();
+                        originX = x;
+                        originY = y;
+                    }
+
+                    clone.style.transition = "transform 0.2s ease-in-out";
+                    clone.style.transform = `translate(${originX}px, ${originY}px)`;
+
+                    const onTransitionEnd = () => {
+                        clone?.removeEventListener("transitionend", onTransitionEnd);
+                        clone?.remove();
+                        clone = null;
+                    };
+
+                    clone.addEventListener("transitionend", onTransitionEnd);
+                } else {
+                    clone.remove();
+                    clone = null;
+                }
             }
 
             if (placeholder) {
@@ -476,7 +502,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             current.style.display = originalElementDisplay;
             setIsDragging(false);
         };
-    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance]);
+    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging]);
 
     return {
         ref,
