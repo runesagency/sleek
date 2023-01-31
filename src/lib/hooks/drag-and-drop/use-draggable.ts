@@ -34,6 +34,25 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
     // The original position of the cursor when the drag started
     const originalCursorPos = useRef<Record<"x" | "y", number>>({ x: 0, y: 0 });
 
+    // Function that executed that will be called after the user is clicking on the element and not dragging it
+    const clickHandler = useRef<(e: MouseEvent) => void>((e) => e.preventDefault());
+
+    const onClick = useCallback((handler: (e: MouseEvent) => void) => {
+        clickHandler.current = handler;
+    }, []);
+
+    const touchHandler = useRef<(e: TouchEvent) => void>((e) => e.preventDefault());
+
+    const onTouch = useCallback((handler: (e: TouchEvent) => void) => {
+        touchHandler.current = handler;
+    }, []);
+
+    const clickOrTouchHandler = useRef<(e: MouseEvent | TouchEvent) => void>((e) => e.preventDefault());
+
+    const onClickOrTouch = useCallback((handler: (e: MouseEvent | TouchEvent) => void) => {
+        clickOrTouchHandler.current = handler;
+    }, []);
+
     /**
      * @description
      * Handle when user starts dragging an element
@@ -68,9 +87,15 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
 
+            // if the element is not being dragged, then it's a click/touch
             if (!isDragging) {
-                // if the element is not being dragged, then it's a click
-                ref.current?.onclick?.(e as MouseEvent);
+                if (e instanceof MouseEvent) {
+                    clickHandler.current(e);
+                } else if (e instanceof TouchEvent) {
+                    touchHandler.current(e);
+                }
+
+                clickOrTouchHandler.current(e);
             }
 
             setHasStartDragging(false);
@@ -516,5 +541,8 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         ref,
         handleRef,
         isDragging,
+        onClick,
+        onTouch,
+        onClickOrTouch,
     };
 }

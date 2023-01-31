@@ -6,7 +6,6 @@ import Label from "@/components/DataDisplay/Label";
 import Button from "@/components/Forms/Button";
 import useDraggable from "@/lib/hooks/drag-and-drop/use-draggable";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
-import useLatest from "@/lib/hooks/use-latest";
 import useMenu from "@/lib/hooks/use-menu";
 
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
@@ -65,12 +64,14 @@ type CardProps = CardType & {
 };
 
 const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, setIsDragging }: CardProps) => {
-    const { ref: cardRef, isDragging } = useDraggable<HTMLAnchorElement>({
+    const {
+        ref: cardRef,
+        isDragging,
+        onClickOrTouch,
+    } = useDraggable<HTMLAnchorElement>({
         id,
         type: SortableType.Card,
     });
-
-    const isActuallyDragging = useLatest(isDragging);
 
     const { emit } = useCustomEvent<string>("card-clicked", false);
     const { openMenu, closeMenu, toggleMenu } = useMenu();
@@ -78,31 +79,19 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const taskButtonRef = useRef<HTMLButtonElement>(null);
 
-    const onCardClick = useCallback(
-        (e: React.MouseEvent<HTMLAnchorElement>) => {
-            e.preventDefault();
+    onClickOrTouch((e) => {
+        e.preventDefault();
 
-            // if e.target is Menu or Task List button or its children, return
-            if (menuButtonRef.current?.contains(e.target as Node)) return;
-            if (taskButtonRef.current?.contains(e.target as Node)) return;
+        // if it was a right click, return
+        if (e instanceof MouseEvent && e.button === 2) return;
 
-            emit(id);
-            closeMenu();
-        },
-        [closeMenu, emit, id]
-    );
+        // if e.target is Menu or Task List button or its children, return
+        if (menuButtonRef.current?.contains(e.target as Node)) return;
+        if (taskButtonRef.current?.contains(e.target as Node)) return;
 
-    const onCardTouch = useCallback(
-        (e: React.TouchEvent<HTMLAnchorElement>) => {
-            e.preventDefault();
-
-            setTimeout(() => {
-                if (isActuallyDragging.current) return;
-                onCardClick(e as unknown as React.MouseEvent<HTMLAnchorElement>);
-            }, 100);
-        },
-        [isActuallyDragging, onCardClick]
-    );
+        emit(id);
+        closeMenu();
+    });
 
     useEffect(() => setIsDragging(isDragging), [isDragging, setIsDragging]);
 
@@ -110,8 +99,6 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         <a
             ref={cardRef}
             onContextMenu={openMenu}
-            onClick={onCardClick}
-            onTouchStart={onCardTouch}
             className={`
                 group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-white hover:border-dark-400
                 ${isDragging && "opacity-30"}
