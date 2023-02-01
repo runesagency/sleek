@@ -59,8 +59,6 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                     ...cards.filter((card) => card.list_id !== currentCard.list_id), //
                     ...newListCards,
                 ];
-
-                setCards(updatedCards);
             }
 
             // Card to Card (different list)
@@ -111,9 +109,9 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                     ...cardsOnNewList,
                     ...cards.filter((card) => card.list_id !== dropped.id && card.list_id !== currentCard.list_id),
                 ];
-
-                setCards(updatedCards);
             }
+
+            setCards(updatedCards);
 
             // await fetch("/api/cards", {
             //     method: "PATCH",

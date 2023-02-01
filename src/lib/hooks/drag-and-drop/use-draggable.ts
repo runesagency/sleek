@@ -506,7 +506,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 clearInterval(autoContainerScrollIntervals);
             }
 
-            if (isDragging && clone) {
+            if (isDragging) {
                 let originX = 0;
                 let originY = 0;
 
@@ -514,36 +514,39 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                     const { x, y } = placeholder.getBoundingClientRect();
                     originX = x;
                     originY = y;
+
+                    placeholder.remove();
                 } else {
                     const { x, y } = current.getBoundingClientRect();
                     originX = x;
                     originY = y;
                 }
 
-                clone.style.transition = "transform 0.2s ease-in-out";
-                clone.style.transform = `translate(${originX}px, ${originY}px)`;
-
-                const onTransitionEnd = () => {
-                    if (placeholder) {
-                        placeholder.remove();
-                    }
-
-                    if (clone) {
-                        clone.removeEventListener("transitionend", onTransitionEnd);
-                        clone.remove();
-                    }
-                };
-
-                clone.addEventListener("transitionend", onTransitionEnd);
-            } else {
                 if (clone) {
-                    clone.remove();
-                }
+                    clone.style.transition = "transform 0.2s ease-in-out";
+                    clone.style.transform = `translate(${originX}px, ${originY}px)`;
 
+                    const onTransitionEnd = () => {
+                        if (clone) {
+                            clone.removeEventListener("transitionend", onTransitionEnd);
+                            clone.remove();
+                        }
+                    };
+
+                    clone.addEventListener("transitionend", onTransitionEnd);
+                }
+            } else {
                 if (placeholder) {
                     placeholder.remove();
                 }
+
+                if (clone) {
+                    clone.remove();
+                }
             }
+
+            current.style.display = originalElementDisplay;
+            setIsDragging(false);
 
             if (lastHoveredElement) {
                 const container = lastHoveredType === HoveredType.Children ? lastHoveredElement.parentElement : lastHoveredElement;
@@ -591,9 +594,6 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                     lastHoveredElement.dispatchEvent(endEvent);
                 }
             }
-
-            current.style.display = originalElementDisplay;
-            setIsDragging(false);
         };
     }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging]);
 
