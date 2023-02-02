@@ -523,17 +523,17 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 }
 
                 if (clone) {
-                    clone.style.transition = "transform 0.2s ease-in-out";
+                    const time = 200;
+                    clone.style.transition = `transform ${time}ms ease-in-out`;
                     clone.style.transform = `translate(${originX}px, ${originY}px)`;
 
-                    const onTransitionEnd = () => {
+                    setTimeout(() => {
                         if (clone) {
-                            clone.removeEventListener("transitionend", onTransitionEnd);
                             clone.remove();
                         }
-                    };
 
-                    clone.addEventListener("transitionend", onTransitionEnd);
+                        setIsDragging(false);
+                    }, time);
                 }
             } else {
                 if (placeholder) {
@@ -546,7 +546,6 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }
 
             current.style.display = originalElementDisplay;
-            setIsDragging(false);
 
             if (lastHoveredElement) {
                 const container = lastHoveredType === HoveredType.Children ? lastHoveredElement.parentElement : lastHoveredElement;
