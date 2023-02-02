@@ -10,6 +10,7 @@ export type useDraggableOptions = {
     type: string;
     useClone?: boolean;
     activatorDistance?: number;
+    visualizeCollision?: boolean;
 };
 
 export const constants = {
@@ -20,7 +21,7 @@ export const constants = {
     },
 };
 
-export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ id, type, useClone = true, activatorDistance = 10 }: useDraggableOptions) {
+export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ id, type, useClone = true, activatorDistance = 10, visualizeCollision }: useDraggableOptions) {
     // The element that is being dragged
     const ref = useRef<T>(null);
 
@@ -186,6 +187,9 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         // The context of the drag and drop that the dragged element is in
         let context: Element | null = null;
 
+        // The canvas used to visualize the strategy of the collision detection
+        let collisionVisualizerCanvas: HTMLCanvasElement | null = null;
+
         /**
          * @description
          * Handle when user is dragging an element
@@ -244,6 +248,20 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             }
         };
 
+        type Hovered = {
+            element: Element;
+            type: HoveredType;
+            locations: HoveredLocation[];
+            distance: number;
+        };
+
+        enum HoveredLocation {
+            Top,
+            Bottom,
+            Left,
+            Right,
+        }
+
         // List of droppable elements that the dragged element is hovering over
         enum HoveredType {
             None,
@@ -255,16 +273,7 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         let hoverCheckInterval: NodeJS.Timeout | null = null;
 
         // The element which is being hovered
-        let lastHoveredElement: Element | null = null;
-
-        // The type of the hovered element
-        let lastHoveredType: HoveredType = HoveredType.None;
-
-        // Is the hover area of the hovered element on top?
-        let isLastHoverAreaOnTop = false;
-
-        // Is the hover area of the hovered element on left?
-        let isLastHoverAreaOnLeft = false;
+        let lastHovered: Hovered | null = null;
 
         /**
          * @description
@@ -289,42 +298,301 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 }
             };
 
-            const getHoveredElement = (elements: Element[], elementType: HoveredType): [Element, HoveredType] | [null, HoveredType.None] => {
-                const hovered = elements.find((element) => {
+            const getHoveredElement = (elements: Element[], elementType: HoveredType): Hovered | null => {
+                let ctx: CanvasRenderingContext2D | null = null;
+
+                if (visualizeCollision) {
+                    if (!collisionVisualizerCanvas) {
+                        collisionVisualizerCanvas = document.createElement("canvas");
+                        collisionVisualizerCanvas.width = window.innerWidth;
+                        collisionVisualizerCanvas.height = window.innerHeight;
+                        collisionVisualizerCanvas.style.position = "fixed";
+                        collisionVisualizerCanvas.style.top = "0";
+                        collisionVisualizerCanvas.style.left = "0";
+                        collisionVisualizerCanvas.style.zIndex = "9999";
+                        collisionVisualizerCanvas.style.pointerEvents = "none";
+                        collisionVisualizerCanvas.style.transition = "none";
+
+                        ctx = collisionVisualizerCanvas.getContext("2d");
+
+                        document.body.appendChild(collisionVisualizerCanvas);
+                    } else {
+                        ctx = collisionVisualizerCanvas.getContext("2d");
+                    }
+
+                    if (collisionVisualizerCanvas && ctx && clone) {
+                        ctx.clearRect(0, 0, collisionVisualizerCanvas.width, collisionVisualizerCanvas.height);
+                        console.clear();
+
+                        let i = 1;
+
+                        for (const element of elements) {
+                            if (element.clientWidth === 0 && element.clientHeight === 0) continue;
+
+                            const { top, left, bottom, right } = element.getBoundingClientRect();
+                            const { top: Ctop, bottom: Cbottom, left: Cleft, right: Cright } = clone.getBoundingClientRect();
+                            const threshold = 100;
+
+                            ctx.strokeStyle = `red`;
+                            ctx.fillStyle = `white`;
+                            ctx.lineWidth = 2;
+                            ctx.font = "30px Arial";
+
+                            const createSplitLine = () => {
+                                if (!collisionVisualizerCanvas || !ctx) return;
+
+                                ctx.strokeStyle = `yellow`;
+                                // create a line that split the hovered element into 4 parts
+                                ctx.beginPath();
+                                ctx.moveTo(left, top + (bottom - top) / 2);
+                                ctx.lineTo(right, top + (bottom - top) / 2);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(left + (right - left) / 2, top);
+                                ctx.lineTo(left + (right - left) / 2, bottom);
+                                ctx.stroke();
+                            };
+
+                            const topLeftCornerToTopLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Ctop - top, 2));
+                            const topRightCornerToTopRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Ctop - top, 2));
+                            const bottomLeftCornerToBottomLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Cbottom - bottom, 2));
+                            const bottomRightCornerToBottomRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Cbottom - bottom, 2));
+
+                            const topLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
+                            const topRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
+                            const bottomLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
+                            const bottomRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
+
+                            if (
+                                topLeftCornerToTopLeftCorner < threshold ||
+                                topRightCornerToTopRightCorner < threshold ||
+                                bottomLeftCornerToBottomLeftCorner < threshold ||
+                                bottomRightCornerToBottomRightCorner < threshold ||
+                                topLeftCornerToCenter < threshold || //
+                                topRightCornerToCenter < threshold ||
+                                bottomLeftCornerToCenter < threshold ||
+                                bottomRightCornerToCenter < threshold
+                            ) {
+                                // create a line between the edges of the hovered element and the dragged element
+                                ctx.beginPath();
+                                ctx.moveTo(Cleft, Ctop);
+                                ctx.lineTo(left, top);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(Cright, Ctop);
+                                ctx.lineTo(right, top);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(Cleft, Cbottom);
+                                ctx.lineTo(left, bottom);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(Cright, Cbottom);
+                                ctx.lineTo(right, bottom);
+                                ctx.stroke();
+
+                                // write a text contain length of the line
+                                // top left corner to top right corner
+                                ctx.fillText(`${Math.round(topLeftCornerToTopLeftCorner)}`, left, top);
+
+                                // top right corner to bottom right corner
+                                ctx.fillText(`${Math.round(topRightCornerToTopRightCorner)}`, right, top);
+
+                                // bottom left corner to bottom right corner
+                                ctx.fillText(`${Math.round(bottomLeftCornerToBottomLeftCorner)}`, left, bottom);
+
+                                // bottom right corner to top left corner
+                                ctx.fillText(`${Math.round(bottomRightCornerToBottomRightCorner)}`, right, bottom);
+
+                                // create a line between the corners of the dragged element into the center of the hovered element
+                                ctx.beginPath();
+                                ctx.moveTo(Cleft, Ctop);
+                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(Cright, Ctop);
+                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(Cleft, Cbottom);
+                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                                ctx.stroke();
+
+                                ctx.beginPath();
+                                ctx.moveTo(Cright, Cbottom);
+                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                                ctx.stroke();
+
+                                // write a text contain length of the line
+                                // top left corner to center
+                                ctx.fillText(
+                                    `${Math.round(topLeftCornerToCenter)}`, //
+                                    left + (right - left) / 4,
+                                    top + (bottom - top) / 4
+                                );
+
+                                // top right corner to center
+                                ctx.fillText(
+                                    `${Math.round(topRightCornerToCenter)}`, //
+                                    right - (right - left) / 3,
+                                    top + (bottom - top) / 4
+                                );
+
+                                // bottom left corner to center
+                                ctx.fillText(
+                                    `${Math.round(bottomLeftCornerToCenter)}`, //
+                                    left + (right - left) / 4,
+                                    bottom - (bottom - top) / 4
+                                );
+
+                                // bottom right corner to center
+                                ctx.fillText(
+                                    `${Math.round(bottomRightCornerToCenter)}`, //
+                                    right - (right - left) / 3,
+                                    bottom - (bottom - top) / 4
+                                );
+
+                                // total length
+                                ctx.fillText(
+                                    `${Math.round(
+                                        topLeftCornerToTopLeftCorner +
+                                            topRightCornerToTopRightCorner +
+                                            bottomLeftCornerToBottomLeftCorner +
+                                            bottomRightCornerToBottomRightCorner +
+                                            topLeftCornerToCenter +
+                                            topRightCornerToCenter +
+                                            bottomLeftCornerToCenter +
+                                            bottomRightCornerToCenter
+                                    )}`,
+                                    left + (right - left) / 2,
+                                    top + (bottom - top) / 2
+                                );
+
+                                createSplitLine();
+
+                                console.log(`Element ${i} is hovered`);
+
+                                // log if the dragged element is on the right or left side of the hovered element
+                                if (Cleft < left + (right - left) / 2) {
+                                    console.log(`Element ${i} is on the left side`);
+                                } else {
+                                    console.log(`Element ${i} is on the right side`);
+                                }
+
+                                // log if the dragged element is on the top or bottom side of the hovered element
+                                if (Ctop < top + (bottom - top) / 2) {
+                                    console.log(`Element ${i} is on the top side`);
+                                } else {
+                                    console.log(`Element ${i} is on the bottom side`);
+                                }
+
+                                // log if the dragged element is on the top left, top right, bottom left or bottom right side of the hovered element
+                                if (Cleft < left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                                    console.log(`Element ${i} is on the top left side`);
+                                } else if (Cleft > left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                                    console.log(`Element ${i} is on the top right side`);
+                                } else if (Cleft < left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                                    console.log(`Element ${i} is on the bottom left side`);
+                                } else if (Cleft > left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                                    console.log(`Element ${i} is on the bottom right side`);
+                                }
+
+                                i++;
+                            }
+                        }
+                    }
+                }
+
+                const hovered = elements.reduce((prevResult, element) => {
+                    if (!clone) return prevResult;
+                    if (element.clientWidth === 0 && element.clientHeight === 0) return prevResult;
+
+                    const { top: Ctop, bottom: Cbottom, left: Cleft, right: Cright } = clone.getBoundingClientRect();
                     const { top, left, bottom, right } = element.getBoundingClientRect();
 
                     const acceptList = element.getAttribute(droppableConstants.dataAttribute.accepts);
-                    const accepts = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
+                    const isAccepted = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
 
-                    return accepts && clientX > left && clientX < right && clientY > top && clientY < bottom;
-                });
+                    if (isAccepted) {
+                        const topLeftCornerToTopLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Ctop - top, 2));
+                        const topRightCornerToTopRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Ctop - top, 2));
+                        const bottomLeftCornerToBottomLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Cbottom - bottom, 2));
+                        const bottomRightCornerToBottomRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Cbottom - bottom, 2));
+
+                        const topLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
+                        const topRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
+                        const bottomLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
+                        const bottomRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
+
+                        const totalDistance =
+                            topLeftCornerToTopLeftCorner +
+                            topRightCornerToTopRightCorner +
+                            bottomLeftCornerToBottomLeftCorner +
+                            bottomRightCornerToBottomRightCorner +
+                            topLeftCornerToCenter +
+                            topRightCornerToCenter +
+                            bottomLeftCornerToCenter +
+                            bottomRightCornerToCenter;
+
+                        if (prevResult && prevResult.distance < totalDistance) {
+                            return prevResult;
+                        }
+
+                        let locations: HoveredLocation[] = [];
+
+                        if (Cleft < left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                            locations.push(HoveredLocation.Top, HoveredLocation.Left);
+                        } else if (Cleft > left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                            locations.push(HoveredLocation.Top, HoveredLocation.Right);
+                        } else if (Cleft < left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                            locations.push(HoveredLocation.Bottom, HoveredLocation.Left);
+                        } else if (Cleft > left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                            locations.push(HoveredLocation.Bottom, HoveredLocation.Right);
+                        }
+
+                        return {
+                            element,
+                            distance: totalDistance,
+                            type: elementType,
+                            locations,
+                        };
+                    }
+
+                    return prevResult;
+                }, null as Hovered | null);
 
                 if (hovered) {
-                    const isSortable = !!hovered.getAttribute(droppableConstants.dataAttribute.sortable);
+                    const isSortable = !!hovered.element.getAttribute(droppableConstants.dataAttribute.sortable);
 
-                    const droppableChilds = hovered.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
+                    const droppableChilds = hovered.element.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
 
                     if (droppableChilds.length > 0) {
                         const droppableInside = getHoveredElement(Array.from(droppableChilds), HoveredType.Droppable);
 
-                        if (droppableInside[0] !== null) {
+                        if (droppableInside) {
                             return droppableInside;
                         }
                     }
 
-                    const childs = isSortable ? hovered.children : [];
+                    const childs = isSortable ? hovered.element.children : [];
 
                     if (childs.length > 0) {
                         const childrenInside = getHoveredElement(Array.from(childs), HoveredType.Children);
 
-                        if (childrenInside[0] !== null) {
+                        if (childrenInside) {
                             return childrenInside;
                         }
                     }
 
-                    return [hovered, elementType];
+                    return hovered;
                 } else {
-                    return [null, HoveredType.None];
+                    return null;
                 }
             };
 
@@ -339,56 +607,68 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 const allDroppableElements = context.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
 
                 // Get the hovered element
-                const [hoveredElement, elementType] = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
+                const hovered = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
 
-                if (hoveredElement && hoveredElement !== current && hoveredElement !== clone && hoveredElement !== placeholder) {
-                    const { top, bottom, left, right } = hoveredElement.getBoundingClientRect();
+                if (hovered && hovered.element !== current && hovered.element !== clone && hovered.element !== placeholder) {
+                    if (!lastHovered || hovered.element !== lastHovered.element || lastHovered.locations.some((location) => !hovered.locations.includes(location))) {
+                        lastHovered = hovered;
 
-                    const isOnTop = clientY < top + (bottom - top) / 2;
-                    const isOnLeft = clientX < left + (right - left) / 2;
+                        const container = hovered.type === HoveredType.Droppable ? hovered.element : hovered.element.parentElement;
+                        if (!container) return;
 
-                    if (hoveredElement !== lastHoveredElement || isLastHoverAreaOnTop !== isOnTop || isLastHoverAreaOnLeft !== isOnLeft) {
-                        lastHoveredElement = hoveredElement;
-                        lastHoveredType = elementType;
-                        isLastHoverAreaOnTop = isOnTop;
-                        isLastHoverAreaOnLeft = isOnLeft;
-
-                        const container = elementType === HoveredType.Droppable ? hoveredElement : (hoveredElement.parentElement as HTMLElement);
                         const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
 
                         if (isContainerSortable) {
                             const sortableDirection = container.getAttribute(droppableConstants.dataAttribute.sortableDirection) as SortableDirection;
-                            const prepend = (sortableDirection === SortableDirection.Vertical && isOnTop) || (sortableDirection === SortableDirection.Horizontal && isOnLeft);
+
+                            let isPrepend: boolean;
+
+                            switch (sortableDirection) {
+                                case SortableDirection.Vertical:
+                                    isPrepend = hovered.locations.includes(HoveredLocation.Top);
+                                    break;
+
+                                case SortableDirection.Horizontal:
+                                    isPrepend = hovered.locations.includes(HoveredLocation.Left);
+                                    break;
+
+                                case SortableDirection.Auto:
+                                    isPrepend = hovered.locations.includes(HoveredLocation.Top) || hovered.locations.includes(HoveredLocation.Left);
+                                    break;
+
+                                default:
+                                    isPrepend = false;
+                                    break;
+                            }
 
                             if (!placeholder) {
                                 placeholder = current.cloneNode(true) as T;
                                 current.style.display = "none";
                             }
 
-                            if (elementType === HoveredType.Droppable) {
-                                if (prepend) {
-                                    hoveredElement.prepend(placeholder);
+                            if (hovered.type === HoveredType.Droppable) {
+                                if (isPrepend) {
+                                    hovered.element.prepend(placeholder);
                                 } else {
-                                    hoveredElement.append(placeholder);
+                                    hovered.element.append(placeholder);
                                 }
-                            } else if (elementType === HoveredType.Children) {
-                                if (prepend) {
-                                    hoveredElement.before(placeholder);
+                            } else if (hovered.type === HoveredType.Children) {
+                                if (isPrepend) {
+                                    hovered.element.before(placeholder);
                                 } else {
-                                    hoveredElement.after(placeholder);
+                                    hovered.element.after(placeholder);
                                 }
                             }
                         }
                     }
-                } else if (!hoveredElement && lastHoveredElement) {
-                    const container = lastHoveredType === HoveredType.Droppable ? lastHoveredElement : (lastHoveredElement.parentElement as HTMLElement);
+                } else if (!hovered && lastHovered) {
+                    const container = lastHovered.type === HoveredType.Droppable ? lastHovered.element : lastHovered.element.parentElement;
+                    if (!container) return;
+
                     const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
 
                     if (!isContainerSortable) {
-                        lastHoveredElement = null;
-                        lastHoveredType = HoveredType.None;
-                        isLastHoverAreaOnTop = false;
-                        isLastHoverAreaOnLeft = false;
+                        lastHovered = null;
                     }
                 }
             }, 100);
@@ -489,6 +769,8 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         }
 
         return () => {
+            if (collisionVisualizerCanvas) collisionVisualizerCanvas.remove();
+
             window.removeEventListener("mousemove", onDragMove);
             window.removeEventListener("mouseup", onDragEnd);
             window.removeEventListener("touchmove", onDragMove);
@@ -547,24 +829,45 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
 
             current.style.display = originalElementDisplay;
 
-            if (lastHoveredElement) {
-                const container = lastHoveredType === HoveredType.Children ? lastHoveredElement.parentElement : lastHoveredElement;
+            if (lastHovered) {
+                const container = lastHovered.type === HoveredType.Children ? lastHovered.element.parentElement : lastHovered.element;
                 if (!container) return;
 
-                let newIndex = -1;
+                const sortableDirection = container.getAttribute(droppableConstants.dataAttribute.sortableDirection) as SortableDirection;
 
-                if (lastHoveredType === HoveredType.Children) {
+                let newIndex = -1;
+                let isPrepend: boolean;
+
+                switch (sortableDirection) {
+                    case SortableDirection.Vertical:
+                        isPrepend = lastHovered.locations.includes(HoveredLocation.Top);
+                        break;
+
+                    case SortableDirection.Horizontal:
+                        isPrepend = lastHovered.locations.includes(HoveredLocation.Left);
+                        break;
+
+                    case SortableDirection.Auto:
+                        isPrepend = lastHovered.locations.includes(HoveredLocation.Top) || lastHovered.locations.includes(HoveredLocation.Left);
+                        break;
+
+                    default:
+                        isPrepend = false;
+                        break;
+                }
+
+                if (lastHovered.type === HoveredType.Children) {
                     newIndex = Array.from(container.children)
                         .filter((child) => child !== placeholder && child !== clone && child !== current)
-                        .indexOf(lastHoveredElement);
+                        .indexOf(lastHovered.element);
 
                     // If the last hovered element area is on bottom, we need to add 1 to the index
                     // since we are inserting the element after the last hovered element
-                    if (!isLastHoverAreaOnTop) {
+                    if (!isPrepend) {
                         newIndex += 1;
                     }
-                } else if (lastHoveredType === HoveredType.Droppable) {
-                    if (isLastHoverAreaOnTop) {
+                } else if (lastHovered.type === HoveredType.Droppable) {
+                    if (isPrepend) {
                         newIndex = 0;
                     } else {
                         newIndex = container.children.length;
@@ -586,15 +889,10 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                 });
 
                 context?.dispatchEvent(endEvent);
-
-                if (lastHoveredType === HoveredType.Children) {
-                    lastHoveredElement.parentElement?.dispatchEvent(endEvent);
-                } else {
-                    lastHoveredElement.dispatchEvent(endEvent);
-                }
+                container.dispatchEvent(endEvent);
             }
         };
-    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging]);
+    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging, visualizeCollision]);
 
     return {
         ref,

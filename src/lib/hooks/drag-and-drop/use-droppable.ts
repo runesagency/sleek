@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 export enum SortableDirection {
     Vertical = "vertical",
     Horizontal = "horizontal",
+    Auto = "auto",
 }
 
 export type useDroppableOptions = {
