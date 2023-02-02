@@ -49,7 +49,7 @@ const Input = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter, inner
             className="rounded-lg bg-dark-500 p-5 focus:outline-none"
             placeholder="Enter your card title here" //
             value={value}
-            rows={3}
+            rows={5}
             onKeyDown={onKeyDown}
             onChange={onChange}
             {...props}
