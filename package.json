@@ -149,6 +149,7 @@
         "@dicebear/collection": "^5.2.0",
         "@dicebear/core": "^5.2.0",
         "@faker-js/faker": "^7.6.0",
+        "@formkit/auto-animate": "1.0.0-beta.6",
         "@mantine/hooks": "^5.10.2",
         "@next/font": "^13.1.6",
         "@prisma/client": "^4.9.0",

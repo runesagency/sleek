@@ -8,7 +8,9 @@ import Textarea from "@/components/Forms/Textarea";
 import useDraggable from "@/lib/hooks/drag-and-drop/use-draggable";
 import useDroppable, { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
 
-import { useClickOutside } from "@mantine/hooks";
+import autoAnimate, { getTransitionSizes } from "@formkit/auto-animate";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useClickOutside, useMergedRef } from "@mantine/hooks";
 import { IconDots, IconPlus } from "@tabler/icons";
 import { useEffect, useRef, useCallback, useState, memo } from "react";
 
@@ -68,6 +70,9 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
         sortableDirection: SortableDirection.Vertical,
     });
 
+    const [autoAnimateRef] = useAutoAnimate<HTMLDivElement>();
+    const dropAreaRef = useMergedRef(droppableRef, autoAnimateRef);
+
     const onNewCardClick = (location: NewCardLocation) => {
         setIsAddingNewCard(location);
     };
@@ -106,6 +111,47 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
         };
     }, [draggableRef]);
 
+    if (droppableRef.current) {
+        autoAnimate(droppableRef.current, (element, action, oldCoords, newCoords) => {
+            let keyframes: Keyframe[] = [];
+
+            if (action === "remain" && oldCoords && newCoords) {
+                // for items that remain, calculate the delta
+                // from their old position to their new position
+                const deltaY = oldCoords.top - newCoords.top;
+
+                // use the getTransitionSizes() helper function to
+                // get the old and new widths of the elements
+                const [widthFrom, widthTo, heightFrom, heightTo] = getTransitionSizes(element, oldCoords, newCoords);
+
+                // set up our steps with our positioning keyframes
+                const start: Keyframe = { transform: `translateY(${deltaY}px)` };
+                const mid: Keyframe = { transform: `translateY(0)` };
+                const end: Keyframe = { transform: `translateY(0)` };
+
+                // if the dimensions changed, animate them too.
+                if (widthFrom !== widthTo) {
+                    start.width = `${widthFrom}px`;
+                    mid.width = `${widthFrom >= widthTo ? widthTo / 1.05 : widthTo * 1.05}px`;
+                    end.width = `${widthTo}px`;
+                }
+                if (heightFrom !== heightTo) {
+                    start.height = `${heightFrom}px`;
+                    mid.height = `${heightFrom >= heightTo ? heightTo / 1.05 : heightTo * 1.05}px`;
+                    end.height = `${heightTo}px`;
+                }
+
+                keyframes = [start, mid, end];
+            }
+
+            // return our KeyframeEffect() and pass
+            // it the chosen keyframes.
+            return new KeyframeEffect(element, keyframes, {
+                duration: 200,
+            });
+        });
+    }
+
     return (
         <div
             ref={draggableRef}
@@ -122,9 +168,9 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
             </div>
 
             <div
-                ref={droppableRef}
+                ref={dropAreaRef}
                 className={`
-                    flex h-full max-h-full flex-col gap-4 overflow-auto px-5 will-change-scroll 
+                    flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 will-change-auto 
                     ${cards.length === 0 && !isAddingNewCard && !isAnyCardDragging ? "py-0" : "py-5"}
                 `}
             >

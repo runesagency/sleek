@@ -4,6 +4,7 @@ specifiers:
   '@dicebear/collection': ^5.2.0
   '@dicebear/core': ^5.2.0
   '@faker-js/faker': ^7.6.0
+  '@formkit/auto-animate': 1.0.0-beta.6
   '@mantine/hooks': ^5.10.2
   '@next/font': ^13.1.6
   '@prisma/client': ^4.9.0
@@ -47,6 +48,7 @@ dependencies:
   '@dicebear/collection': 5.2.0_@dicebear+core@5.2.0
   '@dicebear/core': 5.2.0
   '@faker-js/faker': 7.6.0
+  '@formkit/auto-animate': 1.0.0-beta.6
   '@mantine/hooks': 5.10.2_react@18.2.0
   '@next/font': 13.1.6
   '@prisma/client': 4.9.0_prisma@4.9.0
@@ -428,6 +430,10 @@ packages:
   /@faker-js/faker/7.6.0:
     resolution: {integrity: sha512-XK6BTq1NDMo9Xqw/YkYyGjSsg44fbNwYRx7QK2CuoQgyy+f1rrTDHoExVM5PsyXCtfl2vs2vVJ0MN0yN6LppRw==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    dev: false
+
+  /@formkit/auto-animate/1.0.0-beta.6:
+    resolution: {integrity: sha512-PVDhLAlr+B4Xb7e+1wozBUWmXa6BFU8xUPR/W/E+TsQhPS1qkAdAsJ25keEnFrcePSnXHrOsh3tiFbEToOzV9w==}
     dev: false
 
   /@humanwhocodes/config-array/0.11.8:
