@@ -5,7 +5,7 @@ import type { boards, lists, organizations, PrismaClient, projects, users } from
 import { faker } from "@faker-js/faker";
 
 const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users) => {
-    const length = faker.datatype.number({ min: 0, max: 3 });
+    const length = faker.datatype.number({ min: 0, max: 2 });
     if (length === 0) return;
 
     console.log(`> 🤔 It seems that ${user.name} is planning to create ${length} organizations...`);
@@ -68,7 +68,7 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
 };
 
 const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users, organization: organizations) => {
-    const length = faker.datatype.number({ min: 0, max: 5 });
+    const length = faker.datatype.number({ min: 0, max: 2 });
     if (length === 0) return;
 
     console.log(`> 🤑 Since become an entrepreneur, ${user.name} has been thinking to create ${length} projects...`);
@@ -178,7 +178,7 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
 };
 
 const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users, project: projects) => {
-    const length = faker.datatype.number({ min: 0, max: 3 });
+    const length = faker.datatype.number({ min: 0, max: 5 });
     if (length === 0) return;
 
     console.log(`> In order to make ${project.name} project successful, ${user.name} then create ${length} boards for the project...`);
@@ -287,7 +287,7 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
 };
 
 const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: users, board: boards) => {
-    const length = faker.datatype.number({ min: 1, max: 10 });
+    const length = faker.datatype.number({ min: 1, max: 5 });
 
     console.log(`> To make ${board.name} successful, ${user.name} then create ${length} lists (steps) for the board...`);
 
@@ -314,7 +314,7 @@ const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurat
 };
 
 const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: users, board: boards, list: lists) => {
-    const length = faker.datatype.number({ min: 0, max: 12 });
+    const length = faker.datatype.number({ min: 0, max: 6 });
     if (length === 0) return;
 
     console.log(`> ${user.name} then create ${length} cards (tasks) for the list ${list.title}...`);
@@ -377,7 +377,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
 
                 console.log(`> ${user.name} then add a multiple label to the card ${card.title}...`);
             } else {
-                const newLabelCount = faker.datatype.number({ min: 1, max: 3 });
+                const newLabelCount = faker.datatype.number({ min: 1, max: 5 });
                 let newLabelIndex = 0;
 
                 while (newLabelIndex < newLabelCount) {
@@ -439,56 +439,60 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
         }
 
         // Add checklist to the card
-        const checklistTotal = faker.datatype.number({ min: 0, max: 5 });
-        let checklistIndex = 0;
+        const addChecklist = faker.datatype.boolean();
 
-        while (checklistIndex < checklistTotal) {
-            const checklist = await prisma.card_checklists.create({
-                data: {
-                    title: faker.commerce.productName(),
-                    card_id: card.id,
-                    creator_id: user.id,
-                },
-            });
+        if (addChecklist) {
+            const checklistTotal = faker.datatype.number({ min: 0, max: 5 });
+            let checklistIndex = 0;
 
-            console.log(`> ${user.name} then add a checklist ${checklist.title} to the card ${card.title}...`);
-
-            const taskTotal = faker.datatype.number({ min: 0, max: 5 });
-            let taskIndex = 0;
-
-            while (taskIndex < taskTotal) {
-                const checklistItem = await prisma.card_checklist_tasks.create({
+            while (checklistIndex < checklistTotal) {
+                const checklist = await prisma.card_checklists.create({
                     data: {
                         title: faker.commerce.productName(),
-                        checklist_id: checklist.id,
-                        order: taskIndex,
-                        completed: faker.datatype.boolean(),
+                        card_id: card.id,
                         creator_id: user.id,
                     },
                 });
 
-                console.log(`> ${user.name} then add a checklist item ${checklistItem.title} to the checklist ${checklist.title}...`);
+                console.log(`> ${user.name} then add a checklist ${checklist.title} to the card ${card.title}...`);
 
-                const addMember = faker.datatype.boolean();
+                const taskTotal = faker.datatype.number({ min: 0, max: 5 });
+                let taskIndex = 0;
 
-                if (addMember && availableBoardMembers.length > 0) {
-                    const member = faker.helpers.arrayElements(availableBoardMembers);
-
-                    await prisma.card_checklist_task_users.createMany({
-                        data: member.map((user) => ({
-                            task_id: checklistItem.id,
-                            adder_id: user.id,
-                            user_id: user.id,
-                        })),
+                while (taskIndex < taskTotal) {
+                    const checklistItem = await prisma.card_checklist_tasks.create({
+                        data: {
+                            title: faker.commerce.productName(),
+                            checklist_id: checklist.id,
+                            order: taskIndex,
+                            completed: faker.datatype.boolean(),
+                            creator_id: user.id,
+                        },
                     });
 
-                    console.log(`> ${user.name} then add a multiple member to the checklist item ${checklistItem.title}...`);
+                    console.log(`> ${user.name} then add a checklist item ${checklistItem.title} to the checklist ${checklist.title}...`);
+
+                    const addMember = faker.datatype.boolean();
+
+                    if (addMember && availableBoardMembers.length > 0) {
+                        const member = faker.helpers.arrayElements(availableBoardMembers);
+
+                        await prisma.card_checklist_task_users.createMany({
+                            data: member.map((user) => ({
+                                task_id: checklistItem.id,
+                                adder_id: user.id,
+                                user_id: user.id,
+                            })),
+                        });
+
+                        console.log(`> ${user.name} then add a multiple member to the checklist item ${checklistItem.title}...`);
+                    }
+
+                    taskIndex++;
                 }
 
-                taskIndex++;
+                checklistIndex++;
             }
-
-            checklistIndex++;
         }
 
         index++;
@@ -499,7 +503,7 @@ export default async function fakeData(prisma: PrismaClient, roles: DefaultRoles
     console.log("\n📖 A Story of the Confused Person by Rafly Maulana 🎈");
     console.log("> 🌆 Once upon a time...");
 
-    const usersLength = faker.datatype.number({ min: 4, max: 10 });
+    const usersLength = faker.datatype.number({ min: 4, max: 8 });
     console.log(`> There are ${usersLength} person that are creating accounts...`);
 
     let index = 0;
