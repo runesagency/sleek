@@ -609,10 +609,35 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
 
                 // Get the hovered element
                 const hovered = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
-                const isLastHoveredLocationSame = hovered && lastHovered && hovered.locations.every((location) => lastHovered?.locations.includes(location));
 
                 if (hovered && hovered.element !== current && hovered.element !== clone && hovered.element !== placeholder) {
-                    if (!lastHovered || hovered.element !== lastHovered.element || isLastHoveredLocationSame) {
+                    const isLastHoveredLocationSame = lastHovered && hovered.locations.every((location, index) => lastHovered && location === lastHovered.locations[index]);
+
+                    if (!lastHovered || hovered.element !== lastHovered.element || !isLastHoveredLocationSame) {
+                        if (lastHovered) {
+                            const container = lastHovered.type === HoveredType.Droppable ? lastHovered.element : lastHovered.element.parentElement;
+                            if (!container) return;
+
+                            const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
+
+                            const leaveEvent = new CustomEvent<DragLeaveEvent>(contextConstants.events.dragLeave, {
+                                detail: {
+                                    dragged: {
+                                        id,
+                                        type,
+                                    },
+                                    dropped: {
+                                        id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
+                                        sortable: isContainerSortable,
+                                        index: -1,
+                                    },
+                                },
+                            });
+
+                            context.dispatchEvent(leaveEvent);
+                            container.dispatchEvent(leaveEvent);
+                        }
+
                         lastHovered = hovered;
 
                         const container = hovered.type === HoveredType.Droppable ? hovered.element : hovered.element.parentElement;
