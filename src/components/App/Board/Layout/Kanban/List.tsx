@@ -183,8 +183,8 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
             <div
                 ref={dropAreaRef}
                 className={`
-                    flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 will-change-auto 
-                    ${cards.length === 0 && !isAddingNewCard && !isAnyCardDragging ? "py-0" : "py-5"}
+                    flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 delay-200 duration-500 will-change-auto 
+                    ${cards.length === 0 && !isAddingNewCard && !isAnyCardDragging && !isOnHover ? "py-0" : "py-5"}
                 `}
             >
                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}

@@ -26,112 +26,6 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
         sortableDirection: SortableDirection.Horizontal,
     });
 
-    onDragEnd(async ({ dragged, dropped }: DragEvent) => {
-        // List to List
-        if (dragged.type === SortableType.List && dropped.id === boardId) {
-            const list = lists.find((list) => list.id === dragged.id);
-            if (!list) return;
-
-            const newList = arrayMoveImmutable(lists, list.order, dropped.index).map((list, index) => ({
-                ...list,
-                order: index,
-            }));
-
-            setLists(newList);
-        }
-
-        if (dragged.type === SortableType.Card) {
-            const currentCard = cards.find((card) => card.id === dragged.id);
-            if (!currentCard) return;
-
-            let updatedCards = cards;
-
-            // Card to Card (same list)
-            if (currentCard.list_id === dropped.id) {
-                const cardsOnList = cards.filter((card) => card.list_id === currentCard.list_id).sort((a, b) => a.order - b.order);
-
-                const newListCards = arrayMoveImmutable(cardsOnList, currentCard.order, dropped.index).map((card, index) => ({
-                    ...card,
-                    order: index,
-                }));
-
-                updatedCards = [
-                    ...cards.filter((card) => card.list_id !== currentCard.list_id), //
-                    ...newListCards,
-                ];
-
-                setCards(updatedCards);
-            }
-
-            // Card to Card (different list)
-            else {
-                const cardsOnOldList = cards
-                    .filter((card) => card.list_id === currentCard.list_id)
-                    .filter((card) => card.id !== currentCard.id)
-                    .sort((a, b) => a.order - b.order)
-                    .map((card, index) => ({ ...card, order: index }));
-
-                let cardsOnNewList = cards //
-                    .filter((card) => card.list_id === dropped.id)
-                    .sort((a, b) => a.order - b.order);
-
-                if (dropped.index === 0) {
-                    cardsOnNewList = [
-                        {
-                            ...currentCard,
-                            list_id: dropped.id,
-                            order: 0,
-                        },
-                        ...cardsOnNewList.map((card) => ({
-                            ...card,
-                            order: card.order + 1,
-                        })),
-                    ];
-                } else {
-                    const cardsBefore = cardsOnNewList.slice(0, dropped.index);
-
-                    const cardsAfter = cardsOnNewList.slice(dropped.index).map((card) => ({
-                        ...card,
-                        order: card.order + 1,
-                    }));
-
-                    cardsOnNewList = [
-                        ...cardsBefore, //
-                        {
-                            ...currentCard,
-                            list_id: dropped.id,
-                            order: dropped.index,
-                        },
-                        ...cardsAfter,
-                    ];
-                }
-
-                updatedCards = [
-                    ...cardsOnOldList, //
-                    ...cardsOnNewList,
-                    ...cards.filter((card) => card.list_id !== dropped.id && card.list_id !== currentCard.list_id),
-                ];
-
-                setCards(updatedCards);
-            }
-
-            // await fetch("/api/cards", {
-            //     method: "PATCH",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify(
-            //         updatedCards.filter((card) => {
-            //             const currentCard = cards.find((c) => c.id === card.id);
-            //             if (!currentCard) return false;
-
-            //             return currentCard.order !== card.order || currentCard.list_id !== card.list_id;
-            //         })
-            //     ),
-            // });
-        }
-    });
-
     const onCardAdded = useCallback(
         async (name: string, listId: string, location: NewCardLocation) => {
             const parsedName = name.trim();
@@ -194,6 +88,110 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
 
         setLists(newLists);
     }, [lists, setLists]);
+
+    onDragEnd(async ({ dragged, dropped }: DragEvent) => {
+        // List to List
+        if (dragged.type === SortableType.List && dropped.id === boardId) {
+            const list = lists.find((list) => list.id === dragged.id);
+            if (!list) return;
+
+            const newList = arrayMoveImmutable(lists, list.order, dropped.index).map((list, index) => ({
+                ...list,
+                order: index,
+            }));
+
+            setLists(newList);
+        }
+
+        if (dragged.type === SortableType.Card) {
+            const currentCard = cards.find((card) => card.id === dragged.id);
+            if (!currentCard) return;
+
+            let updatedCards = cards;
+
+            // Card to Card (same list)
+            if (currentCard.list_id === dropped.id) {
+                const cardsOnList = cards.filter((card) => card.list_id === currentCard.list_id).sort((a, b) => a.order - b.order);
+
+                const newListCards = arrayMoveImmutable(cardsOnList, currentCard.order, dropped.index).map((card, index) => ({
+                    ...card,
+                    order: index,
+                }));
+
+                updatedCards = [
+                    ...cards.filter((card) => card.list_id !== currentCard.list_id), //
+                    ...newListCards,
+                ];
+            }
+
+            // Card to Card (different list)
+            else {
+                const cardsOnOldList = cards
+                    .filter((card) => card.list_id === currentCard.list_id)
+                    .filter((card) => card.id !== currentCard.id)
+                    .sort((a, b) => a.order - b.order)
+                    .map((card, index) => ({ ...card, order: index }));
+
+                let cardsOnNewList = cards //
+                    .filter((card) => card.list_id === dropped.id)
+                    .sort((a, b) => a.order - b.order);
+
+                if (dropped.index === 0) {
+                    cardsOnNewList = [
+                        {
+                            ...currentCard,
+                            list_id: dropped.id,
+                            order: 0,
+                        },
+                        ...cardsOnNewList.map((card) => ({
+                            ...card,
+                            order: card.order + 1,
+                        })),
+                    ];
+                } else {
+                    const cardsBefore = cardsOnNewList.slice(0, dropped.index);
+
+                    const cardsAfter = cardsOnNewList.slice(dropped.index).map((card) => ({
+                        ...card,
+                        order: card.order + 1,
+                    }));
+
+                    cardsOnNewList = [
+                        ...cardsBefore, //
+                        {
+                            ...currentCard,
+                            list_id: dropped.id,
+                            order: dropped.index,
+                        },
+                        ...cardsAfter,
+                    ];
+                }
+
+                updatedCards = [
+                    ...cardsOnOldList, //
+                    ...cardsOnNewList,
+                    ...cards.filter((card) => card.list_id !== dropped.id && card.list_id !== currentCard.list_id),
+                ];
+            }
+
+            setCards(updatedCards);
+
+            await fetch("/api/cards", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(
+                    updatedCards.filter((card) => {
+                        const currentCard = cards.find((c) => c.id === card.id);
+                        if (!currentCard) return false;
+
+                        return currentCard.order !== card.order || currentCard.list_id !== card.list_id;
+                    })
+                ),
+            });
+        }
+    });
 
     return (
         <section ref={dndContextRef} className="h-full w-full">
