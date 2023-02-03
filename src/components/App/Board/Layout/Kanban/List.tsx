@@ -178,7 +178,7 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
 
                 {(isOnView || isAnyCardDragging || isDragging) &&
                     cards.map((card) => {
-                        return <Card key={card.id} {...card} isDragging={false} setIsDragging={setIsAnyCardDragging} />;
+                        return <Card key={card.id} {...card} setIsDragging={setIsAnyCardDragging} />;
                     })}
 
                 {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}

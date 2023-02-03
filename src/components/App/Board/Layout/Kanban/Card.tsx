@@ -59,7 +59,6 @@ const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
 };
 
 type CardProps = CardType & {
-    isDragging: boolean;
     setIsDragging: (isDragging: boolean) => void;
 };
 
