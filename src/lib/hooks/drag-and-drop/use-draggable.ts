@@ -720,24 +720,24 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
 
                     if (!isContainerSortable) {
                         lastHovered = null;
+
+                        const leaveEvent = new CustomEvent<DragLeaveEvent>(contextConstants.events.dragLeave, {
+                            detail: {
+                                dragged: {
+                                    id,
+                                    type,
+                                },
+                                dropped: {
+                                    id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
+                                    sortable: isContainerSortable,
+                                    index: -1,
+                                },
+                            },
+                        });
+
+                        context.dispatchEvent(leaveEvent);
+                        container.dispatchEvent(leaveEvent);
                     }
-
-                    const leaveEvent = new CustomEvent<DragLeaveEvent>(contextConstants.events.dragLeave, {
-                        detail: {
-                            dragged: {
-                                id,
-                                type,
-                            },
-                            dropped: {
-                                id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
-                                sortable: isContainerSortable,
-                                index: -1,
-                            },
-                        },
-                    });
-
-                    context.dispatchEvent(leaveEvent);
-                    container.dispatchEvent(leaveEvent);
                 }
             }, 100);
         };
