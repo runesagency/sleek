@@ -348,7 +348,6 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
 
                             const { top, left, bottom, right } = element.getBoundingClientRect();
                             const { top: Ctop, bottom: Cbottom, left: Cleft, right: Cright } = clone.getBoundingClientRect();
-                            const threshold = 100;
 
                             ctx.strokeStyle = `red`;
                             ctx.fillStyle = `white`;
@@ -381,147 +380,136 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                             const bottomLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
                             const bottomRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
 
-                            if (
-                                topLeftCornerToTopLeftCorner < threshold ||
-                                topRightCornerToTopRightCorner < threshold ||
-                                bottomLeftCornerToBottomLeftCorner < threshold ||
-                                bottomRightCornerToBottomRightCorner < threshold ||
-                                topLeftCornerToCenter < threshold || //
-                                topRightCornerToCenter < threshold ||
-                                bottomLeftCornerToCenter < threshold ||
-                                bottomRightCornerToCenter < threshold
-                            ) {
-                                // create a line between the edges of the hovered element and the dragged element
-                                ctx.beginPath();
-                                ctx.moveTo(Cleft, Ctop);
-                                ctx.lineTo(left, top);
-                                ctx.stroke();
+                            // create a line between the edges of the hovered element and the dragged element
+                            ctx.beginPath();
+                            ctx.moveTo(Cleft, Ctop);
+                            ctx.lineTo(left, top);
+                            ctx.stroke();
 
-                                ctx.beginPath();
-                                ctx.moveTo(Cright, Ctop);
-                                ctx.lineTo(right, top);
-                                ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(Cright, Ctop);
+                            ctx.lineTo(right, top);
+                            ctx.stroke();
 
-                                ctx.beginPath();
-                                ctx.moveTo(Cleft, Cbottom);
-                                ctx.lineTo(left, bottom);
-                                ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(Cleft, Cbottom);
+                            ctx.lineTo(left, bottom);
+                            ctx.stroke();
 
-                                ctx.beginPath();
-                                ctx.moveTo(Cright, Cbottom);
-                                ctx.lineTo(right, bottom);
-                                ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(Cright, Cbottom);
+                            ctx.lineTo(right, bottom);
+                            ctx.stroke();
 
-                                // write a text contain length of the line
-                                // top left corner to top right corner
-                                ctx.fillText(`${Math.round(topLeftCornerToTopLeftCorner)}`, left, top);
+                            // write a text contain length of the line
+                            // top left corner to top right corner
+                            ctx.fillText(`${Math.round(topLeftCornerToTopLeftCorner)}`, left, top);
 
-                                // top right corner to bottom right corner
-                                ctx.fillText(`${Math.round(topRightCornerToTopRightCorner)}`, right, top);
+                            // top right corner to bottom right corner
+                            ctx.fillText(`${Math.round(topRightCornerToTopRightCorner)}`, right, top);
 
-                                // bottom left corner to bottom right corner
-                                ctx.fillText(`${Math.round(bottomLeftCornerToBottomLeftCorner)}`, left, bottom);
+                            // bottom left corner to bottom right corner
+                            ctx.fillText(`${Math.round(bottomLeftCornerToBottomLeftCorner)}`, left, bottom);
 
-                                // bottom right corner to top left corner
-                                ctx.fillText(`${Math.round(bottomRightCornerToBottomRightCorner)}`, right, bottom);
+                            // bottom right corner to top left corner
+                            ctx.fillText(`${Math.round(bottomRightCornerToBottomRightCorner)}`, right, bottom);
 
-                                // create a line between the corners of the dragged element into the center of the hovered element
-                                ctx.beginPath();
-                                ctx.moveTo(Cleft, Ctop);
-                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                                ctx.stroke();
+                            // create a line between the corners of the dragged element into the center of the hovered element
+                            ctx.beginPath();
+                            ctx.moveTo(Cleft, Ctop);
+                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                            ctx.stroke();
 
-                                ctx.beginPath();
-                                ctx.moveTo(Cright, Ctop);
-                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                                ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(Cright, Ctop);
+                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                            ctx.stroke();
 
-                                ctx.beginPath();
-                                ctx.moveTo(Cleft, Cbottom);
-                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                                ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(Cleft, Cbottom);
+                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                            ctx.stroke();
 
-                                ctx.beginPath();
-                                ctx.moveTo(Cright, Cbottom);
-                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                                ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(Cright, Cbottom);
+                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
+                            ctx.stroke();
 
-                                // write a text contain length of the line
-                                // top left corner to center
-                                ctx.fillText(
-                                    `${Math.round(topLeftCornerToCenter)}`, //
-                                    left + (right - left) / 4,
-                                    top + (bottom - top) / 4
-                                );
+                            // write a text contain length of the line
+                            // top left corner to center
+                            ctx.fillText(
+                                `${Math.round(topLeftCornerToCenter)}`, //
+                                left + (right - left) / 4,
+                                top + (bottom - top) / 4
+                            );
 
-                                // top right corner to center
-                                ctx.fillText(
-                                    `${Math.round(topRightCornerToCenter)}`, //
-                                    right - (right - left) / 3,
-                                    top + (bottom - top) / 4
-                                );
+                            // top right corner to center
+                            ctx.fillText(
+                                `${Math.round(topRightCornerToCenter)}`, //
+                                right - (right - left) / 3,
+                                top + (bottom - top) / 4
+                            );
 
-                                // bottom left corner to center
-                                ctx.fillText(
-                                    `${Math.round(bottomLeftCornerToCenter)}`, //
-                                    left + (right - left) / 4,
-                                    bottom - (bottom - top) / 4
-                                );
+                            // bottom left corner to center
+                            ctx.fillText(
+                                `${Math.round(bottomLeftCornerToCenter)}`, //
+                                left + (right - left) / 4,
+                                bottom - (bottom - top) / 4
+                            );
 
-                                // bottom right corner to center
-                                ctx.fillText(
-                                    `${Math.round(bottomRightCornerToCenter)}`, //
-                                    right - (right - left) / 3,
-                                    bottom - (bottom - top) / 4
-                                );
+                            // bottom right corner to center
+                            ctx.fillText(
+                                `${Math.round(bottomRightCornerToCenter)}`, //
+                                right - (right - left) / 3,
+                                bottom - (bottom - top) / 4
+                            );
 
-                                // total length
-                                ctx.fillText(
-                                    `${Math.round(
-                                        topLeftCornerToTopLeftCorner +
-                                            topRightCornerToTopRightCorner +
-                                            bottomLeftCornerToBottomLeftCorner +
-                                            bottomRightCornerToBottomRightCorner +
-                                            topLeftCornerToCenter +
-                                            topRightCornerToCenter +
-                                            bottomLeftCornerToCenter +
-                                            bottomRightCornerToCenter
-                                    )}`,
-                                    left + (right - left) / 2,
-                                    top + (bottom - top) / 2
-                                );
+                            // total length
+                            ctx.fillText(
+                                `${Math.round(
+                                    topLeftCornerToTopLeftCorner +
+                                        topRightCornerToTopRightCorner +
+                                        bottomLeftCornerToBottomLeftCorner +
+                                        bottomRightCornerToBottomRightCorner +
+                                        topLeftCornerToCenter +
+                                        topRightCornerToCenter +
+                                        bottomLeftCornerToCenter +
+                                        bottomRightCornerToCenter
+                                )}`,
+                                left + (right - left) / 2,
+                                top + (bottom - top) / 2
+                            );
 
-                                createSplitLine();
+                            createSplitLine();
 
-                                console.log(`Element ${i} is hovered`);
+                            console.log(`Element ${i} is hovered`);
 
-                                // log if the dragged element is on the right or left side of the hovered element
-                                if (Cleft < left + (right - left) / 2) {
-                                    console.log(`Element ${i} is on the left side`);
-                                } else {
-                                    console.log(`Element ${i} is on the right side`);
-                                }
-
-                                // log if the dragged element is on the top or bottom side of the hovered element
-                                if (Ctop < top + (bottom - top) / 2) {
-                                    console.log(`Element ${i} is on the top side`);
-                                } else {
-                                    console.log(`Element ${i} is on the bottom side`);
-                                }
-
-                                // log if the dragged element is on the top left, top right, bottom left or bottom right side of the hovered element
-                                if (Cleft < left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
-                                    console.log(`Element ${i} is on the top left side`);
-                                } else if (Cleft > left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
-                                    console.log(`Element ${i} is on the top right side`);
-                                } else if (Cleft < left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
-                                    console.log(`Element ${i} is on the bottom left side`);
-                                } else if (Cleft > left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
-                                    console.log(`Element ${i} is on the bottom right side`);
-                                }
-
-                                i++;
+                            // log if the dragged element is on the right or left side of the hovered element
+                            if (Cleft < left + (right - left) / 2) {
+                                console.log(`Element ${i} is on the left side`);
+                            } else {
+                                console.log(`Element ${i} is on the right side`);
                             }
+
+                            // log if the dragged element is on the top or bottom side of the hovered element
+                            if (Ctop < top + (bottom - top) / 2) {
+                                console.log(`Element ${i} is on the top side`);
+                            } else {
+                                console.log(`Element ${i} is on the bottom side`);
+                            }
+
+                            // log if the dragged element is on the top left, top right, bottom left or bottom right side of the hovered element
+                            if (Cleft < left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                                console.log(`Element ${i} is on the top left side`);
+                            } else if (Cleft > left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                                console.log(`Element ${i} is on the top right side`);
+                            } else if (Cleft < left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                                console.log(`Element ${i} is on the bottom left side`);
+                            } else if (Cleft > left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                                console.log(`Element ${i} is on the bottom right side`);
+                            }
+
+                            i++;
                         }
                     }
                 }
