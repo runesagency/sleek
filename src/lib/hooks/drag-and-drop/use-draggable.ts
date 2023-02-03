@@ -205,7 +205,12 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         };
 
         const context = findContext(current);
-        if (!context) return console.error("No drag and drop context found");
+
+        if (!context) {
+            return console.warn(
+                `Cannot find context for Draggable with ID: ${id} and type: ${type}. It could happen maybe because the Context is not mounted yet or that you forgot to add the Context component.`
+            );
+        }
 
         /**
          * @description
