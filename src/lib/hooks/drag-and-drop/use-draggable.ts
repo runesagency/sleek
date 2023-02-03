@@ -1,4 +1,4 @@
-import type { DragEvent } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
+import type { DragCancelEvent, DragEndEvent, DragEnterEvent, DragLeaveEvent, DragStartEvent } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
 
 import { constants as contextConstants } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
 import { SortableDirection, constants as droppableConstants } from "@/lib/hooks/drag-and-drop/use-droppable";
@@ -184,11 +184,28 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         // It will be set back to the original value when the element is not being dragged anymore
         const originalElementDisplay = current.style.display;
 
-        // The context of the drag and drop that the dragged element is in
-        let context: Element | null = null;
-
-        // The canvas used to visualize the strategy of the collision detection
+        // The canvas used to visualize the strategy of the collision detection (debugging purpose)
         let collisionVisualizerCanvas: HTMLCanvasElement | null = null;
+
+        // The context of the drag and drop that the dragged element is in
+        const findContext = (element: Element): Element | null => {
+            const context = element.getAttribute(contextConstants.dataAttribute.dragDropContext);
+
+            if (context) {
+                return element;
+            } else {
+                const parent = element.parentElement;
+
+                if (parent) {
+                    return findContext(parent);
+                } else {
+                    return null;
+                }
+            }
+        };
+
+        const context = findContext(current);
+        if (!context) return console.error("No drag and drop context found");
 
         /**
          * @description
@@ -235,6 +252,17 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
 
                     document.body.appendChild(clone);
                 }
+
+                const startEvent = new CustomEvent<DragStartEvent>(contextConstants.events.dragStart, {
+                    detail: {
+                        dragged: {
+                            id,
+                            type,
+                        },
+                    },
+                });
+
+                context.dispatchEvent(startEvent);
             }
 
             if (!offsetX) offsetX = clientX - left;
@@ -281,22 +309,6 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
          */
         const handleHoverCheck = () => {
             if (!current) return;
-
-            const findContext = (element: Element): Element | null => {
-                const context = element.getAttribute(contextConstants.dataAttribute.dragDropContext);
-
-                if (context) {
-                    return element;
-                } else {
-                    const parent = element.parentElement;
-
-                    if (parent) {
-                        return findContext(parent);
-                    } else {
-                        return null;
-                    }
-                }
-            };
 
             const getHoveredElement = (elements: Element[], elementType: HoveredType): Hovered | null => {
                 let ctx: CanvasRenderingContext2D | null = null;
@@ -599,29 +611,26 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             hoverCheckInterval = setInterval(() => {
                 if (!hasMove || !current) return;
 
-                // Get near element with data-drag-drop-context, if not found, log an error
-                context = findContext(current);
-                if (!context) return console.error("No drag and drop context found");
-
                 // Find all droppable elements inside the context
                 const allDroppableElements = context.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
 
                 // Get the hovered element
                 const hovered = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
+                const isLastHoveredLocationSame = hovered && lastHovered && hovered.locations.every((location) => lastHovered?.locations.includes(location));
 
                 if (hovered && hovered.element !== current && hovered.element !== clone && hovered.element !== placeholder) {
-                    if (!lastHovered || hovered.element !== lastHovered.element || lastHovered.locations.some((location) => !hovered.locations.includes(location))) {
+                    if (!lastHovered || hovered.element !== lastHovered.element || isLastHoveredLocationSame) {
                         lastHovered = hovered;
 
                         const container = hovered.type === HoveredType.Droppable ? hovered.element : hovered.element.parentElement;
                         if (!container) return;
 
                         const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
+                        let newIndex = -1;
+                        let isPrepend = false;
 
                         if (isContainerSortable) {
                             const sortableDirection = container.getAttribute(droppableConstants.dataAttribute.sortableDirection) as SortableDirection;
-
-                            let isPrepend: boolean;
 
                             switch (sortableDirection) {
                                 case SortableDirection.Vertical:
@@ -649,17 +658,41 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                             if (hovered.type === HoveredType.Droppable) {
                                 if (isPrepend) {
                                     hovered.element.prepend(placeholder);
+                                    newIndex = 0;
                                 } else {
                                     hovered.element.append(placeholder);
+                                    newIndex = Array.from(container.children).filter((child) => child !== placeholder && child !== clone && child !== current).length;
                                 }
                             } else if (hovered.type === HoveredType.Children) {
+                                newIndex = Array.from(container.children)
+                                    .filter((child) => child !== placeholder && child !== clone && child !== current)
+                                    .indexOf(hovered.element);
+
                                 if (isPrepend) {
                                     hovered.element.before(placeholder);
                                 } else {
                                     hovered.element.after(placeholder);
+                                    newIndex += 1;
                                 }
                             }
                         }
+
+                        const enterEvent = new CustomEvent<DragEnterEvent>(contextConstants.events.dragEnter, {
+                            detail: {
+                                dragged: {
+                                    id,
+                                    type,
+                                },
+                                dropped: {
+                                    id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
+                                    sortable: isContainerSortable,
+                                    index: newIndex,
+                                },
+                            },
+                        });
+
+                        context.dispatchEvent(enterEvent);
+                        container.dispatchEvent(enterEvent);
                     }
                 } else if (!hovered && lastHovered) {
                     const container = lastHovered.type === HoveredType.Droppable ? lastHovered.element : lastHovered.element.parentElement;
@@ -670,6 +703,23 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                     if (!isContainerSortable) {
                         lastHovered = null;
                     }
+
+                    const leaveEvent = new CustomEvent<DragLeaveEvent>(contextConstants.events.dragLeave, {
+                        detail: {
+                            dragged: {
+                                id,
+                                type,
+                            },
+                            dropped: {
+                                id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
+                                sortable: isContainerSortable,
+                                index: -1,
+                            },
+                        },
+                    });
+
+                    context.dispatchEvent(leaveEvent);
+                    container.dispatchEvent(leaveEvent);
                 }
             }, 100);
         };
@@ -870,11 +920,11 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                     if (isPrepend) {
                         newIndex = 0;
                     } else {
-                        newIndex = container.children.length;
+                        newIndex = Array.from(container.children).filter((child) => child !== placeholder && child !== clone && child !== current).length;
                     }
                 }
 
-                const endEvent = new CustomEvent<DragEvent>(contextConstants.events.dragEnd, {
+                const endEvent = new CustomEvent<DragEndEvent>(contextConstants.events.dragEnd, {
                     detail: {
                         dragged: {
                             id,
@@ -888,8 +938,19 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                     },
                 });
 
-                context?.dispatchEvent(endEvent);
+                context.dispatchEvent(endEvent);
                 container.dispatchEvent(endEvent);
+            } else {
+                const cancelEvent = new CustomEvent<DragCancelEvent>(contextConstants.events.dragCancel, {
+                    detail: {
+                        dragged: {
+                            id,
+                            type,
+                        },
+                    },
+                });
+
+                context.dispatchEvent(cancelEvent);
             }
         };
     }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging, visualizeCollision]);
