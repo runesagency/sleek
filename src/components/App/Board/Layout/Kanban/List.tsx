@@ -53,6 +53,7 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
     const [isAnyCardDragging, setIsAnyCardDragging] = useState(false);
     const [isOnView, setIsOnView] = useState(false);
+    const [isOnHover, setIsOnHover] = useState(false);
 
     const {
         ref: draggableRef,
@@ -63,7 +64,11 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
         type: SortableType.List,
     });
 
-    const { ref: droppableRef } = useDroppable({
+    const {
+        ref: droppableRef,
+        onDragEnter,
+        onDragLeave,
+    } = useDroppable({
         id,
         accepts: [SortableType.Card],
         sortable: true,
@@ -90,6 +95,14 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     );
 
     const addCardComponent = <AddNewCard listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
+
+    onDragEnter(() => {
+        setIsOnHover(true);
+    });
+
+    onDragLeave(() => {
+        setIsOnHover(false);
+    });
 
     useEffect(() => {
         const current = draggableRef.current;
