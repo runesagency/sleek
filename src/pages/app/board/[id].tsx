@@ -154,9 +154,10 @@ export default function BoardPage({ lists: originalLists, cards: originalCards, 
     return (
         <AppPageLayout useSidebar={false} className="box-border flex h-full w-full flex-col">
             <div className="flex bg-dark-700 px-11">
-                <SwitchButton>Board 01</SwitchButton>
-                <SwitchButton>Board 02</SwitchButton>
-                <SwitchButton active>Board 03</SwitchButton>
+                <SwitchButton>About</SwitchButton>
+                <SwitchButton active>View</SwitchButton>
+                <SwitchButton>Members</SwitchButton>
+                <SwitchButton>Settings</SwitchButton>
             </div>
 
             <div className="flex items-center gap-6 px-11 py-6">
