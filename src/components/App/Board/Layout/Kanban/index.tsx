@@ -1,6 +1,6 @@
 import type { DragEvent } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
 import type { Card as CardType } from "@/lib/types";
-import type { LayoutProps } from "@/pages/app/boards/[id]";
+import type { LayoutProps } from "@/pages/app/board/[id]";
 
 import List, { NewCardLocation } from "@/components/App/Board/Layout/Kanban/List";
 import Button from "@/components/Forms/Button";
