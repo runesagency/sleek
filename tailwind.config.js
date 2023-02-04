@@ -75,7 +75,7 @@ module.exports = {
                 });
 
                 // get all classes using regex
-                const regex = /^\s+?\.[a-zA-Z-]+/gm;
+                const regex = /^\s+?\.[a-zA-Z0-9-]+/gm;
                 const classes = data.match(regex);
 
                 if (classes) {
