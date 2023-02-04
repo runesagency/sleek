@@ -12,7 +12,7 @@ const Small = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) 
     return (
         <button
             className={`
-                flex items-center justify-center gap-2 rounded-lg bg-dark-600 px-3 py-1 text-sm font-bold text-dark-50 duration-200 hover:opacity-50 
+                ts-sm flex items-center justify-center gap-2 rounded-lg bg-dark-600 px-3 py-1 text-dark-50 duration-200 hover:opacity-50 
                 ${fit ? "w-max" : "w-full"} ${className}
             `}
             {...props}
@@ -27,7 +27,7 @@ const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) 
     return (
         <button
             className={`
-                flex items-center justify-center gap-2 rounded-lg bg-dark-600 px-4 py-2 text-base font-bold text-dark-50 duration-200 hover:opacity-50 
+                ts-base flex items-center justify-center gap-2 rounded-lg bg-dark-600 px-4 py-2 text-dark-50 duration-200 hover:opacity-50 
                 ${fit ? "w-max" : "w-full"} ${className}
             `}
             {...props}

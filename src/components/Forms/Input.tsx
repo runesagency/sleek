@@ -1,16 +1,17 @@
-import type { DetailedHTMLProps, InputHTMLAttributes } from "react";
+import type { DetailedHTMLProps, HTMLInputTypeAttribute, InputHTMLAttributes } from "react";
 
 import { memo, useCallback, useState } from "react";
 
-type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>, "defaultValue" | "ref"> & {
-    innerRef?: React.Ref<HTMLTextAreaElement>;
+type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref"> & {
+    type?: HTMLInputTypeAttribute;
+    innerRef?: React.Ref<HTMLInputElement>;
     defaultValue?: string;
     saveOnEnter?: boolean;
     onClose?: () => void;
     onSave?: (text: string) => void;
 };
 
-const Input = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter, innerRef, ...props }: InputProps) => {
+const Input = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
     const [value, setValue] = useState(defaultValue ?? "");
 
     const onSave = useCallback(() => {
@@ -22,7 +23,7 @@ const Input = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter, inner
     }, [onValueSaved, onClose, value]);
 
     const onKeyDown = useCallback(
-        (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        (event: React.KeyboardEvent<HTMLInputElement>) => {
             if (saveOnEnter && event.key === "Enter" && event.shiftKey === false) {
                 event.preventDefault();
                 onSave();
@@ -37,19 +38,19 @@ const Input = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter, inner
     );
 
     const onChange = useCallback(
-        (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        (event: React.ChangeEvent<HTMLInputElement>) => {
             setValue(event.target.value);
         },
         [setValue]
     );
 
     return (
-        <textarea
+        <input
             ref={innerRef}
+            type={type}
             className="rounded-lg bg-dark-500 p-5 focus:outline-none"
             placeholder="Enter your card title here" //
             value={value}
-            rows={5}
             onKeyDown={onKeyDown}
             onChange={onChange}
             {...props}

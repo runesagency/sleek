@@ -202,8 +202,8 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
     });
 
     return (
-        <section ref={dndContextRef} className="h-full w-full">
-            <div ref={dropAreaRef} className="flex h-full w-full flex-1 justify-start gap-7 overflow-auto py-10 px-11">
+        <section ref={dndContextRef} className="h-full w-full flex-1 overflow-auto">
+            <div ref={dropAreaRef} className="flex h-full max-h-full w-full flex-1 justify-start gap-7 overflow-auto px-11 pb-10">
                 {lists
                     .sort((a, b) => a.order - b.order)
                     .map((list) => {

@@ -4,9 +4,13 @@ import type { GetServerSideProps } from "next";
 import KanbanLayout from "@/components/App/Board/Layout/Kanban";
 import TaskModal from "@/components/App/Board/TaskModal";
 import AppPageLayout from "@/components/App/Layout/AppPageLayout";
+import MemberList from "@/components/DataDisplay/MemberList";
+import Button from "@/components/Forms/Button";
+import SwitchButton from "@/components/Forms/SwitchButton";
 import { prisma } from "@/lib/prisma";
 import { parseSSRProps } from "@/lib/utils/parse-ssr-props";
 
+import { IconFilter } from "@tabler/icons";
 import { useCallback, useState } from "react";
 
 export type PageProps = {
@@ -148,8 +152,26 @@ export default function BoardPage({ lists: originalLists, cards: originalCards, 
     );
 
     return (
-        <AppPageLayout useSidebar={false} className="box-border flex">
+        <AppPageLayout useSidebar={false} className="box-border flex h-full w-full flex-col">
+            <div className="flex bg-dark-700 px-11">
+                <SwitchButton>Board 01</SwitchButton>
+                <SwitchButton>Board 02</SwitchButton>
+                <SwitchButton active>Board 03</SwitchButton>
+            </div>
+
+            <div className="flex items-center gap-6 px-11 py-6">
+                <h2 className="ts-2xl">Project 001</h2>
+
+                <MemberList.Large users={cards[0].users.map(({ user }) => user)} />
+
+                <Button.Large icon={IconFilter} fit>
+                    Filter
+                </Button.Large>
+            </div>
+
             <KanbanLayout cards={cards} lists={lists} boardId={boardId} setCards={setCards} setLists={setLists} />
+
+            {/* Absolute */}
             <TaskModal cards={cards} onUpdate={onCardUpdate} />
         </AppPageLayout>
     );
