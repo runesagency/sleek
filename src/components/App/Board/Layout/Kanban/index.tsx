@@ -8,6 +8,8 @@ import useDragDropContext from "@/lib/hooks/drag-and-drop/use-drag-drop-context"
 import useDroppable, { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
 import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useMergedRef } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons";
 import { memo, useCallback } from "react";
 
@@ -25,6 +27,12 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
         sortable: true,
         sortableDirection: SortableDirection.Horizontal,
     });
+
+    const [autoAnimateRef] = useAutoAnimate<HTMLDivElement>({
+        duration: 100,
+    });
+
+    const dropAreaRef = useMergedRef(droppableRef, autoAnimateRef);
 
     const onCardAdded = useCallback(
         async (name: string, listId: string, location: NewCardLocation) => {
@@ -195,7 +203,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
 
     return (
         <section ref={dndContextRef} className="h-full w-full">
-            <div ref={droppableRef} className="flex h-full w-full flex-1 justify-start gap-7 overflow-auto py-10 px-11">
+            <div ref={dropAreaRef} className="flex h-full w-full flex-1 justify-start gap-7 overflow-auto py-10 px-11">
                 {lists
                     .sort((a, b) => a.order - b.order)
                     .map((list) => {
