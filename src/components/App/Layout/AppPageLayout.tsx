@@ -1,6 +1,7 @@
 import Button from "@/components/Forms/Button";
 
 import { IconBell, IconUsers, IconCards, IconPlus, IconSettings } from "@tabler/icons";
+import Link from "next/link";
 
 type AppShellProps = {
     children: React.ReactNode;
@@ -12,7 +13,9 @@ export default function AppPageLayout({ children, className, useSidebar = true }
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
             <nav className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-20 py-5">
-                <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-6" />
+                <Link href="/app">
+                    <img src="https://britonenglish.co.id/images/logo-light.png" alt="Logo" className="h-6" />
+                </Link>
 
                 <div className="flex items-center gap-4">
                     <IconUsers height={20} />

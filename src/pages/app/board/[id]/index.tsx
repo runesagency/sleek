@@ -10,7 +10,8 @@ import SwitchButton from "@/components/Forms/SwitchButton";
 import { prisma } from "@/lib/prisma";
 import { parseSSRProps } from "@/lib/utils/parse-ssr-props";
 
-import { IconFilter } from "@tabler/icons";
+import { IconArrowBackUp, IconFilter } from "@tabler/icons";
+import Link from "next/link";
 import { useCallback, useState } from "react";
 
 export type PageProps = {
@@ -125,7 +126,7 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
     };
 };
 
-export default function BoardPage({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
+export default function BoardViewPage({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
     const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
     const [cards, setCards] = useState<CardType[]>(originalCards);
 
@@ -161,6 +162,12 @@ export default function BoardPage({ lists: originalLists, cards: originalCards, 
             </div>
 
             <div className="flex items-center gap-6 px-11 py-6">
+                <Link href={`/app/project/${"projectId"}`}>
+                    <Button.Small icon={IconArrowBackUp} fit>
+                        Back
+                    </Button.Small>
+                </Link>
+
                 <h2 className="ts-2xl">Project 001</h2>
 
                 <MemberList.Large users={cards[0].users.map(({ user }) => user)} />
