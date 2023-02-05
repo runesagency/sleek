@@ -10,3 +10,5 @@ This folder contains a list of component that is used in the application. The co
 - [**Forms/**](Forms): A list of form components (input, select, etc).
 
 - [**Miscellaneous/**](Miscellaneous): A list of miscellaneous components (loading, error, library-based component, etc).
+
+-[**Sections/**](Sections): A list of section components (header, footer, etc).

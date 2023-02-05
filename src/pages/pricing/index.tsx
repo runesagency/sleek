@@ -1,7 +1,7 @@
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import FAQ from "@/components/Sections/FAQ";
+import Footer from "@/components/Sections/Footer";
+import Navbar from "@/components/Sections/Navbar";
 import Comparison from "@/pages/pricing/comparison";
-import FAQ from "@/pages/pricing/faq";
 
 import { IconBuildingStore } from "@tabler/icons";
 import { useState } from "react";

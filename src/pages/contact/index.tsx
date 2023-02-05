@@ -1,8 +1,8 @@
-import Footer from "@/components/Footer";
+import Footer from "@/components/Sections/Footer";
 import Button from "@/components/Forms/Button";
 import Input from "@/components/Forms/Input";
 import Navbar from "@/components/Navbar";
-import FAQ from "@/pages/pricing/faq";
+import FAQ from "@/components/Sections/FAQ";
 
 import { IconBuildingCommunity, IconMail, IconPhone } from "@tabler/icons";
 
