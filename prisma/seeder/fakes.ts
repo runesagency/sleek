@@ -513,7 +513,6 @@ export default async function fakeData(prisma: PrismaClient, roles: DefaultRoles
             data: {
                 name: faker.name.fullName(),
                 email: faker.internet.email(),
-                password: faker.internet.password(),
                 username: faker.internet.userName(),
                 phone: faker.phone.number(),
                 role_id: index === 0 ? roles.user.SUPER_ADMIN.id : roles.user.USER.id,
