@@ -125,15 +125,15 @@ const AuthAdapter = (): Adapter => {
             return null;
         },
 
-        updateUser: async ({ id, ...data }) => {
+        updateUser: async ({ id, email, emailVerified, name }) => {
             const updatedUser = await prisma.users.update({
                 where: {
                     id,
                 },
                 data: {
-                    name: data.name ?? undefined,
-                    email: data.email,
-                    verified_at: data.emailVerified ?? undefined,
+                    name: name ?? undefined,
+                    email: email,
+                    verified_at: emailVerified ?? undefined,
                 },
             });
 
