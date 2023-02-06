@@ -6,6 +6,7 @@ import ContextMenu from "@/components/ContextMenu";
 import RouterTransition from "@/components/RouterTransition";
 
 import { Manrope } from "@next/font/google";
+import { SessionProvider } from "next-auth/react";
 
 const manrope = Manrope({
     variable: "--font-manrope",
@@ -18,12 +19,14 @@ const manrope = Manrope({
     subsets: ["latin", "latin-ext"],
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     return (
-        <main className={`${manrope.variable} max-h-screen w-screen font-sans`}>
-            <RouterTransition />
-            <Component {...pageProps} />
-            <ContextMenu />
-        </main>
+        <SessionProvider session={session}>
+            <main className={`${manrope.variable} max-h-screen w-screen font-sans`}>
+                <RouterTransition />
+                <Component {...pageProps} />
+                <ContextMenu />
+            </main>
+        </SessionProvider>
     );
 }
