@@ -282,7 +282,14 @@ export const authOptions: NextAuthOptions = {
     },
     providers: [
         EmailProvider({
-            server: process.env.EMAIL_SERVER,
+            server: {
+                host: process.env.EMAIL_SMTP_HOST,
+                port: process.env.EMAIL_SMTP_PORT,
+                auth: {
+                    user: process.env.EMAIL_SMTP_USER,
+                    pass: process.env.EMAIL_SMTP_PASSWORD,
+                },
+            },
             from: process.env.EMAIL_FROM,
         }),
     ],
