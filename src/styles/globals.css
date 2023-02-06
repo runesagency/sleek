@@ -19,7 +19,7 @@
 
     /* Track */
     ::-webkit-scrollbar-track {
-        @apply bg-transparent;
+        @apply bg-dark-700;
     }
 
     /* Handle */
