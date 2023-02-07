@@ -1,17 +1,16 @@
+import type { TablerIcon } from "@tabler/icons";
 import type { DetailedHTMLProps, HTMLInputTypeAttribute, InputHTMLAttributes } from "react";
 
 import { memo, useCallback, useState } from "react";
 
-type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref"> & {
-    type?: HTMLInputTypeAttribute;
-    innerRef?: React.Ref<HTMLInputElement>;
+type UseInputOptions = {
     defaultValue?: string;
     saveOnEnter?: boolean;
+    onValueSaved?: (value: string) => void;
     onClose?: () => void;
-    onSave?: (text: string) => void;
 };
 
-const Input = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+const useInput = ({ defaultValue, onValueSaved, onClose, saveOnEnter }: UseInputOptions) => {
     const [value, setValue] = useState(defaultValue ?? "");
 
     const onSave = useCallback(() => {
@@ -44,18 +43,78 @@ const Input = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter, inner
         [setValue]
     );
 
+    return {
+        value,
+        setValue,
+        onSave,
+        onKeyDown,
+        onChange,
+    };
+};
+
+type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref"> & {
+    icon?: TablerIcon;
+    type?: HTMLInputTypeAttribute;
+    innerRef?: React.Ref<HTMLInputElement>;
+    defaultValue?: string;
+    saveOnEnter?: boolean;
+    onClose?: () => void;
+    onSave?: (text: string) => void;
+};
+
+const Small = ({ defaultValue, icon: Icon, onSave: onValueSaved, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+    const { value, onKeyDown, onChange } = useInput({ defaultValue, onValueSaved, onClose, saveOnEnter });
+
     return (
-        <input
-            ref={innerRef}
-            type={type}
-            className="rounded-lg bg-dark-500 p-5 focus:outline-none"
-            placeholder="Enter your card title here" //
-            value={value}
-            onKeyDown={onKeyDown}
-            onChange={onChange}
-            {...props}
-        />
+        <div className="flex items-center overflow-hidden rounded-lg bg-dark-500">
+            {Icon && (
+                <div className="py-3 pl-3 pr-1.5">
+                    <Icon height={16} width={undefined} className="shrink-0 stroke-white" />
+                </div>
+            )}
+
+            <input
+                ref={innerRef}
+                type={type}
+                className="ts-sm bg-transparent py-3 pl-1.5 pr-3 focus:outline-none"
+                placeholder="Enter your card title here" //
+                value={value}
+                onKeyDown={onKeyDown}
+                onChange={onChange}
+                {...props}
+            />
+        </div>
     );
 };
 
-export default memo(Input);
+const Large = ({ defaultValue, icon: Icon, onSave: onValueSaved, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+    const { value, onKeyDown, onChange } = useInput({ defaultValue, onValueSaved, onClose, saveOnEnter });
+
+    return (
+        <div className="flex items-center overflow-hidden rounded-lg bg-dark-500">
+            {Icon && (
+                <div className="py-5 pl-5 pr-1.5">
+                    <Icon height={20} width={undefined} className="shrink-0 stroke-white" />
+                </div>
+            )}
+
+            <input
+                ref={innerRef}
+                type={type}
+                className="ts-sm bg-transparent py-5 pl-1.5 pr-5 focus:outline-none"
+                placeholder="Enter your card title here" //
+                value={value}
+                onKeyDown={onKeyDown}
+                onChange={onChange}
+                {...props}
+            />
+        </div>
+    );
+};
+
+const Input = {
+    Small: memo(Small),
+    Large: memo(Large),
+};
+
+export default Input;
