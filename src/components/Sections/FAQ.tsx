@@ -39,6 +39,8 @@ type FAQProps = {
 };
 
 export default function FAQ({ data }: FAQProps) {
+    if (!data || data.length === 0) return null;
+
     return (
         <Container className={["bg-dark-900", "flex flex-col gap-14 px-48 py-20"]}>
             <h3 className="heading-3 text-center">Have Any Questions?</h3>
