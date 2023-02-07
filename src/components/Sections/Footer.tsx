@@ -15,7 +15,7 @@ type FooterSectionProps = {
 const FooterSection = ({ title, links }: FooterSectionProps) => {
     return (
         <section className="flex w-32 shrink-0 flex-col gap-4">
-            <h4 className="ts-xl">Product</h4>
+            <h4 className="ts-xl">{title}</h4>
 
             {links.map(({ title, href }, index) => (
                 <Link key={index} href={href} className="ts-base">
@@ -28,8 +28,8 @@ const FooterSection = ({ title, links }: FooterSectionProps) => {
 
 export default function Footer() {
     return (
-        <footer className="w-full bg-dark-800">
-            <main className="flex max-w-screen-3xl justify-between bg-dark-700 px-48 py-14 text-dark-50">
+        <footer className="w-full bg-dark-700 text-dark-50">
+            <main className="mx-auto flex max-w-screen-3xl justify-between px-48 py-14">
                 <section className="flex w-72 shrink-0 flex-col gap-5">
                     <img src="/logoipsum-286.svg" className="h-8 w-max text-white" alt="Logo" />
 
@@ -75,7 +75,7 @@ export default function Footer() {
                     <p className="ts-base">Get new updates, insight, and an early promo for our product. Don’t worry we won’t spam you :)</p>
 
                     <div className="flex gap-4">
-                        <Input.Large placeholder="Email" icon={IconMail} />
+                        <Input.Large placeholder="Enter Your Email Here" icon={IconMail} />
                         <Button.Large fit>Subscribe</Button.Large>
                     </div>
                 </section>
