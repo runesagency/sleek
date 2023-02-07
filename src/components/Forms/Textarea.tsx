@@ -88,7 +88,7 @@ const Textarea = ({ defaultValue, saveToLocalStorage, localStorageKey, onSave: o
     return (
         <textarea
             ref={innerRef}
-            className="rounded-lg bg-dark-500 p-5 focus:outline-none"
+            className="ts-sm rounded-lg bg-dark-500 p-5 focus:outline-none"
             placeholder="Enter your card title here" //
             value={value}
             rows={3}

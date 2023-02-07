@@ -22,7 +22,7 @@ const manrope = Manrope({
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     return (
         <SessionProvider session={session}>
-            <main className={`${manrope.variable} max-h-screen w-screen font-sans`}>
+            <main className={`${manrope.variable} h-full w-full font-sans`}>
                 <RouterTransition />
                 <Component {...pageProps} />
                 <ContextMenu />
