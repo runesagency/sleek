@@ -6,7 +6,7 @@ import Navigation from "@/components/Sections/Navigation";
 import { IconBuildingStore, IconCheck, IconX } from "@tabler/icons";
 import { useState } from "react";
 
-function Comparison() {
+const ComparisonTable = () => {
     const comparisonDummyData = [
         {
             featName: "Starting Price",
@@ -53,10 +53,11 @@ function Comparison() {
     return (
         <div className="flex flex-col gap-0">
             <div className="flex justify-between border-b border-dark-600 px-8 py-5">
-                <h1 className="shrink-0 basis-2/6 text-2xl">Feature</h1>
-                <h1 className="text-2xl">Other Products</h1>
+                <h3 className="shrink-0 basis-2/6 text-2xl">Feature</h3>
+                <h3 className="text-2xl">Other Products</h3>
                 <img src="/logoipsum-286.svg" className="text-white" alt="logo_ipsum" width="174" height="32" />
             </div>
+
             {comparisonDummyData?.map((val, idx) => (
                 <div key={idx} className="flex justify-between px-8 py-5">
                     <div className="shrink-0 basis-2/6">
@@ -77,7 +78,7 @@ function Comparison() {
             ))}
         </div>
     );
-}
+};
 
 export default function PricingPage() {
     const [isEnterprise, setIsEnterprise] = useState<boolean>(false);
@@ -160,10 +161,9 @@ export default function PricingPage() {
             <Container className={["bg-dark-900", "flex flex-col gap-14 px-48 py-20"]}>
                 <h3 className="heading-3 text-center">Ipsum vs Wokwow: How Do They Compare?</h3>
 
-                <Comparison />
+                <ComparisonTable />
             </Container>
 
-            {/* FAQ */}
             <FAQ
                 data={[
                     {
