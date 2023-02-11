@@ -199,8 +199,8 @@ model attachments {
 // ------------------------------
 
 model verification_tokens {
-  identifier String   @id
-  token      String
+  identifier String
+  token      String   @unique
   expires    DateTime
 
   @@unique([identifier, token])
