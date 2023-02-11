@@ -1,16 +1,16 @@
 import type { TablerIcon } from "@tabler/icons";
 import type { DetailedHTMLProps, HTMLInputTypeAttribute, InputHTMLAttributes } from "react";
 
-import { memo, useCallback, useState } from "react";
+import { useRef, memo, useCallback, useState } from "react";
 
 type UseInputOptions = {
     defaultValue?: string;
     saveOnEnter?: boolean;
-    onValueSaved?: (value: string) => void;
+    onSave?: (value: string) => void;
     onClose?: () => void;
 };
 
-const useInput = ({ defaultValue, onValueSaved, onClose, saveOnEnter }: UseInputOptions) => {
+const useInput = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter }: UseInputOptions) => {
     const [value, setValue] = useState(defaultValue ?? "");
 
     const onSave = useCallback(() => {
@@ -36,12 +36,9 @@ const useInput = ({ defaultValue, onValueSaved, onClose, saveOnEnter }: UseInput
         [onClose, onSave, saveOnEnter]
     );
 
-    const onChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            setValue(event.target.value);
-        },
-        [setValue]
-    );
+    const onChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(event.target.value);
+    }, []);
 
     return {
         value,
@@ -52,29 +49,35 @@ const useInput = ({ defaultValue, onValueSaved, onClose, saveOnEnter }: UseInput
     };
 };
 
-type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref"> & {
+type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref" | "onChange"> & {
     icon?: TablerIcon;
     type?: HTMLInputTypeAttribute;
-    innerRef?: React.Ref<HTMLInputElement>;
+    innerRef?: React.RefObject<HTMLInputElement>;
     defaultValue?: string;
     saveOnEnter?: boolean;
     onClose?: () => void;
     onSave?: (text: string) => void;
 };
 
-const Small = ({ defaultValue, icon: Icon, onSave: onValueSaved, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
-    const { value, onKeyDown, onChange } = useInput({ defaultValue, onValueSaved, onClose, saveOnEnter });
+const Small = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+    const ref = useRef<HTMLInputElement>(null);
+    const { value, onKeyDown, onChange } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
+    const usedRef = innerRef ?? ref;
+
+    const onIconClick = useCallback(() => {
+        usedRef.current?.focus();
+    }, [usedRef]);
 
     return (
         <div className="flex items-center overflow-hidden rounded-lg bg-dark-500">
             {Icon && (
-                <div className="py-3 pl-3 pr-1.5">
+                <div className="cursor-pointer py-3 pl-3 pr-1.5" onClick={onIconClick}>
                     <Icon height={16} width={undefined} className="shrink-0 stroke-white" />
                 </div>
             )}
 
             <input
-                ref={innerRef}
+                ref={usedRef}
                 type={type}
                 className="ts-sm bg-transparent py-3 pl-1.5 pr-3 focus:outline-none"
                 placeholder="Enter your card title here" //
@@ -87,19 +90,25 @@ const Small = ({ defaultValue, icon: Icon, onSave: onValueSaved, onClose, saveOn
     );
 };
 
-const Large = ({ defaultValue, icon: Icon, onSave: onValueSaved, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
-    const { value, onKeyDown, onChange } = useInput({ defaultValue, onValueSaved, onClose, saveOnEnter });
+const Large = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+    const ref = useRef<HTMLInputElement>(null);
+    const { value, onKeyDown, onChange } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
+    const usedRef = innerRef ?? ref;
+
+    const onIconClick = useCallback(() => {
+        usedRef.current?.focus();
+    }, [usedRef]);
 
     return (
         <div className="flex items-center overflow-hidden rounded-lg bg-dark-500">
             {Icon && (
-                <div className="py-5 pl-5 pr-1.5">
+                <div className="cursor-pointer py-5 pl-5 pr-1.5" onClick={onIconClick}>
                     <Icon height={20} width={undefined} className="shrink-0 stroke-white" />
                 </div>
             )}
 
             <input
-                ref={innerRef}
+                ref={usedRef}
                 type={type}
                 className="ts-sm bg-transparent py-5 pl-1.5 pr-5 focus:outline-none"
                 placeholder="Enter your card title here" //
