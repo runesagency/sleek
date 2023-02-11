@@ -79,7 +79,7 @@ const Small = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRe
             <input
                 ref={usedRef}
                 type={type}
-                className="ts-sm bg-transparent py-3 pl-1.5 pr-3 focus:outline-none"
+                className="ts-sm w-full bg-transparent py-3 pl-1.5 pr-3 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
                 placeholder="Enter your card title here" //
                 value={value}
                 onKeyDown={onKeyDown}
@@ -110,7 +110,7 @@ const Large = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRe
             <input
                 ref={usedRef}
                 type={type}
-                className="ts-sm bg-transparent py-5 pl-1.5 pr-5 focus:outline-none"
+                className="ts-sm w-full bg-transparent py-5 pl-1.5 pr-5 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
                 placeholder="Enter your card title here" //
                 value={value}
                 onKeyDown={onKeyDown}
