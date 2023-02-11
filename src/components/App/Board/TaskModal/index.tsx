@@ -14,6 +14,7 @@ import Avatar from "@/components/Miscellaneous/Avatar";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
 import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons";
+import clsx from "clsx";
 import { useCallback, memo } from "react";
 
 type SectionProps = {
@@ -39,7 +40,7 @@ type InformationProps = {
 
 const Information = ({ label, children, alignStart }: InformationProps) => {
     return (
-        <div className={`flex w-full ${alignStart ? "items-start" : "items-center"} justify-start gap-4`}>
+        <div className={clsx("flex w-full justify-start gap-4", alignStart ? "items-start" : "items-center")}>
             <p className="flex w-44 shrink-0 flex-col justify-center overflow-hidden break-words py-1 font-semibold">{label}</p>
 
             {children}

@@ -1,4 +1,5 @@
 import { useDebouncedValue } from "@mantine/hooks";
+import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
 
 type TitleProps = {
@@ -47,10 +48,10 @@ const Title = ({ defaultTitle, onUpdate }: TitleProps) => {
             autoFocus
             onChange={onChange}
             onFocus={setFocusCursor}
-            className={`
-                hide-scrollbar flex-1 resize-none border-b bg-transparent pb-3 text-left text-3xl font-bold focus:outline-none
-                ${invalid ? "border-red-500 text-red-500" : "border-b-dark-600 text-dark-50"}
-            `}
+            className={clsx(
+                "hide-scrollbar flex-1 resize-none border-b bg-transparent pb-3 text-left text-3xl font-bold focus:outline-none",
+                invalid ? "border-red-500 text-red-500" : "border-b-dark-600 text-dark-50"
+            )}
         />
     );
 };

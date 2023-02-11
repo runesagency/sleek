@@ -4,6 +4,7 @@ import Footer from "@/components/Sections/Footer";
 import Navigation from "@/components/Sections/Navigation";
 
 import { IconBuildingStore, IconCheck, IconX } from "@tabler/icons";
+import clsx from "clsx";
 import { useState } from "react";
 
 const ComparisonTable = () => {
@@ -104,12 +105,9 @@ export default function PricingPage() {
 
                             <div
                                 onClick={() => setIsEnterprise(!isEnterprise)}
-                                className={`
-                                    h-8 w-20 cursor-pointer rounded-2xl border-2 bg-dark-500 
-                                    ${!isEnterprise ? "bg-dark-400" : "bg-dark-500"}
-                                `}
+                                className={clsx("h-8 w-20 cursor-pointer rounded-2xl border-2 bg-dark-500", !isEnterprise ? "bg-dark-400" : "bg-dark-500")}
                             >
-                                <div className={`mt-1 flex h-5 w-5 flex-col justify-center rounded-full bg-dark-50 duration-150 ease-in-out ${!isEnterprise ? "ml-1" : "ml-12"}`} />
+                                <div className={clsx("mt-1 flex h-5 w-5 flex-col justify-center rounded-full bg-dark-50 duration-150 ease-in-out", !isEnterprise ? "ml-1" : "ml-12")} />
                             </div>
 
                             <p className="ts-2xl">Enterprise</p>

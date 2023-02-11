@@ -12,6 +12,7 @@ import autoAnimate, { getTransitionSizes } from "@formkit/auto-animate";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useClickOutside, useMergedRef } from "@mantine/hooks";
 import { IconDots, IconPlus } from "@tabler/icons";
+import clsx from "clsx";
 import { useEffect, useRef, useCallback, useState, memo } from "react";
 
 export enum NewCardLocation {
@@ -170,7 +171,7 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
             ref={draggableRef}
             className="group/list relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-sm text-white"
         >
-            <div ref={handleRef} className={`flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600 ${isDragging ? "bg-dark-600" : "bg-dark-900"}`}>
+            <div ref={handleRef} className={clsx("flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600", isDragging ? "bg-dark-600" : "bg-dark-900")}>
                 <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{title}</span>
 
                 <div className="flex items-center gap-3">
@@ -182,10 +183,10 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
 
             <div
                 ref={dropAreaRef}
-                className={`
-                    flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 delay-200 duration-500 will-change-auto 
-                    ${cards.length === 0 && !isAddingNewCard && !isAnyCardDragging && !isOnHover ? "py-0" : "py-5"}
-                `}
+                className={clsx(
+                    "flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 delay-200 duration-500 will-change-auto",
+                    cards.length === 0 && !isAddingNewCard && !isAnyCardDragging && !isOnHover ? "py-0" : "py-5"
+                )}
             >
                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 

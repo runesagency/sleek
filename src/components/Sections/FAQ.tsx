@@ -2,6 +2,7 @@ import Container from "@/components/Sections/Container";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { IconChevronDown } from "@tabler/icons";
+import clsx from "clsx";
 import { useCallback, useState } from "react";
 
 type QnAProps = {
@@ -26,7 +27,7 @@ const QnA = ({ question, answer }: QnAProps) => {
             <div onClick={!isOpen ? undefined : onClose} className="flex items-center gap-4">
                 <h4 className="ts-xl flex-1">{question}</h4>
 
-                <IconChevronDown className={`flex w-5 shrink-0 duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`} />
+                <IconChevronDown className={clsx("flex w-5 shrink-0 duration-200", isOpen ? "rotate-180" : "rotate-0")} />
             </div>
 
             {isOpen && <p className="ts-base cursor-text text-justify">{answer}</p>}

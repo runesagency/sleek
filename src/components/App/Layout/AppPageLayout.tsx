@@ -1,6 +1,7 @@
 import Button from "@/components/Forms/Button";
 
 import { IconBell, IconUsers, IconCards, IconPlus, IconSettings } from "@tabler/icons";
+import clsx from "clsx";
 import Link from "next/link";
 
 type AppShellProps = {
@@ -58,7 +59,7 @@ export default function AppPageLayout({ children, className, useSidebar = true }
                     </aside>
                 )}
 
-                <section className={`h-full max-h-full w-full flex-1 overflow-auto ${className}`}>{children}</section>
+                <section className={clsx("h-full max-h-full w-full flex-1 overflow-auto", className)}>{children}</section>
             </main>
         </main>
     );

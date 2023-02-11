@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 
 import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 
+import clsx from "clsx";
+
 type OrganizationPageShellProps = {
     children: ReactNode;
     className?: string;
@@ -37,7 +39,7 @@ export default function OrganizationPageLayout({ children, className }: Organiza
                 </div>
             </nav>
 
-            <div className={`py-9 px-16 3xl:px-36 ${className}`}>{children}</div>
+            <div className={clsx("py-9 px-16 3xl:px-36", className)}>{children}</div>
         </AppPageLayout>
     );
 }

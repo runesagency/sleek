@@ -9,6 +9,7 @@ import useCustomEvent from "@/lib/hooks/use-custom-event";
 import useMenu from "@/lib/hooks/use-menu";
 
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
+import clsx from "clsx";
 import { useCallback, useRef, useState, memo, useEffect } from "react";
 
 type TasksProgressProps = {
@@ -98,10 +99,10 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         <a
             ref={cardRef}
             onContextMenu={openMenu}
-            className={`
-                group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-white hover:border-dark-400
-                ${isDragging && "opacity-30"}
-            `}
+            className={clsx(
+                "group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-white hover:border-dark-400",
+                isDragging && "opacity-30"
+            )}
         >
             {/* Cover Image */}
             {cover && <img src={cover.filename_disk} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}

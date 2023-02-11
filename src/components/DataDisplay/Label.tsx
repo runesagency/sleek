@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { memo } from "react";
 
 type LabelProps = {
@@ -9,7 +10,7 @@ type LabelProps = {
 const Label = ({ name, color, className }: LabelProps) => {
     return (
         <div
-            className={`rounded-full bg-dark-800 px-2 py-1 text-xs ${className}`}
+            className={clsx("rounded-full bg-dark-800 px-2 py-1 text-xs", className)}
             style={{
                 backgroundColor: color || undefined,
             }}
