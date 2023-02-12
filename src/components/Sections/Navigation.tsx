@@ -30,6 +30,9 @@ const AuthModal = ({ isOpen, setIsOpen }: AuthModalProps) => {
         Error,
     }
 
+    const { data: session } = useSession();
+    const [, setHash] = useHash();
+
     const [animationRef] = useAutoAnimate();
     const clickOutsideRef = useClickOutside(() => setIsOpen(false));
 
@@ -74,6 +77,15 @@ const AuthModal = ({ isOpen, setIsOpen }: AuthModalProps) => {
         setLoginState(LoginState.Success);
     }, [LoginState.Error, LoginState.Loading, LoginState.Success]);
 
+    // Close modal when user is logged in (only if modal is open)
+    useEffect(() => {
+        if (isOpen && session) {
+            setIsOpen(false);
+            setHash("");
+        }
+    }, [session, isOpen, setHash, setIsOpen]);
+
+    // Fetch all available login providers
     useEffect(() => {
         if (!isOpen) return;
 
