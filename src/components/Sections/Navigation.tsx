@@ -34,7 +34,10 @@ const AuthModal = ({ isOpen, setIsOpen }: AuthModalProps) => {
     const [, setHash] = useHash();
 
     const [animationRef] = useAutoAnimate();
-    const clickOutsideRef = useClickOutside(() => setIsOpen(false));
+    const clickOutsideRef = useClickOutside(() => {
+        setIsOpen(false);
+        setHash("");
+    });
 
     const [loginProviders, setLoginProviders] = useState<ClientSafeProvider[]>([]);
     const [loginState, setLoginState] = useState<LoginState | null>(null);
