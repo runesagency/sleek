@@ -171,26 +171,27 @@ type NavigationProps = {
 };
 
 export default function Navigation({ className }: NavigationProps) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const { data: session } = useSession();
     const [hash] = useHash();
+    const { data: session } = useSession();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const onLoginClick = useCallback(() => {
-        setIsModalOpen(true);
-    }, []);
+    const onLogin = useCallback(() => {
+        if (!session) setIsModalOpen(true);
+    }, [session]);
+
+    const onLogout = useCallback(() => {
+        if (session) signOut();
+    }, [session]);
 
     useEffect(() => {
-        if (session) {
         const parsedHash = hash?.split("?")[0].split("#")[1];
 
         switch (parsedHash) {
             case AuthHashCode.Login:
-                if (!session) setIsModalOpen(true);
-                break;
+                return onLogin();
 
             case AuthHashCode.Logout:
-                if (session) signOut();
-                break;
+                return onLogout();
 
             case AuthHashCode.Error:
                 break;
@@ -198,7 +199,7 @@ export default function Navigation({ className }: NavigationProps) {
             case AuthHashCode.Pending:
                 break;
         }
-    }, [hash, session]);
+    }, [hash, onLogin, onLogout]);
 
     return (
         <nav className={clsx("w-full bg-dark-800 text-dark-50", className)}>
@@ -213,11 +214,17 @@ export default function Navigation({ className }: NavigationProps) {
 
                 <div className="flex items-center gap-5">
                     {session ? (
-                        <Link href="/app">
-                            <Button.Large icon={IconDoorEnter}>Go to Application</Button.Large>
-                        </Link>
+                        <>
+                            <p onClick={onLogout} className="cursor-pointer">
+                                Log Out
+                            </p>
+
+                            <Link href="/app">
+                                <Button.Large icon={IconDoorEnter}>Go to Application</Button.Large>
+                            </Link>
+                        </>
                     ) : (
-                        <Button.Large icon={IconLogin} onClick={onLoginClick}>
+                        <Button.Large icon={IconLogin} onClick={onLogin}>
                             Log In / Sign Up
                         </Button.Large>
                     )}
