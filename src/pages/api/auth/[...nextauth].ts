@@ -293,6 +293,13 @@ export const authOptions: NextAuthOptions = {
             from: process.env.EMAIL_FROM,
         }),
     ],
+    pages: {
+        signIn: `/#${AuthHashCode.Login}`,
+        signOut: `/#${AuthHashCode.Logout}`,
+        error: `/#${AuthHashCode.Error}`,
+        verifyRequest: `/#${AuthHashCode.Pending}`,
+        newUser: "/app",
+    },
 };
 
 export default NextAuth(authOptions);

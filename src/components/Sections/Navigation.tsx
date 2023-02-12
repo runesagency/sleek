@@ -4,13 +4,19 @@ import Button from "@/components/Forms/Button";
 import Input from "@/components/Forms/Input";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { useClickOutside } from "@mantine/hooks";
+import { useClickOutside, useHash } from "@mantine/hooks";
 import { IconDoorEnter, IconLogin, IconMail } from "@tabler/icons";
 import clsx from "clsx";
 import Link from "next/link";
-import { getProviders, signIn, useSession } from "next-auth/react";
+import { signOut, getProviders, signIn, useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+export enum AuthHashCode {
+    Login = "login",
+    Logout = "logout",
+    Error = "login-failed",
+    Pending = "login-pending",
+}
 
 type AuthModalProps = {
     isOpen: boolean;
@@ -152,6 +158,7 @@ type NavigationProps = {
 export default function Navigation({ className }: NavigationProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data: session } = useSession();
+    const [hash] = useHash();
 
     const onLoginClick = useCallback(() => {
         setIsModalOpen(true);
@@ -159,9 +166,24 @@ export default function Navigation({ className }: NavigationProps) {
 
     useEffect(() => {
         if (session) {
-            setIsModalOpen(false);
+        const parsedHash = hash?.split("?")[0].split("#")[1];
+
+        switch (parsedHash) {
+            case AuthHashCode.Login:
+                if (!session) setIsModalOpen(true);
+                break;
+
+            case AuthHashCode.Logout:
+                if (session) signOut();
+                break;
+
+            case AuthHashCode.Error:
+                break;
+
+            case AuthHashCode.Pending:
+                break;
         }
-    }, [session]);
+    }, [hash, session]);
 
     return (
         <nav className={clsx("w-full bg-dark-800 text-dark-50", className)}>
