@@ -2,6 +2,7 @@ import type { Prisma, users, user_accounts, user_sessions } from "@prisma/client
 import type { NextAuthOptions } from "next-auth";
 import type { AdapterAccount, Adapter, AdapterUser, AdapterSession } from "next-auth/adapters";
 
+import { AuthHashCode } from "@/components/Sections/Navigation";
 import { prisma } from "@/lib/prisma";
 
 import NextAuth from "next-auth";
