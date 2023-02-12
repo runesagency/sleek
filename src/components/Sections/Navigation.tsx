@@ -18,12 +18,12 @@ export enum AuthHashCode {
     Pending = "login-pending",
 }
 
-type AuthModalProps = {
+type LoginModalProps = {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
 };
 
-const AuthModal = ({ isOpen, setIsOpen }: AuthModalProps) => {
+const LoginModal = ({ isOpen, setIsOpen }: LoginModalProps) => {
     enum LoginState {
         Loading,
         Success,
@@ -224,7 +224,7 @@ export default function Navigation({ className }: NavigationProps) {
                 </div>
             </main>
 
-            <AuthModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+            <LoginModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
         </nav>
     );
 }
