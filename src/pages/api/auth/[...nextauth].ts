@@ -1,14 +1,17 @@
 import type { Prisma, users, user_accounts, user_sessions } from "@prisma/client";
 import type { NextAuthOptions } from "next-auth";
 import type { AdapterAccount, Adapter, AdapterUser, AdapterSession } from "next-auth/adapters";
+import type { Provider } from "next-auth/providers";
 
 import { AuthHashCode } from "@/components/Sections/Navigation";
 import { prisma } from "@/lib/prisma";
 
 import NextAuth from "next-auth";
+import DiscordProvider from "next-auth/providers/discord";
 import EmailProvider from "next-auth/providers/email";
+import GoogleProvider from "next-auth/providers/google";
 
-const AuthAdapter = (): Adapter => {
+const getAdapter = (): Adapter => {
     const parseUser = (user: users) => {
         const parsedUser: AdapterUser = {
             ...user,
@@ -275,25 +278,54 @@ const AuthAdapter = (): Adapter => {
     };
 };
 
-export const authOptions: NextAuthOptions = {
-    adapter: AuthAdapter(),
-    secret: process.env.NEXTAUTH_SECRET,
-    theme: {
-        colorScheme: "dark",
-    },
-    providers: [
-        EmailProvider({
-            server: {
-                host: process.env.EMAIL_SMTP_HOST,
-                port: process.env.EMAIL_SMTP_PORT,
-                auth: {
-                    user: process.env.EMAIL_SMTP_USER,
-                    pass: process.env.EMAIL_SMTP_PASSWORD,
+const getProviders = () => {
+    const providers: Provider[] = [];
+
+    if (process.env.EMAIL_SMTP_HOST && process.env.EMAIL_SMTP_PORT && process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PASSWORD && process.env.EMAIL_FROM) {
+        providers.push(
+            EmailProvider({
+                server: {
+                    host: process.env.EMAIL_SMTP_HOST,
+                    port: process.env.EMAIL_SMTP_PORT,
+                    auth: {
+                        user: process.env.EMAIL_SMTP_USER,
+                        pass: process.env.EMAIL_SMTP_PASSWORD,
+                    },
                 },
-            },
-            from: process.env.EMAIL_FROM,
-        }),
-    ],
+                from: process.env.EMAIL_FROM,
+            })
+        );
+    }
+
+    if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
+        providers.push(
+            DiscordProvider({
+                clientId: process.env.DISCORD_CLIENT_ID as string,
+                clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+            })
+        );
+    }
+
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+        providers.push(
+            GoogleProvider({
+                clientId: process.env.GOOGLE_CLIENT_ID as string,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            })
+        );
+    }
+
+    return providers;
+};
+
+if (!process.env.AUTH_SECRET) {
+    throw new Error("AUTH_SECRET variable is not defined in .env file.");
+}
+
+export const authOptions: NextAuthOptions = {
+    secret: process.env.AUTH_SECRET,
+    adapter: getAdapter(),
+    providers: getProviders(),
     pages: {
         signIn: `/#${AuthHashCode.Login}`,
         signOut: `/#${AuthHashCode.Logout}`,
