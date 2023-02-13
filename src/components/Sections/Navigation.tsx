@@ -1,4 +1,5 @@
 import type { ClientSafeProvider } from "next-auth/react";
+import type { TypeOptions } from "react-toastify";
 
 import Button from "@/components/Forms/Button";
 import Input from "@/components/Forms/Input";
@@ -10,6 +11,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { signOut, getProviders, signIn, useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 export enum AuthHashCode {
     Login = "login",
@@ -171,7 +173,7 @@ type NavigationProps = {
 };
 
 export default function Navigation({ className }: NavigationProps) {
-    const [hash] = useHash();
+    const [hash, setHash] = useHash();
     const { data: session } = useSession();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -185,21 +187,76 @@ export default function Navigation({ className }: NavigationProps) {
 
     useEffect(() => {
         const parsedHash = hash?.split("?")[0].split("#")[1];
+        const params = hash?.split("?")[1]?.split("&");
+        const errorCode = params?.find((param) => param.startsWith("error="))?.split("=")[1];
+
+        const notify = (id: string, message: string, type: TypeOptions) => {
+            toast.dismiss(id);
+
+            setTimeout(() => {
+                toast(message, {
+                    toastId: id,
+                    type,
+                });
+            }, 50);
+        };
+
+        const notifyErrorIfExist = (errorMessages: Record<string, string>) => {
+            if (errorCode) {
+                const errorMessage = errorMessages[errorCode.toLowerCase() as keyof typeof errorMessages] || errorMessages.default;
+                notify(errorCode, errorMessage, "error");
+            }
+        };
 
         switch (parsedHash) {
-            case AuthHashCode.Login:
-                return onLogin();
+            case AuthHashCode.Login: {
+                const errorMessages = {
+                    default: "Unable to sign in, please try again later.",
+                    signin: "Try signing in with a different account.",
+                    oauthsignin: "Try signing in with a different account.",
+                    oauthcallback: "Try signing in with a different account.",
+                    oauthcreateaccount: "Try signing in with a different account.",
+                    emailcreateaccount: "Try signing in with a different account.",
+                    callback: "Try signing in with a different account.",
+                    oauthaccountnotlinked: "To confirm your identity, sign in with the same account you used originally.",
+                    emailsignin: "The e-mail could not be sent.",
+                    credentialssignin: "Sign in failed. Check the details you provided are correct.",
+                    sessionrequired: "Please sign in to access this page.",
+                };
 
-            case AuthHashCode.Logout:
-                return onLogout();
+                notifyErrorIfExist(errorMessages);
+                onLogin();
 
-            case AuthHashCode.Error:
                 break;
+            }
 
-            case AuthHashCode.Pending:
+            case AuthHashCode.Logout: {
+                onLogout();
                 break;
+            }
+
+            case AuthHashCode.Error: {
+                const errorMessages = {
+                    default: "An error occurred, please try again later.",
+                    accessdenied: "You do not have permission to sign in.",
+                    verification: "It may have been used already or it may have expired.",
+                    configuration: "There is a problem with the server configuration. Please contact the administrator.",
+                };
+
+                notifyErrorIfExist(errorMessages);
+                setHash("");
+
+                break;
+            }
+
+            case AuthHashCode.Pending: {
+                notify(AuthHashCode.Pending, "A sign in link has been sent to your email address. Please check your email.", "success");
+                setHash("");
+
+                break;
+            }
         }
-    }, [hash, onLogin, onLogout]);
+    }, [hash, setHash, onLogin, onLogout]);
 
     return (
         <nav className={clsx("w-full bg-dark-800 text-dark-50", className)}>
