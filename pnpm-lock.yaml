@@ -42,6 +42,7 @@ specifiers:
   react-indiana-drag-scroll: ^2.2.0
   react-markdown: ^8.0.5
   react-simplemde-editor: ^5.2.0
+  react-toastify: ^9.1.1
   react-top-loading-bar: ^2.3.1
   tailwindcss: ^3.2.6
   ts-node: ^10.9.1
@@ -70,6 +71,7 @@ dependencies:
   react-indiana-drag-scroll: 2.2.0_biqbaboplfbrettd7655fr4n2y
   react-markdown: 8.0.5_kzbn2opkn2327fwg5yzwzya5o4
   react-simplemde-editor: 5.2.0_krhfp6bid7kgajqtgldm7tc45a
+  react-toastify: 9.1.1_biqbaboplfbrettd7655fr4n2y
   react-top-loading-bar: 2.3.1_react@18.2.0
 
 devDependencies:
@@ -3443,6 +3445,17 @@ packages:
     dependencies:
       '@types/codemirror': 5.60.7
       easymde: 2.18.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /react-toastify/9.1.1_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-pkFCla1z3ve045qvjEmn2xOJOy4ZciwRXm1oMPULVkELi5aJdHCN/FHnuqXq8IwGDLB7PPk2/J6uP9D8ejuiRw==}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      clsx: 1.2.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false

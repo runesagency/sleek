@@ -1,3 +1,4 @@
+import "react-toastify/dist/ReactToastify.css";
 import "@/styles/globals.css";
 
 import type { AppProps } from "next/app";
@@ -8,6 +9,7 @@ import RouterTransition from "@/components/RouterTransition";
 import { Manrope } from "@next/font/google";
 import clsx from "clsx";
 import { SessionProvider } from "next-auth/react";
+import { ToastContainer } from "react-toastify";
 
 const manrope = Manrope({
     variable: "--font-manrope",
@@ -25,8 +27,23 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
         <SessionProvider session={session}>
             <main className={clsx(manrope.variable, "h-full w-full font-sans")}>
                 <RouterTransition />
-                <Component {...pageProps} />
                 <ContextMenu />
+
+                <Component {...pageProps} />
+
+                <ToastContainer
+                    position="top-right" //
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="dark"
+                    limit={5}
+                />
             </main>
         </SessionProvider>
     );

@@ -26,49 +26,55 @@
     ::-webkit-scrollbar-thumb {
         @apply bg-dark-500 hover:bg-dark-600 rounded-full;
     }
+
+    :root {
+        --toastify-color-dark: theme(colors.dark.700) !important;
+        --toastify-color-success: theme(colors.green.500) !important;
+        --toastify-color-warning: theme(colors.yellow.500) !important;
+        --toastify-color-error: theme(colors.red.500) !important;
+    }
 }
 
 @layer components {
     .container {
         @apply relative mx-auto max-w-xs md:max-w-2xl lg:max-w-4xl xl:max-w-6xl 2xl:max-w-screen-xl 3xl:max-w-screen-2xl;
     }
-    
+
     .ts-xs {
         @apply text-xs font-manrope font-medium leading-5;
     }
-    
+
     .ts-sm {
         @apply text-sm font-manrope font-medium leading-5;
     }
-    
+
     .ts-base {
         @apply text-base font-manrope font-medium leading-6;
     }
-    
+
     .ts-xl {
         @apply text-xl font-manrope font-semibold leading-8;
     }
-    
+
     .ts-2xl {
         @apply text-2xl font-manrope font-bold leading-8;
     }
-    
+
     .heading-4 {
         @apply text-3xl font-manrope font-bold leading-10;
     }
-    
+
     .heading-3 {
         @apply text-4xl font-manrope font-bold leading-[48px];
     }
-    
+
     .heading-2 {
         @apply text-5xl font-manrope font-bold leading-[64px];
     }
-    
+
     .heading-1 {
         @apply text-6xl font-manrope font-extrabold leading-[80px];
     }
-    
 }
 
 @layer utilities {

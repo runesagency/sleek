@@ -168,6 +168,7 @@
         "react-indiana-drag-scroll": "^2.2.0",
         "react-markdown": "^8.0.5",
         "react-simplemde-editor": "^5.2.0",
+        "react-toastify": "^9.1.1",
         "react-top-loading-bar": "^2.3.1"
     },
     "devDependencies": {
