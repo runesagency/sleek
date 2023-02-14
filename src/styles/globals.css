@@ -41,39 +41,39 @@
     }
 
     .ts-xs {
-        @apply text-xs font-manrope font-medium leading-5;
+        @apply text-xs font-medium leading-5;
     }
 
     .ts-sm {
-        @apply text-sm font-manrope font-medium leading-5;
+        @apply text-sm font-medium leading-5;
     }
 
     .ts-base {
-        @apply text-base font-manrope font-medium leading-6;
+        @apply text-base font-medium leading-6;
     }
 
     .ts-xl {
-        @apply text-xl font-manrope font-semibold leading-8;
+        @apply text-xl font-semibold leading-8 max-xl:text-lg max-xl:leading-6;
     }
 
     .ts-2xl {
-        @apply text-2xl font-manrope font-bold leading-8;
+        @apply text-2xl font-bold leading-8 max-xl:text-xl max-xl:leading-6;
     }
 
     .heading-4 {
-        @apply text-3xl font-manrope font-bold leading-10;
+        @apply text-3xl font-bold leading-10 max-xl:text-2xl max-xl:leading-8;
     }
 
     .heading-3 {
-        @apply text-4xl font-manrope font-bold leading-[48px];
+        @apply text-4xl font-bold leading-[48px] max-xl:text-3xl max-xl:leading-10;
     }
 
     .heading-2 {
-        @apply text-5xl font-manrope font-bold leading-[64px];
+        @apply text-5xl font-bold leading-[64px] max-xl:text-4xl max-xl:leading-[48px];
     }
 
     .heading-1 {
-        @apply text-6xl font-manrope font-extrabold leading-[80px];
+        @apply text-6xl font-extrabold leading-[80px];
     }
 }
 
@@ -87,6 +87,21 @@
     .hide-scrollbar {
         -ms-overflow-style: none; /* IE and Edge */
         scrollbar-width: none; /* Firefox */
+    }
+    
+    .animate-fade-up {
+        animation: animate-fade-up .5s ease-out;
+    }
+    
+    @keyframes animate-fade-up {
+        0% {
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 }
 

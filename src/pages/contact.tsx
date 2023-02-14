@@ -25,13 +25,13 @@ export default function ContactPage() {
     ];
 
     return (
-        <main className="box-border flex h-full w-full flex-col text-dark-50">
+        <main className="box-border flex h-full w-full flex-col bg-dark-900 text-dark-50">
             <Navigation />
 
             {/* Contact */}
-            <Container className={["bg-dark-900", "flex gap-14 py-20 px-48"]}>
+            <Container className={["bg-dark-900", "flex flex-col gap-14 py-20 lg:flex-row"]}>
                 {/* Form */}
-                <div className="flex flex-1 flex-col gap-10">
+                <div className="flex flex-1 shrink-0 flex-col gap-10">
                     {/* Head */}
                     <div className="flex flex-col gap-4">
                         <h1 className="heading-2">Contact Us</h1>
@@ -39,7 +39,7 @@ export default function ContactPage() {
                     </div>
 
                     {/* Form */}
-                    <form className="grid grid-cols-2 gap-5">
+                    <form className="grid grid-cols-1 gap-5 md:grid-cols-2">
                         <div className="flex flex-col gap-4">
                             <span className="ts-xl">Your First Name</span>
                             <Input.Large placeholder="Enter your first name here ..." />
@@ -50,31 +50,32 @@ export default function ContactPage() {
                             <Input.Large placeholder="Enter your last name here ..." />
                         </div>
 
-                        <div className="col-span-2 flex flex-col gap-4">
+                        <div className="flex flex-col gap-4 md:col-span-2">
                             <span className="ts-xl">Email</span>
                             <Input.Large placeholder="Enter your email here ..." />
                         </div>
 
-                        <div className="col-span-2 flex flex-col gap-4">
+                        <div className="flex flex-col gap-4 md:col-span-2">
                             <span className="ts-xl">Do you have anything to say?</span>
                             <Textarea placeholder="Your message ..." />
                         </div>
 
-                        <Button.Large className="col-span-2">Send your message</Button.Large>
+                        <Button.Large className="md:col-span-2">Send your message</Button.Large>
                     </form>
                 </div>
 
                 {/* Information */}
-                <div className="flex w-full max-w-xl shrink-0 flex-col gap-6">
+                <div className="flex shrink-0 flex-col gap-6 lg:w-1/3">
                     <iframe
-                        className="w-full flex-1 rounded-lg border-0"
+                        className="h-72 w-full rounded-lg border-0 bg-dark-600 lg:flex-1"
+                        height={400}
                         allowFullScreen
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1398700467807!2d106.71664912196631!3d-6.245291681020062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69fa750812dba1%3A0x2d06ea61f1935b3b!2sRunes%20-%20Creative%20Studio%20%26%20Agency%20From%20Indonesia!5e0!3m2!1sen!2sus!4v1675771136259!5m2!1sen!2sus"
                     />
 
-                    <div className="flex h-max flex-col gap-8 rounded-lg border border-dark-600 bg-dark-700 p-10">
+                    <div className="flex h-max flex-col gap-8 rounded-lg border border-dark-600 bg-dark-700 p-6 xl:p-10">
                         <h3 className="ts-2xl">Our Contact Information</h3>
 
                         <section className="flex flex-col gap-5">
@@ -91,6 +92,7 @@ export default function ContactPage() {
             </Container>
 
             <FAQ
+                className={["bg-dark-900"]}
                 data={[
                     {
                         question: "What is Lorem Ipsum?",

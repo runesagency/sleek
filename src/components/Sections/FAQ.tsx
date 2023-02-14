@@ -44,12 +44,12 @@ export default function FAQ({ data, className = [] }: FAQProps) {
     if (!data || data.length === 0) return null;
 
     return (
-        <Container className={[clsx("bg-dark-900", className[0]), clsx("flex flex-col items-center gap-14 px-48 py-20", className[1])]}>
-            <h3 className="heading-3">Have Any Questions?</h3>
+        <Container className={[className[0], clsx("flex flex-col items-center gap-14 py-20", className[1])]}>
+            <h3 className="heading-3 text-center">Have Any Questions?</h3>
 
-            <section className="mx-auto grid w-full max-w-7xl grid-cols-2 gap-9">
+            <section className="mx-auto grid w-full max-w-7xl gap-6 md:grid-cols-2 lg:gap-9">
                 {[...Array(2)].map((_, colIndex) => (
-                    <div key={colIndex} className="flex flex-col gap-9">
+                    <div key={colIndex} className="flex flex-col gap-6 lg:gap-9">
                         {data
                             .filter((_, index) => index % 2 === colIndex)
                             .map((qna, index) => (

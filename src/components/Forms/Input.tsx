@@ -69,9 +69,9 @@ const Small = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRe
     }, [usedRef]);
 
     return (
-        <div className="flex items-center overflow-hidden rounded-lg bg-dark-500">
+        <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-3">
             {Icon && (
-                <div className="cursor-pointer py-3 pl-3 pr-1.5" onClick={onIconClick}>
+                <div className="cursor-pointer py-3" onClick={onIconClick}>
                     <Icon height={16} width={undefined} className="shrink-0 stroke-white" />
                 </div>
             )}
@@ -79,7 +79,7 @@ const Small = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRe
             <input
                 ref={usedRef}
                 type={type}
-                className="ts-sm w-full bg-transparent py-3 pl-1.5 pr-3 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
+                className="ts-sm w-full bg-transparent py-3 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
                 placeholder="Enter your card title here" //
                 value={value}
                 onKeyDown={onKeyDown}
@@ -100,9 +100,9 @@ const Large = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRe
     }, [usedRef]);
 
     return (
-        <div className="flex items-center overflow-hidden rounded-lg bg-dark-500">
+        <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-5">
             {Icon && (
-                <div className="cursor-pointer py-5 pl-5 pr-1.5" onClick={onIconClick}>
+                <div className="cursor-pointer py-5" onClick={onIconClick}>
                     <Icon height={20} width={undefined} className="shrink-0 stroke-white" />
                 </div>
             )}
@@ -110,7 +110,7 @@ const Large = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRe
             <input
                 ref={usedRef}
                 type={type}
-                className="ts-sm w-full bg-transparent py-5 pl-1.5 pr-5 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
+                className="ts-sm w-full bg-transparent py-5 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
                 placeholder="Enter your card title here" //
                 value={value}
                 onKeyDown={onKeyDown}

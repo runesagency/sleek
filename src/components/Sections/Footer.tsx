@@ -1,5 +1,6 @@
 import Button from "@/components/Forms/Button";
 import Input from "@/components/Forms/Input";
+import Container from "@/components/Sections/Container";
 
 import { IconBrandDiscord, IconBrandTwitter, IconMail } from "@tabler/icons";
 import Link from "next/link";
@@ -28,21 +29,23 @@ const FooterSection = ({ title, links }: FooterSectionProps) => {
 
 export default function Footer() {
     return (
-        <footer className="w-full bg-dark-700 text-dark-50">
-            <main className="mx-auto flex max-w-screen-3xl justify-between px-48 py-14">
-                <section className="flex w-72 shrink-0 flex-col gap-5">
-                    <img src="/logoipsum-286.svg" className="h-8 w-max text-white" alt="Logo" />
+        <Container as="footer" className={["bg-dark-700 text-dark-50", "flex flex-col justify-between gap-y-12 py-14 lg:flex-row"]}>
+            <section className="flex shrink-0 flex-col gap-5 lg:w-72">
+                <Link href="/">
+                    <img src="/assets/images/logo.svg" alt="Logo" className="h-8" />
+                </Link>
 
-                    <h4 className="ts-base">Sleek is the most flexible project management app for your team.</h4>
+                <h4 className="ts-base">Sleek is the most flexible project management app for your team.</h4>
 
-                    <div className="flex gap-7">
-                        <IconBrandTwitter />
-                        <IconBrandDiscord />
-                    </div>
+                <div className="flex gap-7">
+                    <IconBrandTwitter />
+                    <IconBrandDiscord />
+                </div>
 
-                    <span className="ts-sm opacity-50">© 2023 Sleek. All Rights Reserved.</span>
-                </section>
+                <span className="ts-sm opacity-50">© 2023 Sleek. All Rights Reserved.</span>
+            </section>
 
+            <section className="flex flex-col justify-between gap-y-12 md:flex-row">
                 <FooterSection
                     title="Product"
                     links={[
@@ -69,17 +72,17 @@ export default function Footer() {
                         { title: "Notion", href: "/compare/notion" },
                     ]}
                 />
+            </section>
 
-                <section className="flex max-w-lg flex-col gap-5">
-                    <h3 className="ts-xl">Join Our Newsletter</h3>
-                    <p className="ts-base">Get new updates, insight, and an early promo for our product. Don’t worry we won’t spam you :)</p>
+            <section className="flex flex-col gap-5 lg:max-w-md">
+                <h3 className="ts-xl">Join Our Newsletter</h3>
+                <p className="ts-base">Get new updates, insight, and an early promo for our product. Don’t worry we won’t spam you :)</p>
 
-                    <div className="flex gap-4">
-                        <Input.Large placeholder="Enter Your Email Here" icon={IconMail} />
-                        <Button.Large fit>Subscribe</Button.Large>
-                    </div>
-                </section>
-            </main>
-        </footer>
+                <div className="flex flex-col gap-4 xl:flex-row">
+                    <Input.Large placeholder="Enter Your Email Here" icon={IconMail} />
+                    <Button.Large fit>Subscribe</Button.Large>
+                </div>
+            </section>
+        </Container>
     );
 }

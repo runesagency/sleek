@@ -9,6 +9,7 @@ import Footer from "@/components/Sections/Footer";
 import Navigation from "@/components/Sections/Navigation";
 
 import { IconDoorEnter, IconFolder, IconLayout, IconMail, IconReload, IconSettings } from "@tabler/icons";
+import clsx from "clsx";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 type IntroductionsContextType = {
@@ -31,23 +32,28 @@ type IntroductionProps = {
     }[];
 };
 
-const Introduction = ({ icon: Icon, title, description, pictureUrl, buttons, index }: IntroductionProps & { index: number }) => {
+const Introduction = ({ icon: Icon, title, description, pictureUrl: defaultPictureUrl, buttons, index }: IntroductionProps & { index: number }) => {
     const ref = useRef<HTMLDivElement>(null);
-    const { pictureUrl: currentPictureUrl, setPictureUrl, activeIndex, setActiveIndex } = useContext(IntroductionsContext);
+    const [opacity, setOpacity] = useState(index === 0 ? 1 : 0);
+    const [pictureUrl, setPictureUrl] = useState(defaultPictureUrl);
+    const { pictureUrl: selectedPictureUrl, setPictureUrl: setSelectedPictureUrl, activeIndex, setActiveIndex } = useContext(IntroductionsContext);
 
     useEffect(() => {
         if (!ref.current) return;
 
-        // check if the element is in the viewport and is on the middle of the screen, if so, set the active index
         const check = () => {
             if (!ref.current) return;
 
             const rect = ref.current.getBoundingClientRect();
 
+            // check if the element is in the viewport and is on the middle of the screen, if so, set the active index
             if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2 && activeIndex !== index) {
                 setActiveIndex(index);
-                setPictureUrl(pictureUrl);
-                console.log("set");
+                setSelectedPictureUrl(pictureUrl);
+                setOpacity(1);
+            } else if (activeIndex !== index) {
+                // set opacity based on the distance from the middle of the screen
+                setOpacity(1 - Math.abs(window.innerHeight / 2 - rect.top) / (window.innerHeight / 2));
             }
         };
 
@@ -56,10 +62,10 @@ const Introduction = ({ icon: Icon, title, description, pictureUrl, buttons, ind
         return () => {
             document.removeEventListener("scroll", check);
         };
-    }, [activeIndex, currentPictureUrl, index, pictureUrl, setActiveIndex, setPictureUrl]);
+    }, [activeIndex, selectedPictureUrl, index, pictureUrl, setActiveIndex, setSelectedPictureUrl]);
 
     return (
-        <section ref={ref} className="flex w-full gap-20 lg:gap-0">
+        <section ref={ref} className="flex w-full flex-col gap-20 max-lg:!opacity-100 lg:flex-row lg:gap-0" style={{ opacity }}>
             <div className="flex flex-1 flex-col justify-center gap-5">
                 <div className="w-max rounded-xl border border-dark-500 bg-dark-600 p-3">
                     <Icon width={32} height={32} />
@@ -71,7 +77,14 @@ const Introduction = ({ icon: Icon, title, description, pictureUrl, buttons, ind
                 {buttons && (
                     <div className="flex w-full flex-wrap gap-4">
                         {buttons.map(({ title, pictureUrl }, index) => (
-                            <SwitchButton key={index} onClick={() => setPictureUrl(pictureUrl)} active={pictureUrl === currentPictureUrl}>
+                            <SwitchButton
+                                key={index}
+                                active={pictureUrl === selectedPictureUrl}
+                                onClick={() => {
+                                    setSelectedPictureUrl(pictureUrl);
+                                    setPictureUrl(pictureUrl);
+                                }}
+                            >
                                 {title}
                             </SwitchButton>
                         ))}
@@ -79,6 +92,7 @@ const Introduction = ({ icon: Icon, title, description, pictureUrl, buttons, ind
                 )}
             </div>
 
+            {/* If had a buttons, use the active image */}
             <img src={pictureUrl} alt="" loading="lazy" className="h-80 w-full shrink-0 rounded-3xl bg-dark-600 lg:w-0" />
         </section>
     );
@@ -89,7 +103,7 @@ const IntroductionList = ({ data }: { data: IntroductionProps[] }) => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     return (
-        <Container className={["bg-gradient-to-b from-dark-700 to-dark-800", "flex gap-20 px-80 py-20"]}>
+        <Container className={["bg-gradient-to-b from-dark-700 to-dark-800", "flex gap-20 py-20"]}>
             <IntroductionsContext.Provider
                 value={{
                     pictureUrl,
@@ -104,7 +118,7 @@ const IntroductionList = ({ data }: { data: IntroductionProps[] }) => {
                     ))}
                 </section>
 
-                <section className="hidden w-full max-w-xl shrink-0 lg:block">
+                <section className="hidden w-full shrink-0 lg:block lg:max-w-md xl:max-w-lg 2xl:max-w-xl">
                     <img src={pictureUrl} alt="" loading="lazy" className="sticky top-1/3 h-80 w-full rounded-3xl bg-dark-600" />
                 </section>
             </IntroductionsContext.Provider>
@@ -117,14 +131,17 @@ export default function HomePage() {
         {
             title: "Flexibility at its Finest",
             description: "Customize it, anything, like how you want it.",
+            pictureUrl: "https://picsum.photos/id/234/500/300",
         },
         {
             title: "Use it Flawlessly",
             description: "Equipped with a lot of shortcuts to make your job easier.",
+            pictureUrl: "https://picsum.photos/id/523/500/300",
         },
         {
             title: "Very Reasonable Price",
             description: "The cheapest, yet most feature-rich.",
+            pictureUrl: "https://picsum.photos/id/348/500/300",
         },
     ];
 
@@ -223,9 +240,10 @@ export default function HomePage() {
 
     return (
         <main className="flex h-full w-full flex-col bg-dark-900 text-white">
-            <Navigation className="!bg-transparent" />
+            <Navigation />
 
-            <Container className={["relative overflow-x-clip", "flex items-center gap-20 py-20 pl-48"]}>
+            {/* Hero */}
+            <Container className={["relative overflow-x-clip", "flex h-full items-center gap-20 py-20 !pr-0"]}>
                 <div className="relative z-20 flex max-w-screen-sm shrink-0 flex-col gap-8">
                     <h1 className="heading-1">Make Collaboration Within Your Team Much Faster 🚀</h1>
                     <h2 className="ts-xl w-5/6 text-justify">Avoid miscommunication, unnecessary conversations, and wasted time when collaborating with your team using Sleek.</h2>
@@ -237,25 +255,30 @@ export default function HomePage() {
                 </div>
 
                 <div className="relative w-full">
-                    <img src="/product-preview.png" alt="" className="relative z-20 h-full w-full rounded-lg border border-dark-600 object-cover object-left-top" />
-                    <img src="/radial.png" alt="" className="absolute top-0 left-0 z-10 max-w-screen-xl -translate-y-1/3 -translate-x-1/3" />
+                    <img src="/assets/images/product-preview.png" alt="" className="relative z-20 h-full w-full rounded-l-lg border border-dark-600 object-cover object-left-top" />
+                    <img src="/assets/images/radial.png" alt="" className="absolute top-0 left-0 z-10 max-w-screen-xl -translate-y-1/3 -translate-x-1/3" />
                 </div>
             </Container>
 
-            <Container className={[undefined, "flex flex-col items-center gap-10 px-48 pb-20"]}>
+            {/* Companies */}
+            <Container className={[undefined, "flex flex-col items-center gap-10 pb-20"]}>
                 <h4 className="ts-2xl">Loved and used by these companies</h4>
 
-                <div className="flex items-center justify-between gap-10">
-                    <div className="h-10 w-48 bg-red-200" />
-                    <div className="h-10 w-14 bg-red-200" />
-                    <div className="h-10 w-24 bg-red-200" />
+                <div className="flex w-full items-center justify-between gap-10">
+                    <img src="https://img.logoipsum.com/255.svg" alt="" className="h-10" />
+                    <img src="https://img.logoipsum.com/241.svg" alt="" className="h-10" />
+                    <img src="https://img.logoipsum.com/242.svg" alt="" className="h-10" />
+                    <img src="https://img.logoipsum.com/238.svg" alt="" className="h-10" />
+                    <img src="https://img.logoipsum.com/226.svg" alt="" className="h-10" />
+                    <img src="https://img.logoipsum.com/290.svg" alt="" className="h-10" />
                 </div>
             </Container>
 
-            <Container className={["relative", "grid grid-cols-3 gap-8 px-48"]}>
-                {features.map(({ title, description }, index) => (
-                    <article key={index} className="relative z-20 flex h-full flex-col rounded-lg border border-dark-600 bg-dark-800">
-                        <section className="relative h-64">
+            {/* Features */}
+            <Container className={["relative", "grid gap-8 lg:grid-cols-3"]}>
+                {features.map(({ title, description, pictureUrl }, index) => (
+                    <article key={index} className="relative z-20 flex h-full flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800">
+                        <section className="relative h-64 bg-cover bg-center" style={{ backgroundImage: `url(${pictureUrl})` }}>
                             <div className="absolute z-20 h-full w-full bg-gradient-to-b from-transparent to-dark-800" />
                         </section>
 
@@ -271,12 +294,13 @@ export default function HomePage() {
 
             <IntroductionList data={introductions} />
 
-            <Container className={["bg-dark-800", "flex flex-col items-center gap-14 px-80 py-20"]}>
+            {/* Testimonies */}
+            <Container className={["bg-dark-800", "flex flex-col items-center gap-14 py-20"]}>
                 <h3 className="heading-3">What Peoples Say</h3>
 
-                <section className="mx-auto grid w-full grid-cols-3 gap-8">
+                <section className="mx-auto grid w-full gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {[...Array(3)].map((_, colIndex) => (
-                        <div key={colIndex} className="flex flex-col gap-8">
+                        <div key={colIndex} className={clsx("flex flex-col gap-8", colIndex === 2 && "md:hidden lg:flex")}>
                             {testimonies
                                 .filter((_, index) => index % 3 === colIndex)
                                 .map(({ name, position, text }, index) => (
@@ -299,7 +323,7 @@ export default function HomePage() {
             </Container>
 
             <FAQ
-                className={["!bg-dark-800"]}
+                className={["bg-dark-800"]}
                 data={[
                     {
                         question: "What is Lorem Ipsum?",
@@ -328,13 +352,14 @@ export default function HomePage() {
                 ]}
             />
 
-            <Container className={["relative", "flex flex-col items-center gap-10 px-48 py-20"]}>
-                <div className="relative z-20 grid grid-cols-2 overflow-hidden rounded-lg">
-                    <section className="relative">
+            {/* CTA */}
+            <Container className={["relative bg-dark-800", "flex flex-col items-center gap-10 py-20"]}>
+                <div className="relative z-20 grid overflow-hidden rounded-lg lg:grid-cols-2">
+                    <section className="relative hidden bg-cover bg-center lg:block" style={{ backgroundImage: "url(https://picsum.photos/800/500)" }}>
                         <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent to-dark-500" />
                     </section>
 
-                    <section className="flex flex-col gap-5 bg-gradient-to-r from-dark-500 to-dark-600 p-20">
+                    <section className="flex flex-col justify-center gap-5 bg-gradient-to-r from-dark-500 to-dark-400 p-10 md:p-20">
                         <h2 className="heading-2">Great teams are those that work together</h2>
                         <p className="ts-xl">What are you waiting for? Join us and share your experience with other users!</p>
 

@@ -85,17 +85,17 @@ export default function PricingPage() {
     const [isEnterprise, setIsEnterprise] = useState<boolean>(false);
 
     return (
-        <main className="box-border flex h-full w-full flex-col text-dark-50">
+        <main className="box-border flex h-full w-full flex-col bg-dark-800 text-dark-50">
             <Navigation />
 
             {/* Hero */}
-            <Container className={["bg-dark-800", "flex gap-20 px-48 py-20"]}>
+            <Container className={["bg-dark-800", "flex flex-col gap-10 py-20 lg:flex-row lg:gap-4 xl:gap-20"]}>
                 {/* Description */}
                 <aside className="flex flex-col gap-14">
                     {/* Content */}
                     <section className="flex flex-col gap-7">
                         <h1 className="heading-2">One Price for All Features, for Small Team or Enterprises.</h1>
-                        <h2 className="ts-xl w-5/6">No more different plans with different features, at Sleek, you only need to subscribe to one plan, and get full access to our app.</h2>
+                        <h2 className="ts-xl lg:w-5/6">No more different plans with different features, at Sleek, you only need to subscribe to one plan, and get full access to our app.</h2>
                     </section>
 
                     {/* Company Type */}
@@ -113,7 +113,7 @@ export default function PricingPage() {
                             <p className="ts-2xl">Enterprise</p>
                         </div>
 
-                        <p className="ts-base w-4/5">
+                        <p className="ts-base lg:w-4/5">
                             For teams with under 50 members, you will be charged for each member that joins. Whereas for companies with more than 50 users, you will be given a package for the number
                             of members that can join.
                         </p>
@@ -121,8 +121,8 @@ export default function PricingPage() {
                 </aside>
 
                 {/* Package */}
-                <aside className="w-full max-w-xl">
-                    <div className="sticky top-8 flex h-max w-full max-w-xl flex-col justify-center gap-8 rounded-3xl bg-dark-700 py-8 px-10">
+                <aside className="w-full xl:max-w-xl">
+                    <div className="sticky top-8 flex h-max w-full flex-col justify-center gap-8 rounded-3xl bg-dark-700 py-8 px-10">
                         <section className="flex flex-col gap-3">
                             <div className="flex items-center gap-8">
                                 <IconBuildingStore size={48} width={undefined} className="shrink-0" />
@@ -156,13 +156,14 @@ export default function PricingPage() {
             </Container>
 
             {/* Comparison */}
-            <Container className={["bg-dark-900", "flex flex-col gap-14 px-48 py-20"]}>
+            <Container className={["bg-dark-900", "flex flex-col gap-14 py-20"]}>
                 <h3 className="heading-3 text-center">Ipsum vs Wokwow: How Do They Compare?</h3>
 
                 <ComparisonTable />
             </Container>
 
             <FAQ
+                className={["bg-dark-900"]}
                 data={[
                     {
                         question: "What is Lorem Ipsum?",
