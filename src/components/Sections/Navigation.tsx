@@ -259,7 +259,7 @@ export default function Navigation({ className }: NavigationProps) {
     }, [hash, setHash, onLogin, onLogout]);
 
     return (
-        <nav className={clsx("w-full bg-dark-800 text-dark-50", className)}>
+        <nav className={clsx("relative z-50 w-full bg-dark-800 text-dark-50", className)}>
             <main className="ts-base mx-auto flex max-w-screen-3xl justify-between px-48 py-8">
                 <div className="flex items-center gap-12">
                     <img src="/logoipsum-286.svg" className="text-white" alt="logo_ipsum" width="174" height="32" />
