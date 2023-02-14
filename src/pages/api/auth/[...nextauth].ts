@@ -326,6 +326,9 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     adapter: getAdapter(),
     providers: getProviders(),
+    session: {
+        strategy: "jwt",
+    },
     pages: {
         signIn: `/#${AuthHashCode.Login}`,
         signOut: `/#${AuthHashCode.Logout}`,
