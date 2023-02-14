@@ -37,14 +37,15 @@ const QnA = ({ question, answer }: QnAProps) => {
 
 type FAQProps = {
     data: QnAProps[];
+    className?: [string?, string?];
 };
 
-export default function FAQ({ data }: FAQProps) {
+export default function FAQ({ data, className = [] }: FAQProps) {
     if (!data || data.length === 0) return null;
 
     return (
-        <Container className={["bg-dark-900", "flex flex-col gap-14 px-48 py-20"]}>
-            <h3 className="heading-3 text-center">Have Any Questions?</h3>
+        <Container className={[clsx("bg-dark-900", className[0]), clsx("flex flex-col items-center gap-14 px-48 py-20", className[1])]}>
+            <h3 className="heading-3">Have Any Questions?</h3>
 
             <section className="mx-auto grid w-full max-w-7xl grid-cols-2 gap-9">
                 {[...Array(2)].map((_, colIndex) => (
