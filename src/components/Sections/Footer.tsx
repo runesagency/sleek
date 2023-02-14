@@ -80,7 +80,7 @@ export default function Footer() {
 
                 <div className="flex flex-col gap-4 xl:flex-row">
                     <Input.Large placeholder="Enter Your Email Here" icon={IconMail} />
-                    <Button.Large fit>Subscribe</Button.Large>
+                    <Button.Large className="xl:w-max">Subscribe</Button.Large>
                 </div>
             </section>
         </Container>

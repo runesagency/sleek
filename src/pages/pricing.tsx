@@ -146,9 +146,9 @@ export default function PricingPage() {
                         <section className="flex flex-col">
                             <p className="ts-base">Get full access for 15 team members at just:</p>
 
-                            <div className="flex items-end gap-1">
-                                <h3 className="heading-2">USD$ 49.99</h3>
-                                <span className="ts-base">/ Month</span>
+                            <div className="flex flex-wrap items-baseline gap-1">
+                                <h3 className="heading-2 w-max">USD$ 49.99</h3>
+                                <span className="ts-base w-max">/ Month</span>
                             </div>
                         </section>
                     </div>

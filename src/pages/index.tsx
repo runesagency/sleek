@@ -243,18 +243,18 @@ export default function HomePage() {
             <Navigation />
 
             {/* Hero */}
-            <Container className={["relative overflow-x-clip", "flex h-full items-center gap-20 py-20 !pr-0"]}>
-                <div className="relative z-20 flex max-w-screen-sm shrink-0 flex-col gap-8">
-                    <h1 className="heading-1">Make Collaboration Within Your Team Much Faster 🚀</h1>
-                    <h2 className="ts-xl w-5/6 text-justify">Avoid miscommunication, unnecessary conversations, and wasted time when collaborating with your team using Sleek.</h2>
+            <Container className={["relative overflow-x-clip", "flex h-full items-stretch gap-10 py-20 md:!pr-0 lg:gap-20"]}>
+                <div className="relative z-20 flex w-full shrink-0 flex-col gap-8 md:max-w-md xl:max-w-screen-sm">
+                    <h1 className="heading-2 xl:heading-1">Make Collaboration Within Your Team Much Faster 🚀</h1>
+                    <h2 className="ts-xl md:w-5/6 xl:text-justify">Avoid miscommunication, unnecessary conversations, and wasted time when collaborating with your team using Sleek.</h2>
 
-                    <div className="flex gap-4">
+                    <div className="flex flex-col gap-4 md:flex-row">
                         <Input.Large placeholder="Enter Your Email Here" icon={IconMail} />
-                        <Button.Large fit>Join Waitlist</Button.Large>
+                        <Button.Large className="md:w-max">Join Waitlist</Button.Large>
                     </div>
                 </div>
 
-                <div className="relative w-full">
+                <div className="relative hidden w-full flex-1 md:block">
                     <img src="/assets/images/product-preview.png" alt="" className="relative z-20 h-full w-full rounded-l-lg border border-dark-600 object-cover object-left-top" />
                     <img src="/assets/images/radial.png" alt="" className="absolute top-0 left-0 z-10 max-w-screen-xl -translate-y-1/3 -translate-x-1/3" />
                 </div>
@@ -262,9 +262,9 @@ export default function HomePage() {
 
             {/* Companies */}
             <Container className={[undefined, "flex flex-col items-center gap-10 pb-20"]}>
-                <h4 className="ts-2xl">Loved and used by these companies</h4>
+                <h4 className="ts-2xl text-center">Loved and used by these companies</h4>
 
-                <div className="flex w-full items-center justify-between gap-10">
+                <div className="flex w-full flex-wrap items-center justify-center gap-10">
                     <img src="https://img.logoipsum.com/255.svg" alt="" className="h-10" />
                     <img src="https://img.logoipsum.com/241.svg" alt="" className="h-10" />
                     <img src="https://img.logoipsum.com/242.svg" alt="" className="h-10" />
