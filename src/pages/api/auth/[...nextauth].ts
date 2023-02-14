@@ -318,12 +318,12 @@ const getProviders = () => {
     return providers;
 };
 
-if (!process.env.AUTH_SECRET) {
-    throw new Error("AUTH_SECRET variable is not defined in .env file.");
+if (!process.env.NEXTAUTH_SECRET) {
+    throw new Error("NEXTAUTH_SECRET variable is not defined in .env file.");
 }
 
 export const authOptions: NextAuthOptions = {
-    secret: process.env.AUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
     adapter: getAdapter(),
     providers: getProviders(),
     pages: {
