@@ -103,7 +103,7 @@ const IntroductionList = ({ data }: { data: IntroductionProps[] }) => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     return (
-        <Container className={["bg-gradient-to-b from-dark-700 to-dark-800", "flex gap-20 py-20"]}>
+        <Container className={["bg-gradient-to-b from-dark-700 to-dark-800", "flex gap-20 py-20 3xl:px-80"]}>
             <IntroductionsContext.Provider
                 value={{
                     pictureUrl,
@@ -244,7 +244,7 @@ export default function HomePage() {
 
             {/* Hero */}
             <Container className={["relative overflow-x-clip", "flex h-full items-stretch gap-10 py-20 md:!pr-0 lg:gap-20"]}>
-                <div className="relative z-20 flex w-full shrink-0 flex-col gap-8 md:max-w-md xl:max-w-screen-sm">
+                <div className="relative z-20 flex w-full shrink-0 flex-col justify-center gap-8 md:max-w-md xl:max-w-screen-sm">
                     <h1 className="heading-2 xl:heading-1">Make Collaboration Within Your Team Much Faster 🚀</h1>
                     <h2 className="ts-xl md:w-5/6 xl:text-justify">Avoid miscommunication, unnecessary conversations, and wasted time when collaborating with your team using Sleek.</h2>
 
@@ -295,7 +295,7 @@ export default function HomePage() {
             <IntroductionList data={introductions} />
 
             {/* Testimonies */}
-            <Container className={["bg-dark-800", "flex flex-col items-center gap-14 py-20"]}>
+            <Container className={["bg-dark-800", "flex flex-col items-center gap-14 py-20  3xl:px-80"]}>
                 <h3 className="heading-3">What Peoples Say</h3>
 
                 <section className="mx-auto grid w-full gap-8 md:grid-cols-2 lg:grid-cols-3">

@@ -44,7 +44,7 @@ export default function FAQ({ data, className = [] }: FAQProps) {
     if (!data || data.length === 0) return null;
 
     return (
-        <Container className={[className[0], clsx("flex flex-col items-center gap-14 py-20", className[1])]}>
+        <Container className={[className[0], clsx("flex flex-col items-center gap-14 py-20 3xl:px-80", className[1])]}>
             <h3 className="heading-3 text-center">Have Any Questions?</h3>
 
             <section className="mx-auto grid w-full max-w-7xl gap-6 md:grid-cols-2 lg:gap-9">
