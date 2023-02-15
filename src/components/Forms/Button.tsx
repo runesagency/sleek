@@ -4,7 +4,7 @@ import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import clsx from "clsx";
 import { memo } from "react";
 
-type ButtonProps = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
+export type ButtonProps = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     icon?: TablerIcon;
     fit?: boolean;
 };

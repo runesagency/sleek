@@ -2,7 +2,7 @@ import { IconCheck } from "@tabler/icons";
 import clsx from "clsx";
 import { memo, useCallback, useState } from "react";
 
-type CheckboxProps = {
+export type CheckboxProps = {
     defaultChecked?: boolean;
     onChange?: (checked: boolean) => void;
 };

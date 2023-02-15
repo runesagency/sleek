@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-type SwitchButtonProps = {
+export type SwitchButtonProps = {
     active?: boolean;
     children: React.ReactNode;
     onClick?: () => void;

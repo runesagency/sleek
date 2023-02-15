@@ -49,7 +49,7 @@ const useInput = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter }: 
     };
 };
 
-type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref" | "onChange"> & {
+export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref" | "onChange"> & {
     icon?: TablerIcon;
     type?: HTMLInputTypeAttribute;
     innerRef?: React.RefObject<HTMLInputElement>;

@@ -30,7 +30,7 @@ const useValueHandler = (active: boolean, key?: string, defaultValue = ""): UseV
     }
 };
 
-type TextareaProps = Omit<DetailedHTMLProps<TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>, "defaultValue" | "ref"> & {
+export type TextareaProps = Omit<DetailedHTMLProps<TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>, "defaultValue" | "ref"> & {
     innerRef?: React.Ref<HTMLTextAreaElement>;
     defaultValue?: string;
     saveOnEnter?: boolean;
