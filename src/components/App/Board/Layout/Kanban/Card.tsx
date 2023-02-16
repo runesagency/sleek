@@ -6,7 +6,6 @@ import Label from "@/components/DataDisplay/Label";
 import Button from "@/components/Forms/Button";
 import useDraggable from "@/lib/hooks/drag-and-drop/use-draggable";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
-import useMenu from "@/lib/hooks/use-menu";
 
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
 import clsx from "clsx";
@@ -74,7 +73,6 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
     });
 
     const { emit } = useCustomEvent<string>("card-clicked", false);
-    const { openMenu, closeMenu, toggleMenu } = useMenu();
 
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const taskButtonRef = useRef<HTMLButtonElement>(null);
@@ -90,7 +88,6 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         if (taskButtonRef.current?.contains(e.target as Node)) return;
 
         emit(id);
-        closeMenu();
     });
 
     useEffect(() => setIsDragging(isDragging), [isDragging, setIsDragging]);
@@ -98,7 +95,6 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
     return (
         <a
             ref={cardRef}
-            onContextMenu={openMenu}
             className={clsx(
                 "group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-white hover:border-dark-400",
                 isDragging && "opacity-30"
@@ -112,7 +108,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
                 <span className="flex-1 break-words font-semibold">{title}</span>
 
                 <button ref={menuButtonRef} className="hidden group-hover/card:block">
-                    <IconDots height={20} width={undefined} onClick={toggleMenu} />
+                    <IconDots height={20} width={undefined} />
                 </button>
             </div>
 

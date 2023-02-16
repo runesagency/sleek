@@ -153,7 +153,6 @@
         "@mantine/hooks": "^5.10.3",
         "@next/font": "^13.1.6",
         "@prisma/client": "^4.10.1",
-        "@szhsin/react-menu": "^3.4.1",
         "@tabler/icons": "^1.119.0",
         "@tailwindcss/line-clamp": "^0.4.2",
         "@tailwindcss/typography": "^0.5.9",

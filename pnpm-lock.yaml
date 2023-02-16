@@ -8,7 +8,6 @@ specifiers:
   '@mantine/hooks': ^5.10.3
   '@next/font': ^13.1.6
   '@prisma/client': ^4.10.1
-  '@szhsin/react-menu': ^3.4.1
   '@tabler/icons': ^1.119.0
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.9
@@ -56,7 +55,6 @@ dependencies:
   '@mantine/hooks': 5.10.3_react@18.2.0
   '@next/font': 13.1.6
   '@prisma/client': 4.10.1_prisma@4.10.1
-  '@szhsin/react-menu': 3.4.1_biqbaboplfbrettd7655fr4n2y
   '@tabler/icons': 1.119.0_biqbaboplfbrettd7655fr4n2y
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.6
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.6
@@ -663,18 +661,6 @@ packages:
     resolution: {integrity: sha512-4C7nX/dvpzB7za4Ql9K81xK3HPxCpHMgwTZVyf+9JQ6VUbn9jjZVN7/Nkdz/Ugzs2CSjqnL/UPXroiVBVHUWUw==}
     dependencies:
       tslib: 2.5.0
-    dev: false
-
-  /@szhsin/react-menu/3.4.1_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-Pxt7Kyp3yuX7zkT5tjdLRJGNFMa5Tx4BP+01gJ/dnMmHQpI1H2or9gEC0X+t3cLldO3LGmm4ViGypNCmQLv/4A==}
-    peerDependencies:
-      react: '>=16.14.0'
-      react-dom: '>=16.14.0'
-    dependencies:
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      react-transition-state: 1.1.5_biqbaboplfbrettd7655fr4n2y
     dev: false
 
   /@tabler/icons/1.119.0_biqbaboplfbrettd7655fr4n2y:
@@ -3467,16 +3453,6 @@ packages:
       react: ^16 || ^17 || ^18
     dependencies:
       react: 18.2.0
-    dev: false
-
-  /react-transition-state/1.1.5_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-ITY2mZqc2dWG2eitJkYNdcSFW8aKeOlkL2A/vowRrLL8GH3J6Re/SpD/BLvQzrVOTqjsP0b5S9N10vgNNzwMUQ==}
-    peerDependencies:
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
-    dependencies:
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /react/18.2.0:
