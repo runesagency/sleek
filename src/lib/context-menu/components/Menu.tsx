@@ -136,8 +136,14 @@ const Menu = () => {
             },
         };
 
-        if (type === MenuVariant.Context) {
-            return <MenuContextVariant variant={{ type, lists }} {...sharedProps} />;
+        switch (data.type) {
+            case MenuVariant.Context: {
+                return <MenuContextVariant {...sharedProps} lists={data.lists} />;
+            }
+
+            case MenuVariant.MemberList: {
+                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onClick={data.onClick} />;
+            }
         }
     }
 
