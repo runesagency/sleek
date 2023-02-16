@@ -31,6 +31,6 @@ export const MenuContext = createContext<MenuContextProps>({
 });
 
 export * from "./types.d";
-export { default as useMenu } from "./use-context-menu";
-export { default as Menu } from "./ContextMenu";
-export { default as MenuProvider } from "./ContextMenuProvider";
+export { default as useMenu } from "./hooks/use-menu";
+export { default as Menu } from "./components/Menu";
+export { default as MenuProvider } from "./components/MenuProvider";

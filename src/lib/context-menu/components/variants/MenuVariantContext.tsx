@@ -1,5 +1,5 @@
 import type { MenuVariantContextItem as DefaultMenuVariantContextItemType } from "@/lib/context-menu";
-import type { MenuSharedProps } from "@/lib/context-menu/ContextMenu";
+import type { MenuSharedProps } from "@/lib/context-menu/components/Menu";
 
 import { MenuVariant } from "@/lib/context-menu";
 
