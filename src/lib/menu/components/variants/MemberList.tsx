@@ -1,47 +1,44 @@
 import type { MenuVariantMemberList } from "@/lib/menu";
 import type { MenuSharedProps } from "@/lib/menu/components/Menu";
+import type { users as User } from "@prisma/client";
 
 import Input from "@/components/Forms/Input";
 import Avatar from "@/components/Miscellaneous/Avatar";
 
+import { IconChevronLeft } from "@tabler/icons";
 import clsx from "clsx";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { memo, useCallback, useEffect, useState } from "react";
 
-// type MenuContextVariantItemProps = MenuVariantContextItem & {
-//     index: number;
-//     activeIndex: number;
-//     closeMenu: () => void;
-//     setActiveIndex: (index: number) => void;
-// };
+type MenuMemberListVariantItemProps = User & {
+    index: number;
+    activeIndex: number;
+    closeMenu: () => void;
+    onItemClick: (user: User) => void;
+    setActiveIndex: (index: number) => void;
+};
 
-// const MenuContextVariantItem = ({ icon: Icon, name, onClick: onItemClick, href, index, activeIndex, closeMenu, setActiveIndex }: MenuContextVariantItemProps) => {
-//     const Component = href ? Link : "button";
+const MenuMemberListVariantItem = ({ onItemClick, index, activeIndex, closeMenu, setActiveIndex, ...props }: MenuMemberListVariantItemProps) => {
+    const { name } = props;
 
-//     const onClick = useCallback(() => {
-//         if (onItemClick) {
-//             onItemClick();
-//         }
+    const onClick = useCallback(() => {
+        onItemClick(props);
+        closeMenu();
+    }, [closeMenu, onItemClick, props]);
 
-//         closeMenu();
-//     }, [closeMenu, onItemClick]);
+    const onHover = useCallback(() => {
+        setActiveIndex(index);
+    }, [index, setActiveIndex]);
 
-//     const onHover = useCallback(() => {
-//         setActiveIndex(index);
-//     }, [index, setActiveIndex]);
+    return (
+        <button key={index} onClick={onClick} onMouseOver={onHover} className={clsx("flex items-center gap-2 rounded-lg p-2", activeIndex === index && "bg-dark-800")}>
+            <Avatar className="h-6 w-6 rounded-full" config={{ seed: name }} />
+            <span className="ts-sm">{name}</span>
+        </button>
+    );
+};
 
-//     if (!href && !onItemClick) return null;
-
-//     return (
-//         <Component href={href ?? "#"} onClick={onClick} onMouseOver={onHover} className={clsx("flex items-center gap-3 px-5 py-3", activeIndex === index && "bg-dark-800")}>
-//             <Icon height={16} width={undefined} />
-//             <span className="ts-sm">{name}</span>
-//         </Component>
-//     );
-// };
-
-const MenuMemberListVariant = ({ lists, onClick, innerRef, closeMenu, ...props }: MenuSharedProps & Omit<MenuVariantMemberList, "type">) => {
+const MenuMemberListVariant = ({ lists, onSelect: onClick, onBack, title, innerRef, closeMenu, ...props }: MenuSharedProps & Omit<MenuVariantMemberList, "type">) => {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
     const [filter, setFilter] = useState("");
@@ -52,14 +49,25 @@ const MenuMemberListVariant = ({ lists, onClick, innerRef, closeMenu, ...props }
         return list.name.toLowerCase().includes(filter.toLowerCase());
     });
 
+    const onSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilter(e.target.value);
+    }, []);
+
+    const onReturnBack = useCallback(() => {
+        if (!onBack) return;
+
+        onBack();
+        closeMenu();
+    }, [closeMenu, onBack]);
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            e.preventDefault();
-
             switch (e.key) {
                 case "ArrowDown": {
+                    e.preventDefault();
+
                     setActiveIndex((prev) => {
-                        if (prev === lists.length - 1) return 0;
+                        if (prev === filteredLists.length - 1) return 0;
                         return prev + 1;
                     });
 
@@ -67,8 +75,10 @@ const MenuMemberListVariant = ({ lists, onClick, innerRef, closeMenu, ...props }
                 }
 
                 case "ArrowUp": {
+                    e.preventDefault();
+
                     setActiveIndex((prev) => {
-                        if (prev === 0) return lists.length - 1;
+                        if (prev === 0) return filteredLists.length - 1;
                         return prev - 1;
                     });
 
@@ -76,7 +86,9 @@ const MenuMemberListVariant = ({ lists, onClick, innerRef, closeMenu, ...props }
                 }
 
                 case "Enter": {
-                    onClick(lists[activeIndex]);
+                    e.preventDefault();
+
+                    onClick(filteredLists[activeIndex]);
                     closeMenu();
                     break;
                 }
@@ -88,24 +100,27 @@ const MenuMemberListVariant = ({ lists, onClick, innerRef, closeMenu, ...props }
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [activeIndex, closeMenu, lists, lists.length, onClick, router]);
+    }, [activeIndex, closeMenu, filteredLists, filteredLists.length, onClick, router]);
 
     return (
-        <section ref={innerRef} {...props} className="flex flex-col gap-5 overflow-hidden rounded-lg border border-dark-600 bg-dark-700 p-5 text-white">
-            <Input.Small value={filter} onSave={(value) => setFilter(value)} placeholder="Enter Member Name..." />
+        <section ref={innerRef} {...props} className="flex w-72 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
+            <header className="flex items-center justify-between gap-2 bg-dark-600 px-5 py-2">
+                {onBack ? <IconChevronLeft height={20} width={undefined} className="cursor-pointer duration-200 hover:opacity-75" onClick={onReturnBack} /> : <div />}
 
-            <div className="flex flex-col gap-4">
-                {filteredLists.map((props, index) => {
-                    const { name } = props;
+                <span className="ts-sm">{title || "Member List"}</span>
 
-                    return (
-                        <button key={index} className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6" config={{ seed: name }} />
-                            <span className="ts-sm">{name}</span>
-                        </button>
-                    );
-                })}
-            </div>
+                <div />
+            </header>
+
+            <main className="flex flex-col gap-5 p-5">
+                <Input.Small value={filter} onChange={onSearch} placeholder="Enter Member Name..." autoFocus />
+
+                <div className="flex flex-col gap-2">
+                    {filteredLists.map((props, index) => (
+                        <MenuMemberListVariantItem key={index} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} onItemClick={onClick} />
+                    ))}
+                </div>
+            </main>
         </section>
     );
 };
