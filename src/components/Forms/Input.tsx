@@ -49,7 +49,7 @@ const useInput = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter }: 
     };
 };
 
-export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref" | "onChange"> & {
+export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref"> & {
     icon?: TablerIcon;
     type?: HTMLInputTypeAttribute;
     innerRef?: React.RefObject<HTMLInputElement>;
@@ -59,14 +59,22 @@ export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputEle
     onSave?: (text: string) => void;
 };
 
-const Small = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+const Small = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
     const ref = useRef<HTMLInputElement>(null);
-    const { value, onKeyDown, onChange } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
+    const { value, onKeyDown, onChange: onChangeHandler } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
     const usedRef = innerRef ?? ref;
 
     const onIconClick = useCallback(() => {
         usedRef.current?.focus();
     }, [usedRef]);
+
+    const onChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            onChangeHandler(event);
+            onInputChange?.(event);
+        },
+        [onInputChange, onChangeHandler]
+    );
 
     return (
         <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-3">
@@ -90,14 +98,22 @@ const Small = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRe
     );
 };
 
-const Large = ({ defaultValue, icon: Icon, onSave, onClose, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+const Large = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
     const ref = useRef<HTMLInputElement>(null);
-    const { value, onKeyDown, onChange } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
+    const { value, onKeyDown, onChange: onChangeHandler } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
     const usedRef = innerRef ?? ref;
 
     const onIconClick = useCallback(() => {
         usedRef.current?.focus();
     }, [usedRef]);
+
+    const onChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            onChangeHandler(event);
+            onInputChange?.(event);
+        },
+        [onInputChange, onChangeHandler]
+    );
 
     return (
         <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-5">
