@@ -6,7 +6,7 @@ import MenuMemberListVariant from "@/lib/menu/components/variants/MemberList";
 
 import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
-export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref" | "onClick"> & {
+export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref" | "onClick" | "onSelect"> & {
     innerRef: React.RefObject<HTMLDivElement>;
     closeMenu: () => void;
 };
@@ -138,11 +138,11 @@ const Menu = () => {
 
         switch (data.type) {
             case MenuVariant.Context: {
-                return <MenuContextVariant {...sharedProps} lists={data.lists} />;
+                return <MenuContextVariant {...sharedProps} {...data} />;
             }
 
             case MenuVariant.MemberList: {
-                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onSelect={data.onSelect} />;
+                return <MenuMemberListVariant {...sharedProps} {...data} />;
             }
         }
     }
