@@ -1,6 +1,6 @@
-import type { MenuContextProps, MenuVariantType } from "@/lib/context-menu";
+import type { MenuContextProps, MenuVariantType } from "@/lib/menu";
 
-import { MenuVariant, MenuContext, MenuPosition } from "@/lib/context-menu";
+import { MenuVariant, MenuContext, MenuPosition } from "@/lib/menu";
 
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 

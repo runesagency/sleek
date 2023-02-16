@@ -1,6 +1,6 @@
-import type { MenuContextProps } from "@/lib/context-menu/types";
+import type { MenuContextProps } from "@/lib/menu/types";
 
-import { MenuPosition } from "@/lib/context-menu/types.d";
+import { MenuPosition } from "@/lib/menu/types";
 
 import { createContext } from "react";
 
@@ -30,7 +30,7 @@ export const MenuContext = createContext<MenuContextProps>({
     setOffset: defaultUninitializedFunction,
 });
 
-export * from "./types.d";
+export * from "./types";
 export { default as useMenu } from "./hooks/use-menu";
 export { default as Menu } from "./components/Menu";
 export { default as MenuProvider } from "./components/MenuProvider";

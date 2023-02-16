@@ -1,5 +1,5 @@
-import type { MenuVariantMemberList } from "@/lib/context-menu";
-import type { MenuSharedProps } from "@/lib/context-menu/components/Menu";
+import type { MenuVariantMemberList } from "@/lib/menu";
+import type { MenuSharedProps } from "@/lib/menu/components/Menu";
 
 import Input from "@/components/Forms/Input";
 import Avatar from "@/components/Miscellaneous/Avatar";

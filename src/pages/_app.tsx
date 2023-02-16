@@ -4,7 +4,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 
 import RouterTransition from "@/components/RouterTransition";
-import { Menu, MenuProvider } from "@/lib/context-menu";
+import { Menu, MenuProvider } from "@/lib/menu";
 
 import { Manrope } from "@next/font/google";
 import clsx from "clsx";

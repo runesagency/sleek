@@ -1,6 +1,6 @@
-import type { MenuVariantType } from "@/lib/context-menu";
+import type { MenuVariantType } from "@/lib/menu";
 
-import { MenuPosition, MenuContext } from "@/lib/context-menu";
+import { MenuPosition, MenuContext } from "@/lib/menu";
 
 import { useId } from "@mantine/hooks";
 import { useCallback, useContext } from "react";

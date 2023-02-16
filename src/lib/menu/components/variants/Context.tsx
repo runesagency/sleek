@@ -1,5 +1,5 @@
-import type { MenuVariantContext, MenuVariantContextItem } from "@/lib/context-menu";
-import type { MenuSharedProps } from "@/lib/context-menu/components/Menu";
+import type { MenuVariantContext, MenuVariantContextItem } from "@/lib/menu";
+import type { MenuSharedProps } from "@/lib/menu/components/Menu";
 
 import clsx from "clsx";
 import Link from "next/link";

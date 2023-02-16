@@ -1,8 +1,8 @@
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
-import { MenuContext, MenuVariant, MenuPosition } from "@/lib/context-menu";
-import MenuContextVariant from "@/lib/context-menu/components/variants/Context";
-import MenuMemberListVariant from "@/lib/context-menu/components/variants/MemberList";
+import { MenuContext, MenuVariant, MenuPosition } from "@/lib/menu";
+import MenuContextVariant from "@/lib/menu/components/variants/Context";
+import MenuMemberListVariant from "@/lib/menu/components/variants/MemberList";
 
 import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
