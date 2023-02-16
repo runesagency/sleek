@@ -1,13 +1,12 @@
-import type { MenuVariantType } from "@/lib/context-menu";
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 import { MenuContext, MenuVariant, MenuPosition } from "@/lib/context-menu";
 import MenuContextVariant from "@/lib/context-menu/components/variants/Context";
+import MenuMemberListVariant from "@/lib/context-menu/components/variants/MemberList";
 
 import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
-export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref"> & {
-    variant: MenuVariantType;
+export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref" | "onClick"> & {
     innerRef: React.RefObject<HTMLDivElement>;
     closeMenu: () => void;
 };
@@ -15,16 +14,7 @@ export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>
 const Menu = () => {
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const {
-        isOpen,
-        offset, //
-        targetRef,
-        targetPosition,
-        lists,
-        type,
-        setOpen,
-        clientCoordinates,
-    } = useContext(MenuContext);
+    const { offset, targetRef, targetPosition, setOpen, clientCoordinates, ...data } = useContext(MenuContext);
 
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
     const { x: clientX, y: clientY } = clientCoordinates.current;
@@ -115,7 +105,7 @@ const Menu = () => {
             });
         };
 
-        if (isOpen) {
+        if (data.isOpen) {
             setMenuCoordinates();
             registerScrollableParents(targetElement);
 
@@ -133,13 +123,14 @@ const Menu = () => {
                 element.removeEventListener("scroll", setMenuCoordinates);
             });
         };
-    }, [isOpen, targetRef, setOpen, clientX, clientY, targetPosition, offsetX, offsetY]);
+    }, [data.isOpen, targetRef, setOpen, clientX, clientY, targetPosition, offsetX, offsetY]);
 
-    if (isOpen) {
+    if (data.isOpen) {
         const sharedProps: Omit<MenuSharedProps, "variant"> = {
             innerRef: menuRef,
             closeMenu,
             style: {
+                position: "fixed",
                 transform: `translate(${coordinates.x}px, ${coordinates.y}px)`,
                 zIndex: 999999,
             },

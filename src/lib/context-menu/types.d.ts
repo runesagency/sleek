@@ -116,7 +116,7 @@ export enum MenuPosition {
     Cursor = "cursor",
 }
 
-export type MenuContextOpenProps = { isOpen: true } & MenuVariantType;
+export type MenuContextOpenProps = MenuVariantType & { isOpen: true };
 
 export type MenuContextCloseProps = {
     isOpen: false;
@@ -128,9 +128,9 @@ export type MenuContextProps = (MenuContextOpenProps | MenuContextCloseProps) & 
     // Generate a random id for each menu instance, on toggle menu,
     // if the id is the same, then close the menu, otherwise open the menu
     instanceId: string;
+    offset: React.MutableRefObject<{ x: number; y: number }>;
     targetRef: React.MutableRefObject<HTMLElement | null>;
     targetPosition: React.MutableRefObject<MenuPosition>;
-    offset: React.MutableRefObject<{ x: number; y: number }>;
     clientCoordinates: React.MutableRefObject<{ x: number; y: number }>;
     setOpen: (isOpen: boolean) => void;
     setInstanceId: (id: string) => void;

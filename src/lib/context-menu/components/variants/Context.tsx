@@ -1,7 +1,5 @@
-import type { MenuVariantContextItem } from "@/lib/context-menu";
+import type { MenuVariantContext, MenuVariantContextItem } from "@/lib/context-menu";
 import type { MenuSharedProps } from "@/lib/context-menu/components/Menu";
-
-import { MenuVariant } from "@/lib/context-menu";
 
 import clsx from "clsx";
 import Link from "next/link";
@@ -40,15 +38,11 @@ const MenuContextVariantItem = ({ icon: Icon, name, onClick: onItemClick, href, 
     );
 };
 
-const MenuContextVariant = ({ variant, innerRef, closeMenu, ...props }: MenuSharedProps) => {
+const MenuContextVariant = ({ lists, innerRef, closeMenu, ...props }: MenuSharedProps & Omit<MenuVariantContext, "type">) => {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
 
-    const { type, lists } = variant;
-
     useEffect(() => {
-        if (type !== MenuVariant.Context) return;
-
         const handleKeyDown = (e: KeyboardEvent) => {
             e.preventDefault();
 
@@ -92,9 +86,7 @@ const MenuContextVariant = ({ variant, innerRef, closeMenu, ...props }: MenuShar
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [activeIndex, closeMenu, lists, lists.length, router, type]);
-
-    if (type !== MenuVariant.Context) return null;
+    }, [activeIndex, closeMenu, lists, lists.length, router]);
 
     return (
         <section ref={innerRef} {...props} className="fixed flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
