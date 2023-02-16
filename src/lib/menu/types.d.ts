@@ -46,9 +46,11 @@ export type MenuVariantContextItem = {
  */
 
 export type MenuVariantMemberList = {
+    title?: string;
     type: MenuVariant.MemberList;
     lists: User[];
     onSelect: (user: User) => void;
+    onBack?: () => void;
 };
 
 /**
@@ -58,9 +60,11 @@ export type MenuVariantMemberList = {
  */
 
 export type MenuVariantLabelList = {
+    title?: string;
     type: MenuVariant.LabelList;
     lists: Label[];
     onSelect: (label: Label) => void;
+    onBack?: () => void;
 };
 
 /**
@@ -70,9 +74,12 @@ export type MenuVariantLabelList = {
  */
 
 export type MenuVariantForm = {
+    title?: string;
     type: MenuVariant.Forms;
     lists: MenuVariantFormItem[];
+    submitButtonLabel?: string;
     onSubmit: (values: Record<string, string>) => void;
+    onBack?: () => void;
 };
 
 export type MenuVariantFormItem = MenuFormVariantType & {
