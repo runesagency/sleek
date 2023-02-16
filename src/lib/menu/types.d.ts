@@ -48,7 +48,7 @@ export type MenuVariantContextItem = {
 export type MenuVariantMemberList = {
     type: MenuVariant.MemberList;
     lists: User[];
-    onClick: (user: User) => void;
+    onSelect: (user: User) => void;
 };
 
 /**
@@ -60,7 +60,7 @@ export type MenuVariantMemberList = {
 export type MenuVariantLabelList = {
     type: MenuVariant.LabelList;
     lists: Label[];
-    onClick: (label: Label) => void;
+    onSelect: (label: Label) => void;
 };
 
 /**

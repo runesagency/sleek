@@ -142,7 +142,7 @@ const Menu = () => {
             }
 
             case MenuVariant.MemberList: {
-                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onClick={data.onClick} />;
+                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onSelect={data.onSelect} />;
             }
         }
     }
