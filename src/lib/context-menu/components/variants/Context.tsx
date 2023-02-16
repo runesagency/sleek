@@ -1,4 +1,4 @@
-import type { MenuVariantContextItem as DefaultMenuVariantContextItemType } from "@/lib/context-menu";
+import type { MenuVariantContextItem } from "@/lib/context-menu";
 import type { MenuSharedProps } from "@/lib/context-menu/components/Menu";
 
 import { MenuVariant } from "@/lib/context-menu";
@@ -8,14 +8,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { memo, useCallback, useEffect, useState } from "react";
 
-type MenuVariantContextItemType = DefaultMenuVariantContextItemType & {
+type MenuContextVariantItemProps = MenuVariantContextItem & {
     index: number;
     activeIndex: number;
     closeMenu: () => void;
     setActiveIndex: (index: number) => void;
 };
 
-const MenuVariantContextItem = ({ icon: Icon, name, onClick: onItemClick, href, index, activeIndex, closeMenu, setActiveIndex }: MenuVariantContextItemType) => {
+const MenuContextVariantItem = ({ icon: Icon, name, onClick: onItemClick, href, index, activeIndex, closeMenu, setActiveIndex }: MenuContextVariantItemProps) => {
     const Component = href ? Link : "button";
 
     const onClick = useCallback(() => {
@@ -40,7 +40,7 @@ const MenuVariantContextItem = ({ icon: Icon, name, onClick: onItemClick, href, 
     );
 };
 
-const MenuVariantContext = ({ variant, innerRef, closeMenu, ...props }: MenuSharedProps) => {
+const MenuContextVariant = ({ variant, innerRef, closeMenu, ...props }: MenuSharedProps) => {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -99,10 +99,10 @@ const MenuVariantContext = ({ variant, innerRef, closeMenu, ...props }: MenuShar
     return (
         <section ref={innerRef} {...props} className="fixed flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
             {lists.map((props, index) => (
-                <MenuVariantContextItem key={props.name} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} />
+                <MenuContextVariantItem key={props.name} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} />
             ))}
         </section>
     );
 };
 
-export default memo(MenuVariantContext);
+export default memo(MenuContextVariant);

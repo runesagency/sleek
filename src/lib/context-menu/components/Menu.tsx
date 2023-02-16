@@ -2,7 +2,7 @@ import type { MenuVariantType } from "@/lib/context-menu";
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 import { MenuContext, MenuVariant, MenuPosition } from "@/lib/context-menu";
-import MenuVariantContext from "@/lib/context-menu/components/variants/MenuVariantContext";
+import MenuContextVariant from "@/lib/context-menu/components/variants/Context";
 
 import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
@@ -146,7 +146,7 @@ const Menu = () => {
         };
 
         if (type === MenuVariant.Context) {
-            return <MenuVariantContext variant={{ type, lists }} {...sharedProps} />;
+            return <MenuContextVariant variant={{ type, lists }} {...sharedProps} />;
         }
     }
 
