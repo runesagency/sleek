@@ -4,8 +4,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 
 import RouterTransition from "@/components/RouterTransition";
-import ContextMenu from "@/lib/context-menu/ContextMenu";
-import ContextMenuProvider from "@/lib/context-menu/ContextMenuProvider";
+import { Menu, MenuProvider } from "@/lib/context-menu";
 
 import { Manrope } from "@next/font/google";
 import clsx from "clsx";
@@ -26,10 +25,10 @@ const manrope = Manrope({
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     return (
         <SessionProvider session={session}>
-            <ContextMenuProvider>
+            <MenuProvider>
                 <main className={clsx(manrope.variable, "h-full w-full font-sans")}>
                     <RouterTransition />
-                    <ContextMenu />
+                    <Menu />
 
                     <Component {...pageProps} />
 
@@ -47,7 +46,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
                         limit={5}
                     />
                 </main>
-            </ContextMenuProvider>
+            </MenuProvider>
         </SessionProvider>
     );
 }

@@ -1,11 +1,20 @@
+import type { MenuVariantType } from "@/lib/context-menu";
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
-import { ContextMenuContext, ControlledMenuVariant, TargetPosition } from ".";
+import { MenuContext, MenuVariant, MenuPosition } from "@/lib/context-menu";
+import MenuVariantContext from "@/lib/context-menu/variants/MenuVariantContext";
 
-import { useEffect, useState, memo, useContext, useRef } from "react";
+import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
-const ContextMenu = () => {
+export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref"> & {
+    variant: MenuVariantType;
+    innerRef: React.RefObject<HTMLDivElement>;
+    closeMenu: () => void;
+};
+
+const Menu = () => {
     const menuRef = useRef<HTMLDivElement>(null);
+
     const {
         isOpen,
         offset, //
@@ -15,11 +24,15 @@ const ContextMenu = () => {
         type,
         setOpen,
         clientCoordinates,
-    } = useContext(ContextMenuContext);
+    } = useContext(MenuContext);
 
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
     const { x: clientX, y: clientY } = clientCoordinates.current;
     const { x: offsetX, y: offsetY } = offset.current;
+
+    const closeMenu = useCallback(() => {
+        setOpen(false);
+    }, [setOpen]);
 
     useEffect(() => {
         const menuElement = menuRef.current;
@@ -71,7 +84,7 @@ const ContextMenu = () => {
             }
 
             if (!colliderOffsetX && posX + cursorOffsetX + menuElement.offsetWidth > windowWidth) {
-                if (targetPosition.current === TargetPosition.Cursor) {
+                if (targetPosition.current === MenuPosition.Cursor) {
                     colliderOffsetX = posX + cursorOffsetX + menuElement.offsetWidth - windowWidth;
                 } else {
                     colliderOffsetX = posX + width + menuElement.offsetWidth - windowWidth;
@@ -79,7 +92,7 @@ const ContextMenu = () => {
             }
 
             if (!colliderOffsetY && posY + cursorOffsetY + menuElement.offsetHeight > windowHeight) {
-                if (targetPosition.current === TargetPosition.Cursor) {
+                if (targetPosition.current === MenuPosition.Cursor) {
                     colliderOffsetY = posY + cursorOffsetY + menuElement.offsetHeight - windowHeight;
                 } else {
                     colliderOffsetY = posY + height + menuElement.offsetHeight - windowHeight;
@@ -87,12 +100,12 @@ const ContextMenu = () => {
             }
 
             let usedX =
-                targetPosition.current === TargetPosition.Cursor //
+                targetPosition.current === MenuPosition.Cursor //
                     ? posX + cursorOffsetX
                     : posX + width;
 
             let usedY =
-                targetPosition.current === TargetPosition.Cursor //
+                targetPosition.current === MenuPosition.Cursor //
                     ? posY + cursorOffsetY
                     : posY;
 
@@ -123,29 +136,21 @@ const ContextMenu = () => {
     }, [isOpen, targetRef, setOpen, clientX, clientY, targetPosition, offsetX, offsetY]);
 
     if (isOpen) {
-        const sharedProps: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> = {
-            ref: menuRef,
+        const sharedProps: Omit<MenuSharedProps, "variant"> = {
+            innerRef: menuRef,
+            closeMenu,
             style: {
                 transform: `translate(${coordinates.x}px, ${coordinates.y}px)`,
                 zIndex: 999999,
             },
         };
 
-        if (type === ControlledMenuVariant.ContextMenu) {
-            return (
-                <section {...sharedProps} className="fixed flex flex-col rounded-lg border border-dark-600 bg-dark-700 text-white">
-                    {lists.map(({ icon: Icon, name }, index) => (
-                        <button key={index} className="flex items-center gap-3 px-5 py-3">
-                            <Icon height={16} width={undefined} />
-                            <span className="ts-sm">{name}</span>
-                        </button>
-                    ))}
-                </section>
-            );
+        if (type === MenuVariant.Context) {
+            return <MenuVariantContext variant={{ type, lists }} {...sharedProps} />;
         }
     }
 
     return null;
 };
 
-export default memo(ContextMenu);
+export default memo(Menu);

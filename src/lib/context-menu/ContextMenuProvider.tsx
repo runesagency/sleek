@@ -1,24 +1,24 @@
-import type { ControlledMenuContextProps, ControlledMenuVariantType } from ".";
+import type { MenuContextProps, MenuVariantType } from "@/lib/context-menu";
 
-import { ControlledMenuVariant, ContextMenuContext, TargetPosition } from ".";
+import { MenuVariant, MenuContext, MenuPosition } from "@/lib/context-menu";
 
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 
-type ContextMenuProviderProps = {
+type MenuProviderProps = {
     children: React.ReactNode;
 };
 
-const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
+const MenuProvider = ({ children }: MenuProviderProps) => {
     const targetRef = useRef<HTMLElement | null>(null);
-    const targetPosition = useRef<TargetPosition>(TargetPosition.Element);
+    const targetPosition = useRef<MenuPosition>(MenuPosition.Element);
     const clientCoordinates = useRef({ x: 0, y: 0 });
     const offset = useRef({ x: 0, y: 0 });
 
     const [isOpen, setOpen] = useState(false);
     const [instanceId, setInstanceId] = useState("");
 
-    const [variant, setVariant] = useState<ControlledMenuVariantType>({
-        type: ControlledMenuVariant.ContextMenu,
+    const [variant, setVariant] = useState<MenuVariantType>({
+        type: MenuVariant.Context,
         lists: [],
     });
 
@@ -30,7 +30,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         clientCoordinates.current = { x, y };
     }, []);
 
-    const setTargetPosition = useCallback((position: TargetPosition) => {
+    const setTargetPosition = useCallback((position: MenuPosition) => {
         targetPosition.current = position;
     }, []);
 
@@ -38,7 +38,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         offset.current = { x, y };
     }, []);
 
-    const contextValue = useMemo<ControlledMenuContextProps>(() => {
+    const contextValue = useMemo<MenuContextProps>(() => {
         const defaultProps = {
             targetRef,
             offset,
@@ -70,7 +70,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         };
     }, [instanceId, isOpen, setClientCoordinates, setOffset, setTargetPosition, setTargetRef, variant]);
 
-    return <ContextMenuContext.Provider value={contextValue}>{children}</ContextMenuContext.Provider>;
+    return <MenuContext.Provider value={contextValue}>{children}</MenuContext.Provider>;
 };
 
-export default memo(ContextMenuProvider);
+export default memo(MenuProvider);

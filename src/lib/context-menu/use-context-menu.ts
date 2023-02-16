@@ -1,19 +1,19 @@
-import type { ControlledMenuVariantType } from ".";
+import type { MenuVariantType } from "@/lib/context-menu";
 
-import { TargetPosition, ContextMenuContext } from ".";
+import { MenuPosition, MenuContext } from "@/lib/context-menu";
 
 import { useId } from "@mantine/hooks";
 import { useCallback, useContext } from "react";
 
-export type MenuOptions = ControlledMenuVariantType & {
-    position?: TargetPosition;
+export type MenuOptions = MenuVariantType & {
+    position?: MenuPosition;
     offset?: {
         x: number;
         y: number;
     };
 };
 
-export default function useContextMenu() {
+export default function useMenu() {
     const currentInstanceId = useId();
     const {
         isOpen, //
@@ -25,7 +25,7 @@ export default function useContextMenu() {
         setInstanceId,
         setTargetPosition,
         setClientCoordinates,
-    } = useContext(ContextMenuContext);
+    } = useContext(MenuContext);
 
     /**
      * @description
@@ -41,7 +41,7 @@ export default function useContextMenu() {
             setTargetRef(event.currentTarget as HTMLElement);
             setVariant(options);
             setClientCoordinates(event.clientX, event.clientY);
-            setTargetPosition(options.position ?? TargetPosition.Element);
+            setTargetPosition(options.position ?? MenuPosition.Element);
             setOffset(options.offset?.x ?? 0, options.offset?.y ?? 0);
         },
         [setOpen, setInstanceId, currentInstanceId, setTargetRef, setVariant, setClientCoordinates, setTargetPosition, setOffset]
