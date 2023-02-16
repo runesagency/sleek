@@ -5,8 +5,8 @@ import Link from "next/link";
 
 export default function Project() {
     return (
-        <Link href="/app/project/123" className="flex items-start gap-4 rounded-lg border border-dark-500 bg-dark-600 p-4">
-            <img src="https://picsum.photos/1080" alt="banner" className="h-full w-1/3 shrink-0 rounded-lg object-cover object-center" />
+        <Link href="/app/project/123" onContextMenu={onContextMenu} className="flex flex-col items-start gap-4 rounded-lg border border-dark-500 bg-dark-600 p-4 xl:flex-row">
+            <img src="https://picsum.photos/1080" alt="banner" className="h-32 w-full shrink-0 rounded-lg object-cover object-center xl:h-full xl:w-1/3" />
 
             <div className="flex flex-col gap-4 overflow-hidden">
                 <div className="flex items-center gap-2">

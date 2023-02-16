@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function AppUserHomePage() {
     return (
-        <AppPageLayout className="flex flex-col gap-10 px-20 py-10">
+        <AppPageLayout className="flex flex-col gap-10 p-10 md:px-20">
             <section className="flex flex-col gap-5">
                 <div className="flex flex-col gap-3">
                     <h2 className="ts-2xl">Organization 001</h2>
@@ -19,7 +19,7 @@ export default function AppUserHomePage() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-3 gap-5">
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                     <Project />
                     <Project />
                     <Project />
