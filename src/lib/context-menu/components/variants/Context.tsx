@@ -89,7 +89,7 @@ const MenuContextVariant = ({ lists, innerRef, closeMenu, ...props }: MenuShared
     }, [activeIndex, closeMenu, lists, lists.length, router]);
 
     return (
-        <section ref={innerRef} {...props} className="fixed flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
+        <section ref={innerRef} {...props} className="flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
             {lists.map((props, index) => (
                 <MenuContextVariantItem key={props.name} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} />
             ))}
