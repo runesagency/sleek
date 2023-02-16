@@ -3,8 +3,9 @@ import "@/styles/globals.css";
 
 import type { AppProps } from "next/app";
 
-import ContextMenu from "@/components/ContextMenu";
 import RouterTransition from "@/components/RouterTransition";
+import ContextMenu from "@/lib/context-menu/ContextMenu";
+import ContextMenuProvider from "@/lib/context-menu/ContextMenuProvider";
 
 import { Manrope } from "@next/font/google";
 import clsx from "clsx";
@@ -25,26 +26,28 @@ const manrope = Manrope({
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
     return (
         <SessionProvider session={session}>
-            <main className={clsx(manrope.variable, "h-full w-full font-sans")}>
-                <RouterTransition />
-                <ContextMenu />
+            <ContextMenuProvider>
+                <main className={clsx(manrope.variable, "h-full w-full font-sans")}>
+                    <RouterTransition />
+                    <ContextMenu />
 
-                <Component {...pageProps} />
+                    <Component {...pageProps} />
 
-                <ToastContainer
-                    position="top-right" //
-                    autoClose={5000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="dark"
-                    limit={5}
-                />
-            </main>
+                    <ToastContainer
+                        position="top-right" //
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="dark"
+                        limit={5}
+                    />
+                </main>
+            </ContextMenuProvider>
         </SessionProvider>
     );
 }
