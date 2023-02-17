@@ -10,7 +10,7 @@ import clsx from "clsx";
 import { useRouter } from "next/router";
 import { memo, useCallback, useEffect, useState } from "react";
 
-type MenuMemberListVariantItemProps = User & {
+type MenuMemberListComponentItemProps = User & {
     index: number;
     activeIndex: number;
     closeMenu: () => void;
@@ -18,7 +18,7 @@ type MenuMemberListVariantItemProps = User & {
     setActiveIndex: (index: number) => void;
 };
 
-const MenuMemberListVariantItem = ({ onItemClick, index, activeIndex, closeMenu, setActiveIndex, ...props }: MenuMemberListVariantItemProps) => {
+const MenuMemberListComponentItem = ({ onItemClick, index, activeIndex, closeMenu, setActiveIndex, ...props }: MenuMemberListComponentItemProps) => {
     const { name } = props;
 
     const onClick = useCallback(() => {
@@ -38,7 +38,9 @@ const MenuMemberListVariantItem = ({ onItemClick, index, activeIndex, closeMenu,
     );
 };
 
-const MenuMemberListVariant = ({ lists, onSelect: onClick, onBack, title, innerRef, closeMenu, ...props }: MenuSharedProps & Omit<MenuVariantMemberList, "type">) => {
+type MenuMemberListComponent = MenuSharedProps & Omit<MenuVariantMemberList, "type">;
+
+const MenuMemberListComponent = ({ lists, onSelect: onClick, onBack, title, innerRef, closeMenu, ...props }: MenuMemberListComponent) => {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
     const [filter, setFilter] = useState("");
@@ -117,7 +119,7 @@ const MenuMemberListVariant = ({ lists, onSelect: onClick, onBack, title, innerR
 
                 <div className="flex flex-col gap-2">
                     {filteredLists.map((props, index) => (
-                        <MenuMemberListVariantItem key={index} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} onItemClick={onClick} />
+                        <MenuMemberListComponentItem key={index} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} onItemClick={onClick} />
                     ))}
                 </div>
             </main>
@@ -125,4 +127,4 @@ const MenuMemberListVariant = ({ lists, onSelect: onClick, onBack, title, innerR
     );
 };
 
-export default memo(MenuMemberListVariant);
+export default memo(MenuMemberListComponent);

@@ -6,14 +6,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { memo, useCallback, useEffect, useState } from "react";
 
-type MenuContextVariantItemProps = MenuVariantContextItem & {
+type MenuContextComponentItemProps = MenuVariantContextItem & {
     index: number;
     activeIndex: number;
     closeMenu: () => void;
     setActiveIndex: (index: number) => void;
 };
 
-const MenuContextVariantItem = ({ icon: Icon, name, onClick: onItemClick, href, index, activeIndex, closeMenu, setActiveIndex }: MenuContextVariantItemProps) => {
+const MenuContextComponentItem = ({ icon: Icon, name, onClick: onItemClick, href, index, activeIndex, closeMenu, setActiveIndex }: MenuContextComponentItemProps) => {
     const Component = href ? Link : "button";
 
     const onClick = useCallback(() => {
@@ -38,7 +38,9 @@ const MenuContextVariantItem = ({ icon: Icon, name, onClick: onItemClick, href, 
     );
 };
 
-const MenuContextVariant = ({ lists, innerRef, closeMenu, ...props }: MenuSharedProps & Omit<MenuVariantContext, "type">) => {
+type MenuContextComponentProps = MenuSharedProps & Omit<MenuVariantContext, "type">;
+
+const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuContextComponentProps) => {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -91,10 +93,10 @@ const MenuContextVariant = ({ lists, innerRef, closeMenu, ...props }: MenuShared
     return (
         <section ref={innerRef} {...props} className="flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
             {lists.map((props, index) => (
-                <MenuContextVariantItem key={props.name} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} />
+                <MenuContextComponentItem key={props.name} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} />
             ))}
         </section>
     );
 };
 
-export default memo(MenuContextVariant);
+export default memo(MenuContextComponent);

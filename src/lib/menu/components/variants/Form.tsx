@@ -11,11 +11,11 @@ import { MenuFormVariant as MenuFormVariantSelection } from "@/lib/menu";
 import { IconChevronLeft } from "@tabler/icons";
 import { memo, useCallback, useState } from "react";
 
-type MenuFormVariantItemProps = MenuVariantFormItem & {
+type MenuFormComponentItemProps = MenuVariantFormItem & {
     setValue: (id: string, value: unknown) => void;
 };
 
-const MenuFormVariantItem = ({ id, label, props, type, setValue }: MenuFormVariantItemProps) => {
+const MenuFormComponentItem = ({ id, label, props, type, setValue }: MenuFormComponentItemProps) => {
     const onChange = useCallback(
         (e: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
             const { value } = e.currentTarget;
@@ -46,7 +46,9 @@ const MenuFormVariantItem = ({ id, label, props, type, setValue }: MenuFormVaria
     );
 };
 
-const MenuFormVariant = ({ lists, onSubmit: onFormSubmit, onBack, title, innerRef, closeMenu, ...props }: MenuSharedProps & Omit<MenuVariantForm, "type">) => {
+type MenuFormComponentProps = MenuSharedProps & Omit<MenuVariantForm, "type">;
+
+const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, innerRef, closeMenu, ...props }: MenuFormComponentProps) => {
     const [values, setValues] = useState<Record<string, unknown>>({});
 
     const onReturnBack = useCallback(() => {
@@ -87,7 +89,7 @@ const MenuFormVariant = ({ lists, onSubmit: onFormSubmit, onBack, title, innerRe
 
             <form onSubmit={onSubmit} className="grid gap-5 p-5">
                 {lists.map((props, index) => (
-                    <MenuFormVariantItem key={index} {...props} setValue={onValueSet} />
+                    <MenuFormComponentItem key={index} {...props} setValue={onValueSet} />
                 ))}
 
                 <Button.Large type="submit">Submit</Button.Large>
@@ -96,4 +98,4 @@ const MenuFormVariant = ({ lists, onSubmit: onFormSubmit, onBack, title, innerRe
     );
 };
 
-export default memo(MenuFormVariant);
+export default memo(MenuFormComponent);

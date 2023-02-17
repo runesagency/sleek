@@ -1,9 +1,9 @@
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 import { MenuContext, MenuVariant, MenuAnchor, MenuDirection, MenuAlignment } from "@/lib/menu";
-import MenuContextVariant from "@/lib/menu/components/variants/Context";
-import MenuFormVariant from "@/lib/menu/components/variants/Form";
-import MenuMemberListVariant from "@/lib/menu/components/variants/MemberList";
+import MenuContextComponent from "@/lib/menu/components/variants/Context";
+import MenuFormComponent from "@/lib/menu/components/variants/Form";
+import MenuMemberListComponent from "@/lib/menu/components/variants/MemberList";
 
 import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
@@ -353,15 +353,15 @@ const Menu = () => {
 
         switch (data.type) {
             case MenuVariant.Context: {
-                return <MenuContextVariant {...sharedProps} lists={data.lists} />;
+                return <MenuContextComponent {...sharedProps} lists={data.lists} />;
             }
 
             case MenuVariant.MemberList: {
-                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onSelect={data.onSelect} onBack={data.onBack} title={data.title} />;
+                return <MenuMemberListComponent {...sharedProps} lists={data.lists} onSelect={data.onSelect} onBack={data.onBack} title={data.title} />;
             }
 
             case MenuVariant.Forms: {
-                return <MenuFormVariant {...sharedProps} lists={data.lists} onSubmit={data.onSubmit} onBack={data.onBack} title={data.title} submitButtonLabel={data.submitButtonLabel} />;
+                return <MenuFormComponent {...sharedProps} lists={data.lists} onSubmit={data.onSubmit} onBack={data.onBack} title={data.title} submitButtonLabel={data.submitButtonLabel} />;
             }
         }
     }
