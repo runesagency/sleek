@@ -191,7 +191,7 @@ const Navigation = ({ className }: NavigationProps) => {
 
         const notifyErrorIfExist = (errorMessages: Record<string, string>) => {
             if (errorCode) {
-                const errorMessage = errorMessages[errorCode.toLowerCase() as keyof typeof errorMessages] || errorMessages.default;
+                const errorMessage = errorMessages[errorCode.toLowerCase()] || errorMessages.default;
                 notify(errorCode, errorMessage, "error");
             }
         };

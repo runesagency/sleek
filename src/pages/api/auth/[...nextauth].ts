@@ -66,12 +66,16 @@ const getAdapter = (): Adapter => {
                 },
             });
 
+            if (!defaultRole) {
+                throw new Error("No default role found for new users.");
+            }
+
             const newUser = await prisma.users.create({
                 data: {
                     email: data.email,
                     name: data.name ?? "Guest",
                     verified_at: data.emailVerified,
-                    role_id: defaultRole?.id as string,
+                    role_id: defaultRole.id,
                 },
             });
 
@@ -300,8 +304,8 @@ const getProviders = () => {
     if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
         providers.push(
             DiscordProvider({
-                clientId: process.env.DISCORD_CLIENT_ID as string,
-                clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
+                clientId: process.env.DISCORD_CLIENT_ID,
+                clientSecret: process.env.DISCORD_CLIENT_SECRET,
             })
         );
     }
@@ -309,8 +313,8 @@ const getProviders = () => {
     if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         providers.push(
             GoogleProvider({
-                clientId: process.env.GOOGLE_CLIENT_ID as string,
-                clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             })
         );
     }
