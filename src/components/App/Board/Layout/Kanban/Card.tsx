@@ -4,7 +4,7 @@ import { SortableType } from ".";
 
 import Label from "@/components/DataDisplay/Label";
 import { Button } from "@/components/Forms";
-import useDraggable from "@/lib/hooks/drag-and-drop/use-draggable";
+import useDraggable from "@/lib/drag-and-drop/use-draggable";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";

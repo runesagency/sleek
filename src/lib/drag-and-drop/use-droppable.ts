@@ -1,6 +1,6 @@
-import type { DragEndEvent, DragEnterEvent, DragLeaveEvent } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
+import type { DragEndEvent, DragEnterEvent, DragLeaveEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
 
-import { constants as contextConstants } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
+import { constants as contextConstants } from "@/lib/drag-and-drop/use-drag-drop-context";
 
 import { useEffect, useRef } from "react";
 

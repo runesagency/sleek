@@ -4,8 +4,8 @@ import { SortableType } from ".";
 
 import Card from "@/components/App/Board/Layout/Kanban/Card";
 import { Button, Textarea } from "@/components/Forms";
-import useDraggable from "@/lib/hooks/drag-and-drop/use-draggable";
-import useDroppable, { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
+import useDraggable from "@/lib/drag-and-drop/use-draggable";
+import useDroppable, { SortableDirection } from "@/lib/drag-and-drop/use-droppable";
 
 import autoAnimate, { getTransitionSizes } from "@formkit/auto-animate";
 import { useAutoAnimate } from "@formkit/auto-animate/react";

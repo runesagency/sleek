@@ -1,7 +1,7 @@
-import type { DragCancelEvent, DragEndEvent, DragEnterEvent, DragLeaveEvent, DragStartEvent } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
+import type { DragCancelEvent, DragEndEvent, DragEnterEvent, DragLeaveEvent, DragStartEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
 
-import { constants as contextConstants } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
-import { SortableDirection, constants as droppableConstants } from "@/lib/hooks/drag-and-drop/use-droppable";
+import { constants as contextConstants } from "@/lib/drag-and-drop/use-drag-drop-context";
+import { SortableDirection, constants as droppableConstants } from "@/lib/drag-and-drop/use-droppable";
 
 import { useCallback, useRef, useState, useEffect } from "react";
 

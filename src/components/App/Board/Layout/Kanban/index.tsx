@@ -1,11 +1,11 @@
-import type { DragEvent } from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
+import type { DragEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
 import type { Card as CardType } from "@/lib/types";
 import type { LayoutProps } from "@/pages/app/board/[id]";
 
 import List, { NewCardLocation } from "@/components/App/Board/Layout/Kanban/List";
 import { Button } from "@/components/Forms";
-import useDragDropContext from "@/lib/hooks/drag-and-drop/use-drag-drop-context";
-import useDroppable, { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
+import useDragDropContext from "@/lib/drag-and-drop/use-drag-drop-context";
+import useDroppable, { SortableDirection } from "@/lib/drag-and-drop/use-droppable";
 import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
