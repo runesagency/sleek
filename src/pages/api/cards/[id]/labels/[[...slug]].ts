@@ -13,7 +13,7 @@ const router = createRouter<NextApiRequest & { params: Record<string, string> },
 router.post("/api/cards/:id/labels/:labelId", async (req, res) => {
     const { id, labelId } = req.params as { id: string; labelId: string };
 
-    await prisma.card_labels.create({
+    await prisma.cardLabel.create({
         data: {
             card_id: id,
             label_id: labelId,
@@ -30,7 +30,7 @@ router.post("/api/cards/:id/labels/:labelId", async (req, res) => {
 router.delete("/api/cards/:id/labels/:labelId", async (req, res) => {
     const { id, labelId } = req.params as { id: string; labelId: string };
 
-    await prisma.card_labels.deleteMany({
+    await prisma.cardLabel.deleteMany({
         where: {
             card_id: id,
             label_id: labelId,

@@ -1,6 +1,6 @@
 import type { MenuVariantMemberList } from "@/lib/menu";
 import type { MenuSharedProps } from "@/lib/menu/components/Menu";
-import type { users as User } from "@prisma/client";
+import type { User } from "@prisma/client";
 
 import { Input } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";

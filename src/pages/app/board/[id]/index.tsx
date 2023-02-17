@@ -27,7 +27,7 @@ export type LayoutProps = PageProps & {
 export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]: unknown }> = async ({ query }) => {
     const boardId = query.id as string;
 
-    const board = await prisma.boards.findUnique({
+    const board = await prisma.board.findUnique({
         where: {
             id: boardId,
         },
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
         };
     }
 
-    const lists = await prisma.lists.findMany({
+    const lists = await prisma.list.findMany({
         orderBy: {
             order: "asc",
         },
@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
         },
     });
 
-    const cards = await prisma.cards.findMany({
+    const cards = await prisma.card.findMany({
         where: {
             board_id: boardId,
         },
@@ -94,7 +94,7 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
         },
     });
 
-    const activities = await prisma.activities.findMany({
+    const activities = await prisma.activity.findMany({
         where: {
             object_type: {
                 in: ["CARD"],

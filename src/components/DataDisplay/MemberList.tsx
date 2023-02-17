@@ -1,5 +1,5 @@
 import type { ParsedSSRProps } from "@/lib/utils/parse-ssr-props";
-import type { users as User } from "@prisma/client";
+import type { User } from "@prisma/client";
 
 import Avatar from "@/components/Miscellaneous/Avatar";
 

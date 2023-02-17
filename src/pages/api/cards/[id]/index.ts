@@ -1,4 +1,4 @@
-import type { Card as CardType } from "@/lib/types";
+import type { Card } from "@/lib/types";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "@/lib/prisma";
@@ -14,7 +14,7 @@ const router = createRouter<NextApiRequest & { params: Record<string, string> },
 router.get(async (req, res) => {
     const { id } = req.params as { id: string };
 
-    const card = await prisma.cards.findUnique({
+    const card = await prisma.card.findUnique({
         where: { id },
     });
 
@@ -28,13 +28,13 @@ router.get(async (req, res) => {
 /**
  * PATCH /api/cards/:id
  * @summary Edit a card data
- * @param {CardType} card - A card object with updated data
+ * @param {Card} card - A card object with updated data
  */
 router.patch(async (req, res) => {
     const { id } = req.params as { id: string };
-    const card: CardType = req.body;
+    const card: Card = req.body;
 
-    await prisma.cards.update({
+    await prisma.card.update({
         where: {
             id,
         },
@@ -60,7 +60,7 @@ router.patch(async (req, res) => {
 router.delete(async (req, res) => {
     const { id } = req.params as { id: string };
 
-    await prisma.cards.delete({
+    await prisma.card.delete({
         where: { id },
     });
 

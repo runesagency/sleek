@@ -16,7 +16,7 @@ router.post(async (req, res) => {
     const usersId: string[] = req.body;
 
     usersId.map(async (userId) => {
-        await prisma.card_users.create({
+        await prisma.cardUser.create({
             data: {
                 user_id: userId,
                 card_id: id,
@@ -35,7 +35,7 @@ router.post(async (req, res) => {
 router.delete(async (req, res) => {
     const usersId: string[] = req.body;
 
-    await prisma.card_users.deleteMany({
+    await prisma.cardUser.deleteMany({
         where: {
             id: {
                 in: usersId,

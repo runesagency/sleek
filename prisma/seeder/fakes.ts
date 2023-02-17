@@ -1,10 +1,10 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import type { DefaultConfigurations, DefaultRoles } from "./defaults";
-import type { boards, lists, organizations, PrismaClient, projects, users } from "@prisma/client";
+import type { Board, List, Organization, PrismaClient, Project, User } from "@prisma/client";
 
 import { faker } from "@faker-js/faker";
 
-const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users) => {
+const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: User) => {
     const length = faker.datatype.number({ min: 0, max: 2 });
     if (length === 0) return;
 
@@ -14,10 +14,10 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
 
     while (index < length) {
         // List of users in the organization that can create projects
-        let members: users[] = [user];
+        let members: User[] = [user];
 
         // Create the organization
-        const organization = await prisma.organizations.create({
+        const organization = await prisma.organization.create({
             data: {
                 name: faker.company.name(),
                 description: faker.company.catchPhrase(),
@@ -34,14 +34,14 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
         if (addUser) {
             console.log(`> 🤝 He/She also thinking about adding another user to the organization...`);
 
-            const anotherUsers = await prisma.users.findMany({
+            const anotherUsers = await prisma.user.findMany({
                 take: faker.datatype.number({ min: 1, max: 3 }),
             });
 
             for (const invitedUser of anotherUsers) {
                 const roleGiven = faker.helpers.arrayElement([roles.organization.ADMIN, roles.organization.MANAGER, roles.organization.MEMBER]);
 
-                await prisma.organization_users.create({
+                await prisma.organizationUser.create({
                     data: {
                         user_id: invitedUser.id,
                         organization_id: organization.id,
@@ -67,7 +67,7 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
     }
 };
 
-const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users, organization: organizations) => {
+const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: User, organization: Organization) => {
     const length = faker.datatype.number({ min: 0, max: 2 });
     if (length === 0) return;
 
@@ -77,10 +77,10 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
 
     while (index < length) {
         // List of users in the project that can create boards
-        let members: users[] = [user];
+        let members: User[] = [user];
 
         // Create the project
-        const project = await prisma.projects.create({
+        const project = await prisma.project.create({
             data: {
                 name: faker.commerce.productName(),
                 description: faker.commerce.productDescription(),
@@ -92,7 +92,7 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
             },
         });
 
-        await prisma.project_users.create({
+        await prisma.projectUser.create({
             data: {
                 user_id: user.id,
                 project_id: project.id,
@@ -109,14 +109,14 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
         if (addUser) {
             console.log(`> 🤝 He/She wants another user to the project...`);
 
-            const anotherUsers = await prisma.users.findMany({
+            const anotherUsers = await prisma.user.findMany({
                 take: faker.datatype.number({ min: 1, max: 3 }),
             });
 
             for (const invitedUser of anotherUsers) {
                 const roleGiven = faker.helpers.arrayElement([roles.project.ADMIN, roles.project.MEMBER]);
 
-                await prisma.project_users.create({
+                await prisma.projectUser.create({
                     data: {
                         user_id: invitedUser.id,
                         project_id: project.id,
@@ -139,7 +139,7 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
         if (addOrganization) {
             console.log(`> 🤝 Because he/she is a rich person, he/she then contacting another organization to the project...`);
 
-            const anotherOrganizations = await prisma.organizations.findMany({
+            const anotherOrganizations = await prisma.organization.findMany({
                 take: faker.datatype.number({ min: 1, max: 3 }),
                 where: {
                     id: {
@@ -151,7 +151,7 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
             for (const invitedOrganization of anotherOrganizations) {
                 const roleGiven = faker.helpers.arrayElement([roles.project.ADMIN, roles.project.MEMBER]);
 
-                await prisma.project_organizations.create({
+                await prisma.projectOrganization.create({
                     data: {
                         organization_id: invitedOrganization.id,
                         project_id: project.id,
@@ -177,7 +177,7 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
     }
 };
 
-const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: users, project: projects) => {
+const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: User, project: Project) => {
     const length = faker.datatype.number({ min: 0, max: 5 });
     if (length === 0) return;
 
@@ -187,10 +187,10 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
 
     while (index < length) {
         // List of users in the board that can create lists and cards
-        let members: users[] = [user];
+        let members: User[] = [user];
 
         // Create the board
-        const board = await prisma.boards.create({
+        const board = await prisma.board.create({
             data: {
                 name: faker.commerce.productName(),
                 description: faker.commerce.productDescription(),
@@ -201,7 +201,7 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
             },
         });
 
-        await prisma.board_users.create({
+        await prisma.boardUser.create({
             data: {
                 user_id: user.id,
                 board_id: board.id,
@@ -218,14 +218,14 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
         if (addUser) {
             console.log(`> 🤝 ${user.name} wants another user to the board...`);
 
-            const anotherUsers = await prisma.users.findMany({
+            const anotherUsers = await prisma.user.findMany({
                 take: faker.datatype.number({ min: 1, max: 3 }),
             });
 
             for (const invitedUser of anotherUsers) {
                 const roleGiven = faker.helpers.arrayElement([roles.board.ADMIN, roles.board.MEMBER, roles.board.GUEST]);
 
-                await prisma.board_users.create({
+                await prisma.boardUser.create({
                     data: {
                         user_id: invitedUser.id,
                         board_id: board.id,
@@ -248,7 +248,7 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
         if (addOrganization) {
             console.log(`> 🤝 ${user.name} wants another organization to the board...`);
 
-            const anotherOrganizations = await prisma.organizations.findMany({
+            const anotherOrganizations = await prisma.organization.findMany({
                 take: faker.datatype.number({ min: 1, max: 3 }),
                 where: {
                     id: {
@@ -260,7 +260,7 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
             for (const invitedOrganization of anotherOrganizations) {
                 const roleGiven = faker.helpers.arrayElement([roles.board.ADMIN, roles.board.MEMBER, roles.board.GUEST]);
 
-                await prisma.board_organizations.create({
+                await prisma.boardOrganization.create({
                     data: {
                         organization_id: invitedOrganization.id,
                         board_id: board.id,
@@ -286,7 +286,7 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
     }
 };
 
-const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: users, board: boards) => {
+const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: User, board: Board) => {
     const length = faker.datatype.number({ min: 1, max: 5 });
 
     console.log(`> To make ${board.name} successful, ${user.name} then create ${length} lists (steps) for the board...`);
@@ -294,7 +294,7 @@ const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurat
     let index = 0;
 
     while (index < length) {
-        const list = await prisma.lists.create({
+        const list = await prisma.list.create({
             data: {
                 title: faker.random.word(),
                 description: faker.commerce.productDescription(),
@@ -313,7 +313,7 @@ const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurat
     }
 };
 
-const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: users, board: boards, list: lists) => {
+const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: User, board: Board, list: List) => {
     const length = faker.datatype.number({ min: 0, max: 6 });
     if (length === 0) return;
 
@@ -322,7 +322,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
     let index = 0;
 
     while (index < length) {
-        const card = await prisma.cards.create({
+        const card = await prisma.card.create({
             data: {
                 title: faker.commerce.productName(),
                 description: faker.lorem.paragraphs(),
@@ -335,7 +335,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
 
         console.log(`Card: *${index + 1}. ${card.title}*`);
 
-        const availableBoardMembers = await prisma.users.findMany({
+        const availableBoardMembers = await prisma.user.findMany({
             where: {
                 boards: {
                     some: {
@@ -349,7 +349,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
         const addLabel = faker.datatype.boolean();
 
         if (addLabel) {
-            const availableLabels = await prisma.labels.findMany({
+            const availableLabels = await prisma.label.findMany({
                 where: {
                     OR: {
                         cards: {
@@ -367,7 +367,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
             if (availableLabels.length > 0) {
                 const labels = faker.helpers.arrayElements(availableLabels);
 
-                await prisma.card_labels.createMany({
+                await prisma.cardLabel.createMany({
                     data: labels.map((label) => ({
                         label_id: label.id,
                         adder_id: user.id,
@@ -381,7 +381,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                 let newLabelIndex = 0;
 
                 while (newLabelIndex < newLabelCount) {
-                    const label = await prisma.labels.create({
+                    const label = await prisma.label.create({
                         data: {
                             name: faker.random.word(),
                             description: faker.commerce.productDescription(),
@@ -407,7 +407,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
         if (addMember && availableBoardMembers.length > 0) {
             const members = faker.helpers.arrayElements(availableBoardMembers);
 
-            await prisma.card_users.createMany({
+            await prisma.cardUser.createMany({
                 data: members.map((member) => ({
                     card_id: card.id,
                     adder_id: user.id,
@@ -424,7 +424,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
 
         if (addTimer) {
             const isEnded = faker.datatype.boolean();
-            await prisma.card_timers.create({
+            await prisma.cardTimer.create({
                 data: {
                     card_id: card.id,
                     description: faker.commerce.productDescription(),
@@ -446,7 +446,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
             let checklistIndex = 0;
 
             while (checklistIndex < checklistTotal) {
-                const checklist = await prisma.card_checklists.create({
+                const checklist = await prisma.cardChecklist.create({
                     data: {
                         title: faker.commerce.productName(),
                         card_id: card.id,
@@ -460,7 +460,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                 let taskIndex = 0;
 
                 while (taskIndex < taskTotal) {
-                    const checklistItem = await prisma.card_checklist_tasks.create({
+                    const checklistItem = await prisma.cardChecklistTask.create({
                         data: {
                             title: faker.commerce.productName(),
                             checklist_id: checklist.id,
@@ -477,7 +477,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                     if (addMember && availableBoardMembers.length > 0) {
                         const member = faker.helpers.arrayElements(availableBoardMembers);
 
-                        await prisma.card_checklist_task_users.createMany({
+                        await prisma.cardChecklistTaskUser.createMany({
                             data: member.map((user) => ({
                                 task_id: checklistItem.id,
                                 adder_id: user.id,
@@ -509,7 +509,7 @@ export default async function fakeData(prisma: PrismaClient, roles: DefaultRoles
     let index = 0;
 
     while (index < usersLength) {
-        const user = await prisma.users.create({
+        const user = await prisma.user.create({
             data: {
                 name: faker.name.fullName(),
                 email: faker.internet.email(),

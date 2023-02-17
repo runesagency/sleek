@@ -1,4 +1,4 @@
-import type { Card as CardType } from "@/lib/types";
+import type { Card } from "@/lib/types";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "@/lib/prisma";
@@ -10,14 +10,14 @@ const router = createRouter<NextApiRequest & { params: Record<string, string> },
 /**
  * POST /api/cards
  * @summary Create a single or multiple cards
- * @param {CardType | CardType[]} cards - A card or an array of cards object
+ * @param {Card | Card[]} cards - A card or an array of cards object
  */
 router.post(async (req, res) => {
-    const sourceCards: CardType[] | CardType = req.body;
+    const sourceCards: Card[] | Card = req.body;
     const cards = Array.isArray(sourceCards) ? sourceCards : [sourceCards];
 
     const results = cards.map(async (card) => {
-        return await prisma.cards.create({
+        return await prisma.card.create({
             data: {
                 title: card.title,
                 description: card.description,
@@ -70,13 +70,13 @@ router.post(async (req, res) => {
 /**
  * PATCH /api/cards
  * @summary Edit multiple cards data
- * @param {CardType[]} cards - An array of cards object with updated data
+ * @param {Card[]} cards - An array of cards object with updated data
  */
 router.patch(async (req, res) => {
-    const cards: CardType[] = req.body;
+    const cards: Card[] = req.body;
 
     cards.map(async (card) => {
-        await prisma.cards.update({
+        await prisma.card.update({
             where: {
                 id: card.id,
             },
@@ -97,9 +97,9 @@ router.patch(async (req, res) => {
  * @summary Delete multiple cards
  */
 router.delete(async (req, res) => {
-    const cards: CardType[] = req.body;
+    const cards: Card[] = req.body;
 
-    await prisma.cards.deleteMany({
+    await prisma.card.deleteMany({
         where: {
             id: {
                 in: cards.map((card) => card.id),

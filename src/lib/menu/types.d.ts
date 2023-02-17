@@ -2,7 +2,7 @@ import type { ButtonProps } from "@/components/Forms/Button";
 import type { CheckboxProps } from "@/components/Forms/Checkbox";
 import type { InputProps } from "@/components/Forms/Input";
 import type { TextareaProps } from "@/components/Forms/Textarea";
-import type { labels as Label, users as User } from "@prisma/client";
+import type { Label, User } from "@prisma/client";
 import type { TablerIcon } from "@tabler/icons";
 
 export enum MenuVariant {

@@ -1,4 +1,4 @@
-import type { Prisma, users, user_accounts, user_sessions } from "@prisma/client";
+import type { Prisma, User, UserAccount, UserSession } from "@prisma/client";
 import type { NextAuthOptions } from "next-auth";
 import type { AdapterAccount, Adapter, AdapterUser, AdapterSession } from "next-auth/adapters";
 import type { Provider } from "next-auth/providers";
@@ -12,7 +12,7 @@ import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 
 const getAdapter = (): Adapter => {
-    const parseUser = (user: users) => {
+    const parseUser = (user: User) => {
         const parsedUser: AdapterUser = {
             ...user,
 
@@ -23,7 +23,7 @@ const getAdapter = (): Adapter => {
         return parsedUser;
     };
 
-    const parseUserAccount = (account: user_accounts) => {
+    const parseUserAccount = (account: UserAccount) => {
         const parsedAccount: AdapterAccount = {
             ...account,
 
@@ -44,7 +44,7 @@ const getAdapter = (): Adapter => {
         return parsedAccount;
     };
 
-    const parseUserSession = (session: user_sessions) => {
+    const parseUserSession = (session: UserSession) => {
         const parsedSession: AdapterSession = {
             ...session,
 
@@ -59,7 +59,7 @@ const getAdapter = (): Adapter => {
 
     return {
         createUser: async (data) => {
-            const defaultRole = await prisma.roles.findFirst({
+            const defaultRole = await prisma.role.findFirst({
                 where: {
                     name: "User",
                     level: "USER",
@@ -70,7 +70,7 @@ const getAdapter = (): Adapter => {
                 throw new Error("No default role found for new users.");
             }
 
-            const newUser = await prisma.users.create({
+            const newUser = await prisma.user.create({
                 data: {
                     email: data.email,
                     name: data.name ?? "Guest",
@@ -83,7 +83,7 @@ const getAdapter = (): Adapter => {
         },
 
         getUser: async (id) => {
-            const user = await prisma.users.findUnique({
+            const user = await prisma.user.findUnique({
                 where: {
                     id,
                 },
@@ -100,7 +100,7 @@ const getAdapter = (): Adapter => {
         },
 
         getUserByEmail: async (email) => {
-            const user = await prisma.users.findUnique({
+            const user = await prisma.user.findUnique({
                 where: {
                     email,
                 },
@@ -114,7 +114,7 @@ const getAdapter = (): Adapter => {
         },
 
         getUserByAccount: async ({ provider, providerAccountId }) => {
-            const account = await prisma.user_accounts.findUnique({
+            const account = await prisma.userAccount.findUnique({
                 where: {
                     provider_provider_account_id: {
                         provider,
@@ -134,7 +134,7 @@ const getAdapter = (): Adapter => {
         },
 
         updateUser: async ({ id, email, emailVerified, name }) => {
-            const updatedUser = await prisma.users.update({
+            const updatedUser = await prisma.user.update({
                 where: {
                     id,
                 },
@@ -149,7 +149,7 @@ const getAdapter = (): Adapter => {
         },
 
         deleteUser: async (id) => {
-            const deletedUser = await prisma.users.delete({
+            const deletedUser = await prisma.user.delete({
                 where: {
                     id,
                 },
@@ -159,7 +159,7 @@ const getAdapter = (): Adapter => {
         },
 
         linkAccount: async ({ providerAccountId, userId, id_token, expires_at, ...data }) => {
-            const linkedAccount = await prisma.user_accounts.create({
+            const linkedAccount = await prisma.userAccount.create({
                 data: {
                     ...data,
                     token_id: id_token,
@@ -177,7 +177,7 @@ const getAdapter = (): Adapter => {
         },
 
         unlinkAccount: async ({ provider, providerAccountId }) => {
-            const unlinkedAccount = await prisma.user_accounts.delete({
+            const unlinkedAccount = await prisma.userAccount.delete({
                 where: {
                     provider_provider_account_id: {
                         provider,
@@ -194,7 +194,7 @@ const getAdapter = (): Adapter => {
         },
 
         getSessionAndUser: async (sessionToken) => {
-            const session = await prisma.user_sessions.findUnique({
+            const session = await prisma.userSession.findUnique({
                 where: {
                     session_token: sessionToken,
                 },
@@ -216,7 +216,7 @@ const getAdapter = (): Adapter => {
         },
 
         createSession: async ({ expires, sessionToken, userId }) => {
-            const newSession = await prisma.user_sessions.create({
+            const newSession = await prisma.userSession.create({
                 data: {
                     expired_at: expires,
                     session_token: sessionToken,
@@ -228,7 +228,7 @@ const getAdapter = (): Adapter => {
         },
 
         updateSession: async ({ sessionToken, expires, userId }) => {
-            const updatedSession = await prisma.user_sessions.update({
+            const updatedSession = await prisma.userSession.update({
                 where: {
                     session_token: sessionToken,
                 },
@@ -243,7 +243,7 @@ const getAdapter = (): Adapter => {
         },
 
         deleteSession: async (sessionToken) => {
-            const deletedSession = await prisma.user_sessions.delete({
+            const deletedSession = await prisma.userSession.delete({
                 where: {
                     session_token: sessionToken,
                 },
@@ -253,7 +253,7 @@ const getAdapter = (): Adapter => {
         },
 
         createVerificationToken: async (data) => {
-            const newVerificationToken = await prisma.verification_tokens.create({
+            const newVerificationToken = await prisma.verificationToken.create({
                 data,
             });
 
@@ -262,7 +262,7 @@ const getAdapter = (): Adapter => {
 
         useVerificationToken: async (identifier_token) => {
             try {
-                const verificationToken = await prisma.verification_tokens.delete({
+                const verificationToken = await prisma.verificationToken.delete({
                     where: {
                         identifier_token,
                     },

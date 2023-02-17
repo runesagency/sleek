@@ -1,4 +1,4 @@
-import type { card_timers as CardTimer } from "@prisma/client";
+import type { CardTimer } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "@/lib/prisma";
@@ -14,7 +14,7 @@ const router = createRouter<NextApiRequest & { params: Record<string, string> },
 router.post("/api/cards/:id/timers", async (req, res) => {
     const { id } = req.params as { id: string };
 
-    await prisma.card_timers.create({
+    await prisma.cardTimer.create({
         data: {
             card_id: id,
         },
@@ -32,7 +32,7 @@ router.patch("/api/cards/:id/timers/:timerId", async (req, res) => {
     const { id, timerId } = req.params as { id: string; timerId: string };
     const body: CardTimer = req.body;
 
-    await prisma.card_timers.updateMany({
+    await prisma.cardTimer.updateMany({
         data: body,
         where: {
             id: timerId,
@@ -51,7 +51,7 @@ router.patch("/api/cards/:id/timers/:timerId", async (req, res) => {
 router.delete("/api/cards/:id/timers/:timerId", async (req, res) => {
     const { id, timerId } = req.params as { id: string; timerId: string };
 
-    await prisma.card_timers.deleteMany({
+    await prisma.cardTimer.deleteMany({
         where: {
             id: timerId,
             card_id: id,

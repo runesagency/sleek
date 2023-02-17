@@ -4,7 +4,7 @@ export type DefaultRoles = Awaited<ReturnType<typeof defaultRoles>>;
 
 const defaultRoles = async (prisma: PrismaClient) => {
     const user = async () => {
-        const SUPER_ADMIN = await prisma.roles.create({
+        const SUPER_ADMIN = await prisma.role.create({
             data: {
                 name: "Super Admin",
                 description: "Can do everything",
@@ -45,7 +45,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
             },
         });
 
-        const USER = await prisma.roles.create({
+        const USER = await prisma.role.create({
             data: {
                 name: "User",
                 description: "Basic user",
@@ -60,7 +60,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
     };
 
     const organization = async () => {
-        const ADMIN = await prisma.roles.create({
+        const ADMIN = await prisma.role.create({
             data: {
                 name: "Admin",
                 description: "Control everything in the organization, have the ability same as the owner",
@@ -95,7 +95,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
             },
         });
 
-        const MANAGER = await prisma.roles.create({
+        const MANAGER = await prisma.role.create({
             data: {
                 name: "Manager",
                 description: "Have administator permission in the organization projects",
@@ -126,7 +126,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
             },
         });
 
-        const MEMBER = await prisma.roles.create({
+        const MEMBER = await prisma.role.create({
             data: {
                 name: "Member",
                 description: "Member of the organization",
@@ -142,7 +142,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
     };
 
     const project = async () => {
-        const ADMIN = await prisma.roles.create({
+        const ADMIN = await prisma.role.create({
             data: {
                 name: "Admin",
                 description: "Control everything in the project",
@@ -171,7 +171,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
             },
         });
 
-        const MEMBER = await prisma.roles.create({
+        const MEMBER = await prisma.role.create({
             data: {
                 name: "Member",
                 description: "Member of the project",
@@ -188,7 +188,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
     };
 
     const board = async () => {
-        const ADMIN = await prisma.roles.create({
+        const ADMIN = await prisma.role.create({
             data: {
                 name: "Admin",
                 description: "Control everything in the board",
@@ -208,7 +208,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
             },
         });
 
-        const MEMBER = await prisma.roles.create({
+        const MEMBER = await prisma.role.create({
             data: {
                 name: "Member",
                 description: "Member of the board",
@@ -222,7 +222,7 @@ const defaultRoles = async (prisma: PrismaClient) => {
             },
         });
 
-        const GUEST = await prisma.roles.create({
+        const GUEST = await prisma.role.create({
             data: {
                 name: "Guest",
                 description: "Guest of the board",
@@ -251,7 +251,7 @@ export type DefaultConfigurations = Awaited<ReturnType<typeof defaultConfigurati
 
 const defaultConfigurations = async (prisma: PrismaClient) => {
     const attachmentStorage = async () => {
-        const LOCAL = await prisma.attachment_storage.create({
+        const LOCAL = await prisma.attachmentStorage.create({
             data: {
                 provider: "LOCAL",
             },
