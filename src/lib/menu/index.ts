@@ -1,6 +1,6 @@
 import type { MenuContextProps } from "@/lib/menu/types.d";
 
-import { MenuPosition } from "@/lib/menu/types.d";
+import { MenuAlignment, MenuDirection, MenuAnchor } from "@/lib/menu/types.d";
 
 import { createContext } from "react";
 
@@ -20,14 +20,12 @@ export const MenuContext = createContext<MenuContextProps>({
     targetRef: defaultRefValue(null),
     offset: defaultRefValue({ x: 0, y: 0 }),
     clientCoordinates: defaultRefValue({ x: 0, y: 0 }),
-    targetPosition: defaultRefValue(MenuPosition.Element),
+    anchor: defaultRefValue(MenuAnchor.Element),
+    direction: defaultRefValue(MenuDirection.Right),
+    alignment: defaultRefValue(MenuAlignment.Start),
     setOpen: defaultUninitializedFunction,
     setVariant: defaultUninitializedFunction,
     setInstanceId: defaultUninitializedFunction,
-    setTargetRef: defaultUninitializedFunction,
-    setClientCoordinates: defaultUninitializedFunction,
-    setTargetPosition: defaultUninitializedFunction,
-    setOffset: defaultUninitializedFunction,
 });
 
 export * from "./types.d";

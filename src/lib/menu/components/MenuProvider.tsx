@@ -1,8 +1,8 @@
 import type { MenuContextProps, MenuVariantType } from "@/lib/menu";
 
-import { MenuVariant, MenuContext, MenuPosition } from "@/lib/menu";
+import { MenuAlignment, MenuVariant, MenuContext, MenuAnchor, MenuDirection } from "@/lib/menu";
 
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 
 type MenuProviderProps = {
     children: React.ReactNode;
@@ -10,9 +10,11 @@ type MenuProviderProps = {
 
 const MenuProvider = ({ children }: MenuProviderProps) => {
     const targetRef = useRef<HTMLElement | null>(null);
-    const targetPosition = useRef<MenuPosition>(MenuPosition.Element);
+    const anchor = useRef<MenuAnchor>(MenuAnchor.Element);
     const clientCoordinates = useRef({ x: 0, y: 0 });
     const offset = useRef({ x: 0, y: 0 });
+    const direction = useRef<MenuDirection>(MenuDirection.Right);
+    const alignment = useRef<MenuAlignment>(MenuAlignment.Start);
 
     const [isOpen, setOpen] = useState(false);
     const [instanceId, setInstanceId] = useState("");
@@ -22,36 +24,18 @@ const MenuProvider = ({ children }: MenuProviderProps) => {
         lists: [],
     });
 
-    const setTargetRef = useCallback((ref: HTMLElement) => {
-        targetRef.current = ref;
-    }, []);
-
-    const setClientCoordinates = useCallback((x: number, y: number) => {
-        clientCoordinates.current = { x, y };
-    }, []);
-
-    const setTargetPosition = useCallback((position: MenuPosition) => {
-        targetPosition.current = position;
-    }, []);
-
-    const setOffset = useCallback((x: number, y: number) => {
-        offset.current = { x, y };
-    }, []);
-
     const contextValue = useMemo<MenuContextProps>(() => {
         const defaultProps = {
             targetRef,
             offset,
             instanceId,
-            targetPosition,
+            anchor,
             clientCoordinates,
+            direction,
+            alignment,
             setOpen,
-            setOffset,
             setVariant,
-            setTargetRef,
             setInstanceId,
-            setTargetPosition,
-            setClientCoordinates,
         };
 
         if (!isOpen) {
@@ -68,7 +52,7 @@ const MenuProvider = ({ children }: MenuProviderProps) => {
             ...variant,
             ...defaultProps,
         };
-    }, [instanceId, isOpen, setClientCoordinates, setOffset, setTargetPosition, setTargetRef, variant]);
+    }, [instanceId, offset, targetRef, anchor, clientCoordinates, direction, isOpen, variant]);
 
     return <MenuContext.Provider value={contextValue}>{children}</MenuContext.Provider>;
 };

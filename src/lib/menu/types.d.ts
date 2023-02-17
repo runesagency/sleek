@@ -118,9 +118,22 @@ export type MenuFormVariantType =
  * ------------------------------
  */
 
-export enum MenuPosition {
+export enum MenuAnchor {
     Element = "element",
     Cursor = "cursor",
+}
+
+export enum MenuDirection {
+    Top = "top",
+    Bottom = "bottom",
+    Left = "left",
+    Right = "right",
+}
+
+export enum MenuAlignment {
+    Start = "start",
+    Center = "center",
+    End = "end",
 }
 
 export type MenuContextOpenProps = MenuVariantType & { isOpen: true };
@@ -135,15 +148,13 @@ export type MenuContextProps = (MenuContextOpenProps | MenuContextCloseProps) & 
     // Generate a random id for each menu instance, on toggle menu,
     // if the id is the same, then close the menu, otherwise open the menu
     instanceId: string;
+    anchor: React.MutableRefObject<MenuAnchor>;
+    direction: React.MutableRefObject<MenuDirection>;
+    alignment: React.MutableRefObject<MenuAlignment>;
     offset: React.MutableRefObject<{ x: number; y: number }>;
     targetRef: React.MutableRefObject<HTMLElement | null>;
-    targetPosition: React.MutableRefObject<MenuPosition>;
     clientCoordinates: React.MutableRefObject<{ x: number; y: number }>;
     setOpen: (isOpen: boolean) => void;
     setInstanceId: (id: string) => void;
-    setTargetRef: (ref: HTMLElement) => void;
-    setOffset: (x: number, y: number) => void;
-    setClientCoordinates: (x: number, y: number) => void;
-    setTargetPosition: (position: MenuPosition) => void;
     setVariant: (variant: MenuVariantType) => void;
 };

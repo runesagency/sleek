@@ -1,15 +1,17 @@
 import type { MenuVariantType } from "@/lib/menu";
 
-import { MenuPosition, MenuContext } from "@/lib/menu";
+import { MenuAnchor, MenuContext, MenuAlignment, MenuDirection } from "@/lib/menu";
 
 import { useId } from "@mantine/hooks";
 import { useCallback, useContext } from "react";
 
 export type MenuOptions = MenuVariantType & {
-    position?: MenuPosition;
+    anchor?: MenuAnchor;
+    direction?: MenuDirection;
+    alignment?: MenuAlignment;
     offset?: {
-        x: number;
-        y: number;
+        x?: number;
+        y?: number;
     };
 };
 
@@ -18,13 +20,15 @@ export default function useMenu() {
     const {
         isOpen, //
         instanceId,
+        anchor,
+        clientCoordinates,
+        targetRef,
+        offset,
+        alignment,
+        direction,
         setOpen,
-        setOffset,
         setVariant,
-        setTargetRef,
         setInstanceId,
-        setTargetPosition,
-        setClientCoordinates,
     } = useContext(MenuContext);
 
     /**
@@ -36,15 +40,26 @@ export default function useMenu() {
             event.preventDefault();
             if (!options) return;
 
-            setOpen(true);
+            targetRef.current = event.currentTarget as HTMLElement;
+            anchor.current = options.anchor ?? MenuAnchor.Element;
+            alignment.current = options.alignment ?? MenuAlignment.Start;
+            direction.current = options.direction ?? MenuDirection.Right;
+
+            offset.current = {
+                x: options.offset?.x ?? 0,
+                y: options.offset?.y ?? 0,
+            };
+
+            clientCoordinates.current = {
+                x: event.clientX,
+                y: event.clientY,
+            };
+
             setInstanceId(currentInstanceId);
-            setTargetRef(event.currentTarget as HTMLElement);
             setVariant(options);
-            setClientCoordinates(event.clientX, event.clientY);
-            setTargetPosition(options.position ?? MenuPosition.Element);
-            setOffset(options.offset?.x ?? 0, options.offset?.y ?? 0);
+            setOpen(true);
         },
-        [setOpen, setInstanceId, currentInstanceId, setTargetRef, setVariant, setClientCoordinates, setTargetPosition, setOffset]
+        [targetRef, anchor, alignment, direction, offset, clientCoordinates, setInstanceId, currentInstanceId, setVariant, setOpen]
     );
 
     /**

@@ -1,6 +1,6 @@
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
-import { MenuContext, MenuVariant, MenuPosition } from "@/lib/menu";
+import { MenuContext, MenuVariant, MenuAnchor, MenuDirection, MenuAlignment } from "@/lib/menu";
 import MenuContextVariant from "@/lib/menu/components/variants/Context";
 import MenuMemberListVariant from "@/lib/menu/components/variants/MemberList";
 
@@ -14,7 +14,7 @@ export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>
 const Menu = () => {
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const { offset, targetRef, targetPosition, setOpen, clientCoordinates, ...data } = useContext(MenuContext);
+    const { offset, targetRef, anchor, alignment, direction, setOpen, clientCoordinates, ...data } = useContext(MenuContext);
 
     const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
     const { x: clientX, y: clientY } = clientCoordinates.current;
@@ -123,7 +123,7 @@ const Menu = () => {
                 element.removeEventListener("scroll", setMenuCoordinates);
             });
         };
-    }, [data.isOpen, targetRef, setOpen, clientX, clientY, targetPosition, offsetX, offsetY]);
+    }, [data.isOpen, targetRef, setOpen, clientX, clientY, anchor, offsetX, offsetY, direction, alignment]);
 
     if (data.isOpen) {
         const sharedProps: Omit<MenuSharedProps, "variant"> = {
