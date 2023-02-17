@@ -136,6 +136,7 @@ const Menu = () => {
             style: {
                 position: "fixed",
                 transform: `translate(${coordinates.x}px, ${coordinates.y}px)`,
+                transition: "transform 0.1s ease-out",
                 zIndex: 999999,
             },
         };
