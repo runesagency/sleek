@@ -41,7 +41,7 @@ const FeaturesContext = createContext<FeaturesContextType>({
     },
 });
 
-const Feature = ({ icon: Icon, title, description, pictureUrl: defaultPictureUrl, buttons, index }: FeatureProps & { index: number }) => {
+const FeatureSection = ({ icon: Icon, title, description, pictureUrl: defaultPictureUrl, buttons, index }: FeatureProps & { index: number }) => {
     const ref = useRef<HTMLDivElement>(null);
     const [opacity, setOpacity] = useState(index === 0 ? 1 : 0);
     const [pictureUrl, setPictureUrl] = useState(defaultPictureUrl ?? buttons[0].pictureUrl);
@@ -123,7 +123,7 @@ const Features = ({ data }: { data: FeatureProps[] }) => {
             >
                 <section className="flex flex-1 flex-col gap-20">
                     {data.map((props, index) => (
-                        <Feature key={index} index={index} {...props} />
+                        <FeatureSection key={index} index={index} {...props} />
                     ))}
                 </section>
 
