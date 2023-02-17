@@ -42,7 +42,7 @@ const Menu = () => {
         let colliderOffsetX = 0;
         let colliderOffsetY = 0;
 
-        const handleBlur = (e: MouseEvent) => {
+        const onBlur = (e: MouseEvent) => {
             if (!menuElement.contains(e.target as Node)) {
                 setOpen(false);
             }
@@ -322,7 +322,7 @@ const Menu = () => {
             // We need to wait for the next tick to add the click event listener
             // because the click event that triggered the menu to open will
             setTimeout(() => {
-                document.addEventListener("click", handleBlur);
+                document.addEventListener("click", onBlur);
             }, 0);
 
             scrollableParents.map((element) => {
@@ -331,7 +331,7 @@ const Menu = () => {
         }
 
         return () => {
-            document.removeEventListener("click", handleBlur);
+            document.removeEventListener("click", onBlur);
 
             scrollableParents.map((element) => {
                 element.removeEventListener("scroll", setMenuCoordinates);

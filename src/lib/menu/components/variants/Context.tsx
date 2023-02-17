@@ -45,7 +45,7 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
     const [activeIndex, setActiveIndex] = useState(0);
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const onKeyDown = (e: KeyboardEvent) => {
             e.preventDefault();
 
             switch (e.key) {
@@ -83,10 +83,10 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
             }
         };
 
-        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener("keydown", onKeyDown);
 
         return () => {
-            document.removeEventListener("keydown", handleKeyDown);
+            document.removeEventListener("keydown", onKeyDown);
         };
     }, [activeIndex, closeMenu, lists, lists.length, router]);
 

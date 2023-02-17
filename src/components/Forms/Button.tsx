@@ -2,7 +2,6 @@ import type { TablerIcon } from "@tabler/icons";
 import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 
 import clsx from "clsx";
-import { memo } from "react";
 
 export type ButtonProps = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     icon?: TablerIcon;
@@ -42,8 +41,8 @@ const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) 
 };
 
 const Button = {
-    Small: memo(Small),
-    Large: memo(Large),
+    Small,
+    Large,
 };
 
 export default Button;

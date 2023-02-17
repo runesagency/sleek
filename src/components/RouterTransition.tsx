@@ -9,24 +9,24 @@ const RouterTransition = () => {
     const ref = useRef<LoadingBarRef>(null);
 
     useEffect(() => {
-        const handleStart = (url: string) => {
+        const onStart = (url: string) => {
             if (url !== router.asPath) {
                 ref.current?.continuousStart();
             }
         };
 
-        const handleComplete = () => {
+        const onComplete = () => {
             ref.current?.complete();
         };
 
-        router.events.on("routeChangeStart", handleStart);
-        router.events.on("routeChangeComplete", handleComplete);
-        router.events.on("routeChangeError", handleComplete);
+        router.events.on("routeChangeStart", onStart);
+        router.events.on("routeChangeComplete", onComplete);
+        router.events.on("routeChangeError", onComplete);
 
         return () => {
-            router.events.off("routeChangeStart", handleStart);
-            router.events.off("routeChangeComplete", handleComplete);
-            router.events.off("routeChangeError", handleComplete);
+            router.events.off("routeChangeStart", onStart);
+            router.events.off("routeChangeComplete", onComplete);
+            router.events.off("routeChangeError", onComplete);
         };
     }, [router.asPath, router.events]);
 

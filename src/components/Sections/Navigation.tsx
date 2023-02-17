@@ -150,7 +150,7 @@ type NavigationProps = {
     className?: string;
 };
 
-export default function Navigation({ className }: NavigationProps) {
+const Navigation = ({ className }: NavigationProps) => {
     const [hash, setHash] = useHash();
     const { data: session } = useSession();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -283,4 +283,6 @@ export default function Navigation({ className }: NavigationProps) {
             {isModalOpen && <LoginModal isOpen={isModalOpen} closeModal={closeModal} />}
         </Container>
     );
-}
+};
+
+export default Navigation;

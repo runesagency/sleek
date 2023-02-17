@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { memo } from "react";
 
 export type SwitchButtonProps = {
     active?: boolean;
@@ -15,4 +14,4 @@ const SwitchButton = ({ active = false, onClick, children }: SwitchButtonProps) 
     );
 };
 
-export default memo(SwitchButton);
+export default SwitchButton;

@@ -3,7 +3,7 @@ import type { TablerIcon } from "@tabler/icons";
 import { SwitchButton } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 
-import { createContext, memo, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 type FeaturesContextType = {
     activeIndex: number;
@@ -135,4 +135,4 @@ const Features = ({ data }: { data: FeatureProps[] }) => {
     );
 };
 
-export default memo(Features);
+export default Features;

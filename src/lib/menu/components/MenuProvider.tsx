@@ -2,7 +2,7 @@ import type { MenuContextProps, MenuVariantType } from "@/lib/menu";
 
 import { MenuAlignment, MenuVariant, MenuContext, MenuAnchor, MenuDirection } from "@/lib/menu";
 
-import { memo, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type MenuProviderProps = {
     children: React.ReactNode;
@@ -57,4 +57,4 @@ const MenuProvider = ({ children }: MenuProviderProps) => {
     return <MenuContext.Provider value={contextValue}>{children}</MenuContext.Provider>;
 };
 
-export default memo(MenuProvider);
+export default MenuProvider;

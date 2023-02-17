@@ -12,7 +12,7 @@ type ContainerProps = {
     innerRef?: React.RefObject<HTMLDivElement>;
 };
 
-export default function Container({ children, className = [], as = "section", innerRef, containerRef }: ContainerProps) {
+const Container = ({ children, className = [], as = "section", innerRef, containerRef }: ContainerProps) => {
     const Wrapper = as;
 
     return (
@@ -22,4 +22,6 @@ export default function Container({ children, className = [], as = "section", in
             </main>
         </Wrapper>
     );
-}
+};
+
+export default Container;

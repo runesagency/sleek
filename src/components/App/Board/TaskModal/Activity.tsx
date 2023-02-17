@@ -1,5 +1,4 @@
 import { IconArrowBackUp, IconDots, IconPencil, IconSquare, IconTrash } from "@tabler/icons";
-import { memo } from "react";
 import ReactMarkdown from "react-markdown";
 
 type ActivityProps = {
@@ -38,4 +37,4 @@ const Activity = ({ sender, content, timestamp, details }: ActivityProps) => {
     );
 };
 
-export default memo(Activity);
+export default Activity;

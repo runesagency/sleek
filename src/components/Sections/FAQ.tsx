@@ -15,16 +15,18 @@ const QnA = ({ question, answer }: QnAProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const onOpen = useCallback(() => {
+        if (isOpen) return;
         setIsOpen(true);
-    }, []);
+    }, [isOpen]);
 
     const onClose = useCallback(() => {
+        if (!isOpen) return;
         setIsOpen(false);
-    }, []);
+    }, [isOpen]);
 
     return (
-        <div ref={ref} onClick={!isOpen ? onOpen : undefined} className="flex w-full cursor-pointer flex-col gap-4 rounded-lg border border-dark-600 bg-dark-700 px-7 py-5">
-            <div onClick={!isOpen ? undefined : onClose} className="flex items-center gap-4">
+        <div ref={ref} onClick={onOpen} className="flex w-full cursor-pointer flex-col gap-4 rounded-lg border border-dark-600 bg-dark-700 px-7 py-5">
+            <div onClick={onClose} className="flex items-center gap-4">
                 <h4 className="ts-xl flex-1">{question}</h4>
 
                 <IconChevronDown className={clsx("flex w-5 shrink-0 duration-200", isOpen ? "rotate-180" : "rotate-0")} />
@@ -40,7 +42,7 @@ type FAQProps = {
     className?: [string?, string?];
 };
 
-export default function FAQ({ data, className = [] }: FAQProps) {
+const FAQ = ({ data, className = [] }: FAQProps) => {
     if (!data || data.length === 0) return null;
 
     return (
@@ -60,4 +62,6 @@ export default function FAQ({ data, className = [] }: FAQProps) {
             </section>
         </Container>
     );
-}
+};
+
+export default FAQ;

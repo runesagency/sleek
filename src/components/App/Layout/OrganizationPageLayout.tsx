@@ -9,7 +9,7 @@ type OrganizationPageShellProps = {
     className?: string;
 };
 
-export default function OrganizationPageLayout({ children, className }: OrganizationPageShellProps) {
+const OrganizationPageLayout = ({ children, className }: OrganizationPageShellProps) => {
     return (
         <AppPageLayout className="flex flex-col">
             <img src="https://picsum.photos/1080" alt="banner" className="h-60 w-full object-cover object-center" />
@@ -42,4 +42,6 @@ export default function OrganizationPageLayout({ children, className }: Organiza
             <div className={clsx("py-9 px-16 3xl:px-36", className)}>{children}</div>
         </AppPageLayout>
     );
-}
+};
+
+export default OrganizationPageLayout;

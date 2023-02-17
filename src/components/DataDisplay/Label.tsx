@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { memo } from "react";
 
 type LabelProps = {
     name: string;
@@ -20,4 +19,4 @@ const Label = ({ name, color, className }: LabelProps) => {
     );
 };
 
-export default memo(Label);
+export default Label;

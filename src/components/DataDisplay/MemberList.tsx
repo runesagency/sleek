@@ -3,8 +3,6 @@ import type { users as User } from "@prisma/client";
 
 import Avatar from "@/components/Miscellaneous/Avatar";
 
-import { memo } from "react";
-
 type MemberListProps = {
     users: ParsedSSRProps<User[]>;
     max?: number;
@@ -60,8 +58,8 @@ const Large = ({ users, max }: MemberListProps) => {
 };
 
 const MemberList = {
-    Small: memo(Small),
-    Large: memo(Large),
+    Small,
+    Large,
 };
 
 export default MemberList;

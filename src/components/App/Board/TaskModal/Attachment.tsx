@@ -1,5 +1,4 @@
 import { IconDots, IconMessageDots, IconPencil, IconTrash } from "@tabler/icons";
-import { memo } from "react";
 
 type AttachmentProps = {
     title: string;
@@ -29,4 +28,4 @@ const Attachment = ({ title, timestamp }: AttachmentProps) => {
     );
 };
 
-export default memo(Attachment);
+export default Attachment;

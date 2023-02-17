@@ -63,7 +63,7 @@ const MenuMemberListComponent = ({ lists, onSelect: onClick, onBack, title, inne
     }, [closeMenu, onBack]);
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const onKeyDown = (e: KeyboardEvent) => {
             switch (e.key) {
                 case "ArrowDown": {
                     e.preventDefault();
@@ -97,10 +97,10 @@ const MenuMemberListComponent = ({ lists, onSelect: onClick, onBack, title, inne
             }
         };
 
-        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener("keydown", onKeyDown);
 
         return () => {
-            document.removeEventListener("keydown", handleKeyDown);
+            document.removeEventListener("keydown", onKeyDown);
         };
     }, [activeIndex, closeMenu, filteredLists, filteredLists.length, onClick, router]);
 

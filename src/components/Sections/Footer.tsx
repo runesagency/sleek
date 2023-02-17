@@ -26,7 +26,7 @@ const FooterSection = ({ title, links }: FooterSectionProps) => {
     );
 };
 
-export default function Footer() {
+const Footer = () => {
     return (
         <Container as="footer" className={["bg-dark-700 text-dark-50", "flex flex-col justify-between gap-y-12 py-14 lg:flex-row"]}>
             <section className="flex shrink-0 flex-col gap-5 lg:w-72">
@@ -84,4 +84,6 @@ export default function Footer() {
             </section>
         </Container>
     );
-}
+};
+
+export default Footer;

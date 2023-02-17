@@ -3,16 +3,20 @@ import type { Card as CardType } from "@/lib/types";
 import { Button, Checkbox } from "@/components/Forms";
 
 import { IconDots, IconPlus } from "@tabler/icons";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 type ChecklistProps = {
     data?: CardType["checklists"][0];
 };
 
 const Checklist = ({ data }: ChecklistProps) => {
-    if (!data) return null;
+    const percentage = useMemo(() => {
+        if (!data) return 0;
 
-    const percentage = Math.round((data.tasks.filter((task) => task.completed).length / data.tasks.length) * 100);
+        Math.round((data.tasks.filter((task) => task.completed).length / data.tasks.length) * 100);
+    }, [data]);
+
+    if (!data) return null;
 
     return (
         <div className="flex flex-col gap-4">
