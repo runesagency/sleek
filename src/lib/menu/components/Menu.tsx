@@ -352,11 +352,11 @@ const Menu = () => {
 
         switch (data.type) {
             case MenuVariant.Context: {
-                return <MenuContextVariant {...sharedProps} {...data} />;
+                return <MenuContextVariant {...sharedProps} lists={data.lists} />;
             }
 
             case MenuVariant.MemberList: {
-                return <MenuMemberListVariant {...sharedProps} {...data} />;
+                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onSelect={data.onSelect} onBack={data.onBack} />;
             }
         }
     }
