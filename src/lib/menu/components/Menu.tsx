@@ -109,7 +109,11 @@ const Menu = () => {
             setMenuCoordinates();
             registerScrollableParents(targetElement);
 
-            document.addEventListener("click", handleBlur);
+            // We need to wait for the next tick to add the click event listener
+            // because the click event that triggered the menu to open will
+            setTimeout(() => {
+                document.addEventListener("click", handleBlur);
+            }, 0);
 
             scrollableParents.map((element) => {
                 element.addEventListener("scroll", setMenuCoordinates);
