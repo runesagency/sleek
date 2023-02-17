@@ -1,9 +1,7 @@
 import Project from "@/components/App/DataDisplay/Project";
 import OrganizationPageLayout from "@/components/App/Layout/OrganizationPageLayout";
-import Button from "@/components/Forms/Button";
 
-import { IconCalendar, IconCards, IconFolder } from "@tabler/icons";
-import Link from "next/link";
+import { IconFolder } from "@tabler/icons";
 
 export default function OrganizationProjectListPage() {
     return (

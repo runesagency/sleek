@@ -1,5 +1,4 @@
-import Button from "@/components/Forms/Button";
-import Input from "@/components/Forms/Input";
+import { Button, Input } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 
 import { IconBrandDiscord, IconBrandTwitter, IconMail } from "@tabler/icons";

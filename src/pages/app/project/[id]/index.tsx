@@ -1,6 +1,6 @@
 import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 import MemberList from "@/components/DataDisplay/MemberList";
-import Button from "@/components/Forms/Button";
+import { Button } from "@/components/Forms";
 
 import { IconArrowBackUp, IconFilter, IconPlus, IconShare } from "@tabler/icons";
 import Link from "next/link";

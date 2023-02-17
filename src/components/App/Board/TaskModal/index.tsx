@@ -8,8 +8,7 @@ import Description from "@/components/App/Board/TaskModal/Description";
 import Title from "@/components/App/Board/TaskModal/Title";
 import Label from "@/components/DataDisplay/Label";
 import MemberList from "@/components/DataDisplay/MemberList";
-import Button from "@/components/Forms/Button";
-import Textarea from "@/components/Forms/Textarea";
+import { Button, Textarea } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 

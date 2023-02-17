@@ -3,8 +3,7 @@ import type { Card as CardType, List as ListType } from "@/lib/types";
 import { SortableType } from ".";
 
 import Card from "@/components/App/Board/Layout/Kanban/Card";
-import Button from "@/components/Forms/Button";
-import Textarea from "@/components/Forms/Textarea";
+import { Button, Textarea } from "@/components/Forms";
 import useDraggable from "@/lib/hooks/drag-and-drop/use-draggable";
 import useDroppable, { SortableDirection } from "@/lib/hooks/drag-and-drop/use-droppable";
 

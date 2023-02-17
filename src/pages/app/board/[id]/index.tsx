@@ -5,8 +5,7 @@ import KanbanLayout from "@/components/App/Board/Layout/Kanban";
 import TaskModal from "@/components/App/Board/TaskModal";
 import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 import MemberList from "@/components/DataDisplay/MemberList";
-import Button from "@/components/Forms/Button";
-import SwitchButton from "@/components/Forms/SwitchButton";
+import { SwitchButton, Button } from "@/components/Forms";
 import { prisma } from "@/lib/prisma";
 import { parseSSRProps } from "@/lib/utils/parse-ssr-props";
 

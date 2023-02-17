@@ -1,8 +1,6 @@
 import type { TablerIcon } from "@tabler/icons";
 
-import Button from "@/components/Forms/Button";
-import Input from "@/components/Forms/Input";
-import SwitchButton from "@/components/Forms/SwitchButton";
+import { SwitchButton, Input, Button } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 import FAQ from "@/components/Sections/FAQ";
 import Footer from "@/components/Sections/Footer";

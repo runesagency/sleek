@@ -2,10 +2,7 @@ import type { MenuVariantForm, MenuVariantFormItem } from "@/lib/menu";
 import type { MenuSharedProps } from "@/lib/menu/components/Menu";
 import type { FormEvent } from "react";
 
-import Button from "@/components/Forms/Button";
-import Checkbox from "@/components/Forms/Checkbox";
-import Input from "@/components/Forms/Input";
-import Textarea from "@/components/Forms/Textarea";
+import { Button, Input, Checkbox, Textarea } from "@/components/Forms";
 import { MenuFormVariant as MenuFormVariantSelection } from "@/lib/menu";
 
 import { IconChevronLeft } from "@tabler/icons";

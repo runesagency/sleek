@@ -3,7 +3,7 @@ import type { Card as CardType } from "@/lib/types";
 import { SortableType } from ".";
 
 import Label from "@/components/DataDisplay/Label";
-import Button from "@/components/Forms/Button";
+import { Button } from "@/components/Forms";
 import useDraggable from "@/lib/hooks/drag-and-drop/use-draggable";
 import useCustomEvent from "@/lib/hooks/use-custom-event";
 

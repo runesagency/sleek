@@ -1,6 +1,6 @@
 import type EasyMDE from "easymde";
 
-import Button from "@/components/Forms/Button";
+import { Button } from "@/components/Forms";
 import MarkdownEditor from "@/components/Miscellaneous/MarkdownEditor";
 
 import { memo, useEffect, useRef, useState } from "react";

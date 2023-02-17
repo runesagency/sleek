@@ -1,8 +1,7 @@
 import type { ClientSafeProvider } from "next-auth/react";
 import type { TypeOptions } from "react-toastify";
 
-import Button from "@/components/Forms/Button";
-import Input from "@/components/Forms/Input";
+import { Button, Input } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 
 import { useClickOutside, useHash } from "@mantine/hooks";

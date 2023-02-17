@@ -1,7 +1,7 @@
 import Project from "@/components/App/DataDisplay/Project";
 import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 import MemberList from "@/components/DataDisplay/MemberList";
-import Button from "@/components/Forms/Button";
+import { Button } from "@/components/Forms";
 
 import Link from "next/link";
 

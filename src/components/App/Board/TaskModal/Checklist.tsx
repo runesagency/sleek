@@ -1,7 +1,6 @@
 import type { Card as CardType } from "@/lib/types";
 
-import Button from "@/components/Forms/Button";
-import Checkbox from "@/components/Forms/Checkbox";
+import { Button, Checkbox } from "@/components/Forms";
 
 import { IconDots, IconPlus } from "@tabler/icons";
 import { memo } from "react";
