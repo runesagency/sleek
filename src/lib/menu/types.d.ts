@@ -97,19 +97,19 @@ export enum MenuFormVariant {
 export type MenuFormVariantType =
     | {
           type: MenuFormVariant.Input;
-          props: InputProps;
+          props?: InputProps;
       }
     | {
           type: MenuFormVariant.Checkbox;
-          props: CheckboxProps;
+          props?: CheckboxProps;
       }
     | {
           type: MenuFormVariant.Button;
-          props: ButtonProps;
+          props?: Omit<ButtonProps, "ref">;
       }
     | {
           type: MenuFormVariant.Textarea;
-          props: TextareaProps;
+          props?: TextareaProps;
       };
 
 /**
