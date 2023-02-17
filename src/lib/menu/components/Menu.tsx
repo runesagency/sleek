@@ -2,11 +2,12 @@ import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 import { MenuContext, MenuVariant, MenuAnchor, MenuDirection, MenuAlignment } from "@/lib/menu";
 import MenuContextVariant from "@/lib/menu/components/variants/Context";
+import MenuFormVariant from "@/lib/menu/components/variants/Form";
 import MenuMemberListVariant from "@/lib/menu/components/variants/MemberList";
 
 import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
-export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref" | "onClick" | "onSelect"> & {
+export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref" | "onClick" | "onSelect" | "onSubmit"> & {
     innerRef: React.RefObject<HTMLDivElement>;
     closeMenu: () => void;
 };
@@ -356,7 +357,11 @@ const Menu = () => {
             }
 
             case MenuVariant.MemberList: {
-                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onSelect={data.onSelect} onBack={data.onBack} />;
+                return <MenuMemberListVariant {...sharedProps} lists={data.lists} onSelect={data.onSelect} onBack={data.onBack} title={data.title} />;
+            }
+
+            case MenuVariant.Forms: {
+                return <MenuFormVariant {...sharedProps} lists={data.lists} onSubmit={data.onSubmit} onBack={data.onBack} title={data.title} submitButtonLabel={data.submitButtonLabel} />;
             }
         }
     }

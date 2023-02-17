@@ -78,7 +78,7 @@ export type MenuVariantForm = {
     type: MenuVariant.Forms;
     lists: MenuVariantFormItem[];
     submitButtonLabel?: string;
-    onSubmit: (values: Record<string, string>) => void;
+    onSubmit: <T = Record<string, unknown>>(values: T) => void;
     onBack?: () => void;
 };
 
