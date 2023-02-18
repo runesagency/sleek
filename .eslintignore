@@ -35,3 +35,6 @@ yarn-error.log*
 
 # tailwind config
 tailwind.config.js
+
+# prisma
+prisma/zod-schema/*
