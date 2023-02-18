@@ -1,3 +1,5 @@
+import type { Organization } from "@prisma/client";
+
 import { Button } from "@/components/Forms";
 import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
@@ -14,6 +16,7 @@ type AppShellProps = {
 
 const AppPageLayout = ({ children, className, useSidebar = true }: AppShellProps) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [organizations, setOrganizations] = useState<Organization[]>([]);
     const { toggleMenu } = useMenu();
 
     const onCreatingNewOrganization = useCallback(
@@ -35,6 +38,19 @@ const AppPageLayout = ({ children, className, useSidebar = true }: AppShellProps
         },
         [toggleMenu]
     );
+
+    useEffect(() => {
+        fetch("/api/organizations", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(async (res) => {
+            const data = await res.json();
+
+            setOrganizations(data);
+        });
+    }, []);
 
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
@@ -77,11 +93,13 @@ const AppPageLayout = ({ children, className, useSidebar = true }: AppShellProps
                         <div className="flex flex-col gap-6 px-5">
                             <span className="text-xs font-medium opacity-50">Organization</span>
 
-                            <button className="flex items-center gap-3">
-                                <img src="https://picsum.photos/200" alt="123" className="h-5 w-5 rounded-full" />
+                            {organizations.map(({ name }, index) => (
+                                <button key={index} className="flex items-center gap-3">
+                                    <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
 
-                                <p className="text-sm">Organization 1</p>
-                            </button>
+                                    <p className="text-sm">{name}</p>
+                                </button>
+                            ))}
 
                             <Button.Small className="!py-1" icon={IconPlus} onClick={onCreatingNewOrganization}>
                                 Create New Organization
