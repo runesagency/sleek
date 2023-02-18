@@ -32,6 +32,7 @@ specifiers:
   next: 13.0.7
   next-auth: ^4.19.2
   next-connect: 1.0.0-next.3
+  next-validations: ^0.3.1
   nodemailer: ^6.9.1
   postcss: ^8.4.21
   prettier: ^2.8.4
@@ -65,6 +66,7 @@ dependencies:
   next: 13.0.7_biqbaboplfbrettd7655fr4n2y
   next-auth: 4.19.2_3cwqslqzlzoexu5xtohrsogrx4
   next-connect: 1.0.0-next.3
+  next-validations: 0.3.1_next@13.0.7
   nodemailer: 6.9.1
   prisma-zod-generator: 0.8.11_prisma@4.10.1
   react: 18.2.0
@@ -3594,6 +3596,16 @@ packages:
       regexparam: 2.0.1
     dev: false
 
+  /next-validations/0.3.1_next@13.0.7:
+    resolution: {integrity: sha512-oA75bp4LdKqegjcM2H380Q+ETXjr1ayWi+oUu/miWfvh4Eig1/niTybfEjiigRpn1oElvSgnmUuIyPvFVA11+g==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      next: '*'
+    dependencies:
+      next: 13.0.7_biqbaboplfbrettd7655fr4n2y
+      type-fest: 3.2.0
+    dev: false
+
   /next/13.0.7_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-YfTifqX9vfHm+rSU/H/3xvzOHDkYuMuh4wsvTjiqj9h7qHEF7KHB66X4qrH96Po+ohdid4JY8YVGPziDwdXL0A==}
     engines: {node: '>=14.6.0'}
@@ -4952,6 +4964,11 @@ packages:
   /type-fest/0.8.1:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
+    dev: false
+
+  /type-fest/3.2.0:
+    resolution: {integrity: sha512-Il3wdLRzWvbAEtocgxGQA9YOoRVeVUGOMBtel5LdEpNeEAol6GJTLw8GbX6Z8EIMfvfhoOXs2bwOijtAZdK5og==}
+    engines: {node: '>=14.16'}
     dev: false
 
   /typed-array-length/1.0.4:
