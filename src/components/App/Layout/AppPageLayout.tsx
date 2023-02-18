@@ -12,7 +12,7 @@ type AppShellProps = {
     useSidebar?: boolean;
 };
 
-export default function AppPageLayout({ children, className, useSidebar = true }: AppShellProps) {
+const AppPageLayout = ({ children, className, useSidebar = true }: AppShellProps) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { toggleMenu } = useMenu();
 
@@ -94,4 +94,6 @@ export default function AppPageLayout({ children, className, useSidebar = true }
             </main>
         </main>
     );
-}
+};
+
+export default AppPageLayout;
