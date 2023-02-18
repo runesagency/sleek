@@ -1,9 +1,10 @@
-import Button from "@/components/Forms/Button";
+import { Button } from "@/components/Forms";
+import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { IconBell, IconUsers, IconCards, IconPlus, IconSettings, IconMenu2 } from "@tabler/icons";
 import clsx from "clsx";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type AppShellProps = {
     children: React.ReactNode;
@@ -13,6 +14,27 @@ type AppShellProps = {
 
 export default function AppPageLayout({ children, className, useSidebar = true }: AppShellProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { toggleMenu } = useMenu();
+
+    const onCreatingNewOrganization = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            toggleMenu(e, {
+                type: MenuVariant.Forms,
+                direction: MenuDirection.Bottom,
+                offset: { y: 10 },
+                title: "Create New Organization",
+                lists: [
+                    {
+                        id: "name",
+                        label: "Name",
+                        type: MenuFormVariant.Input,
+                    },
+                ],
+                onSubmit: (values) => {},
+            });
+        },
+        [toggleMenu]
+    );
 
     return (
         <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
@@ -61,7 +83,7 @@ export default function AppPageLayout({ children, className, useSidebar = true }
                                 <p className="text-sm">Organization 1</p>
                             </button>
 
-                            <Button.Small className="!py-1" icon={IconPlus}>
+                            <Button.Small className="!py-1" icon={IconPlus} onClick={onCreatingNewOrganization}>
                                 Create New Organization
                             </Button.Small>
                         </div>
