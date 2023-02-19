@@ -1,4 +1,4 @@
-import type { Card as CardType } from "@/lib/types";
+import type { Activity, Attachment, Card as CardType, CardAttachment, CardChecklist, CardChecklistTask, CardLabel, CardUser, User, Label as LabelType } from "@prisma/client";
 
 import { SortableType } from ".";
 
@@ -11,9 +11,11 @@ import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip
 import clsx from "clsx";
 import { useCallback, useRef, useState, memo, useEffect } from "react";
 
-type TasksProgressProps = {
-    checklists: CardType["checklists"];
+export type TasksProgressProps = {
     innerRef?: React.Ref<HTMLButtonElement>;
+    checklists: (CardChecklist & {
+        tasks: CardChecklistTask[];
+    })[];
 };
 
 const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
@@ -58,8 +60,20 @@ const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
     );
 };
 
-type CardProps = CardType & {
+export type CardProps = CardType & {
     setIsDragging: (isDragging: boolean) => void;
+    cover: Attachment | null;
+    attachments: CardAttachment[];
+    activities: Activity[];
+    checklists: (CardChecklist & {
+        tasks: CardChecklistTask[];
+    })[];
+    labels: (CardLabel & {
+        label: LabelType;
+    })[];
+    users: (CardUser & {
+        user: User;
+    })[];
 };
 
 const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, setIsDragging }: CardProps) => {
@@ -131,7 +145,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
                 <section className="flex items-end justify-between gap-4">
                     {due_date && (
                         <Button.Small className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
-                            <p className="truncate text-xs">{due_date}</p>
+                            <p className="truncate text-xs">{due_date.toString()}</p>
                         </Button.Small>
                     )}
 

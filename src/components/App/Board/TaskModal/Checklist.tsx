@@ -1,4 +1,4 @@
-import type { Card as CardType } from "@/lib/types";
+import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
 import { Button, Checkbox } from "@/components/Forms";
 
@@ -6,7 +6,9 @@ import { IconDots, IconPlus } from "@tabler/icons";
 import { memo, useMemo } from "react";
 
 type ChecklistProps = {
-    data?: CardType["checklists"][0];
+    data?: CardChecklist & {
+        tasks: CardChecklistTask[];
+    };
 };
 
 const Checklist = ({ data }: ChecklistProps) => {

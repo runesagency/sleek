@@ -1,4 +1,4 @@
-import type { Card as CardType } from "@/lib/types";
+import type { Card as CardType } from "@prisma/client";
 import type { ReactNode } from "react";
 
 import Activity from "@/components/App/Board/TaskModal/Activity";

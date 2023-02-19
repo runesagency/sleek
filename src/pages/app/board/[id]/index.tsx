@@ -1,5 +1,4 @@
-import type { Card as CardType, List as ListType } from "@/lib/types";
-import type { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 
 import KanbanLayout from "@/components/App/Board/Layout/Kanban";
 import TaskModal from "@/components/App/Board/TaskModal";
@@ -7,24 +6,25 @@ import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { SwitchButton, Button } from "@/components/Forms";
 import { prisma } from "@/lib/prisma";
-import { parseSSRProps } from "@/lib/utils/parse-ssr-props";
 
 import { IconArrowBackUp, IconFilter } from "@tabler/icons";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
+type RequiredProperty<T> = { [P in keyof T]: Required<NonNullable<T[P]>> };
+
 export type PageProps = {
     boardId: string;
-    cards: CardType[];
-    lists: ListType[];
+    cards: RequiredProperty<Awaited<ReturnType<typeof getServerSideProps>>["props"]["cards"]>;
+    lists: RequiredProperty<Awaited<ReturnType<typeof getServerSideProps>>["props"]["lists"]>;
 };
 
 export type LayoutProps = PageProps & {
-    setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
-    setLists: React.Dispatch<React.SetStateAction<ListType[]>>;
+    setCards: React.Dispatch<React.SetStateAction<PageProps["cards"][]>>;
+    setLists: React.Dispatch<React.SetStateAction<PageProps["lists"][]>>;
 };
 
-export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]: unknown }> = async ({ query }) => {
+export const getServerSideProps = async ({ query }: GetServerSidePropsContext) => {
     const boardId = query.id as string;
 
     const board = await prisma.board.findUnique({
@@ -114,23 +114,21 @@ export const getServerSideProps: GetServerSideProps<PageProps | { [key: string]:
     return {
         props: {
             boardId,
-            lists: parseSSRProps(lists),
-            cards: parseSSRProps(
-                cards.map((card) => ({
-                    ...card,
-                    activities: activities.filter(({ object_id }) => object_id === card.id),
-                }))
-            ),
+            lists: lists,
+            cards: cards.map((card) => ({
+                ...card,
+                activities: activities.filter(({ object_id }) => object_id === card.id),
+            })),
         },
     };
 };
 
 export default function BoardViewPage({ lists: originalLists, cards: originalCards, boardId }: PageProps) {
     const [lists, setLists] = useState<PageProps["lists"]>(originalLists);
-    const [cards, setCards] = useState<CardType[]>(originalCards);
+    const [cards, setCards] = useState<PageProps["cards"]>(originalCards);
 
     const onCardUpdate = useCallback(
-        async (card: CardType) => {
+        async (card: PageProps["cards"]) => {
             const foundCardIndex = cards.findIndex(({ id }) => id === card.id);
 
             if (foundCardIndex === -1) return;

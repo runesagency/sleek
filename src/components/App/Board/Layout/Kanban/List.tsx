@@ -1,4 +1,5 @@
-import type { Card as CardType, List as ListType } from "@/lib/types";
+import type { CardProps } from "@/components/App/Board/Layout/Kanban/Card";
+import type { List as ListType } from "@prisma/client";
 
 import { SortableType } from ".";
 
@@ -45,7 +46,7 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
 };
 
 type ListProps = ListType & {
-    cards: CardType[];
+    cards: Omit<CardProps, "setIsDragging">[];
     onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
 };
 

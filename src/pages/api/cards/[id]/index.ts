@@ -1,4 +1,4 @@
-import type { Card } from "@/lib/types";
+import type { Card } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { prisma } from "@/lib/prisma";
