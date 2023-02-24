@@ -21,8 +21,8 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
             data: {
                 name: faker.company.name(),
                 description: faker.company.catchPhrase(),
-                owner_id: user.id,
-                creator_id: user.id,
+                ownerId: user.id,
+                creatorId: user.id,
             },
         });
 
@@ -43,10 +43,10 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
 
                 await prisma.organizationUser.create({
                     data: {
-                        user_id: invitedUser.id,
-                        organization_id: organization.id,
-                        role_id: roleGiven.id,
-                        adder_id: user.id,
+                        userId: invitedUser.id,
+                        organizationId: organization.id,
+                        roleId: roleGiven.id,
+                        adderId: user.id,
                     },
                 });
 
@@ -85,19 +85,19 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
                 name: faker.commerce.productName(),
                 description: faker.commerce.productDescription(),
                 password: faker.datatype.boolean() ? faker.internet.password() : null,
-                start_date: faker.datatype.boolean() ? faker.date.past() : null,
-                due_date: faker.datatype.boolean() ? faker.date.future() : null,
-                organization_id: organization.id,
-                creator_id: user.id,
+                startDate: faker.datatype.boolean() ? faker.date.past() : null,
+                dueDate: faker.datatype.boolean() ? faker.date.future() : null,
+                organizationId: organization.id,
+                creatorId: user.id,
             },
         });
 
         await prisma.projectUser.create({
             data: {
-                user_id: user.id,
-                project_id: project.id,
-                role_id: roles.project.ADMIN.id,
-                adder_id: user.id,
+                userId: user.id,
+                projectId: project.id,
+                roleId: roles.project.ADMIN.id,
+                adderId: user.id,
             },
         });
 
@@ -118,10 +118,10 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
 
                 await prisma.projectUser.create({
                     data: {
-                        user_id: invitedUser.id,
-                        project_id: project.id,
-                        role_id: roleGiven.id,
-                        adder_id: user.id,
+                        userId: invitedUser.id,
+                        projectId: project.id,
+                        roleId: roleGiven.id,
+                        adderId: user.id,
                     },
                 });
 
@@ -153,10 +153,10 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
 
                 await prisma.projectOrganization.create({
                     data: {
-                        organization_id: invitedOrganization.id,
-                        project_id: project.id,
-                        role_id: roleGiven.id,
-                        adder_id: user.id,
+                        organizationId: invitedOrganization.id,
+                        projectId: project.id,
+                        roleId: roleGiven.id,
+                        adderId: user.id,
                     },
                 });
 
@@ -196,17 +196,17 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
                 description: faker.commerce.productDescription(),
                 locked: faker.datatype.boolean(),
                 password: faker.datatype.boolean() ? faker.internet.password() : null,
-                project_id: project.id,
-                creator_id: user.id,
+                projectId: project.id,
+                creatorId: user.id,
             },
         });
 
         await prisma.boardUser.create({
             data: {
-                user_id: user.id,
-                board_id: board.id,
-                role_id: roles.board.ADMIN.id,
-                adder_id: user.id,
+                userId: user.id,
+                boardId: board.id,
+                roleId: roles.board.ADMIN.id,
+                adderId: user.id,
             },
         });
 
@@ -227,10 +227,10 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
 
                 await prisma.boardUser.create({
                     data: {
-                        user_id: invitedUser.id,
-                        board_id: board.id,
-                        role_id: roleGiven.id,
-                        adder_id: user.id,
+                        userId: invitedUser.id,
+                        boardId: board.id,
+                        roleId: roleGiven.id,
+                        adderId: user.id,
                     },
                 });
 
@@ -252,7 +252,7 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
                 take: faker.datatype.number({ min: 1, max: 3 }),
                 where: {
                     id: {
-                        not: project.organization_id,
+                        not: project.organizationId,
                     },
                 },
             });
@@ -262,10 +262,10 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
 
                 await prisma.boardOrganization.create({
                     data: {
-                        organization_id: invitedOrganization.id,
-                        board_id: board.id,
-                        role_id: roleGiven.id,
-                        adder_id: user.id,
+                        organizationId: invitedOrganization.id,
+                        boardId: board.id,
+                        roleId: roleGiven.id,
+                        adderId: user.id,
                     },
                 });
 
@@ -300,8 +300,8 @@ const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurat
                 description: faker.commerce.productDescription(),
                 order: index,
                 locked: faker.datatype.boolean(),
-                board_id: board.id,
-                creator_id: user.id,
+                boardId: board.id,
+                creatorId: user.id,
             },
         });
 
@@ -326,9 +326,9 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
             data: {
                 title: faker.commerce.productName(),
                 description: faker.lorem.paragraphs(),
-                list_id: list.id,
-                board_id: board.id,
-                creator_id: user.id,
+                listId: list.id,
+                boardId: board.id,
+                creatorId: user.id,
                 order: index,
             },
         });
@@ -339,7 +339,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
             where: {
                 boards: {
                     some: {
-                        board_id: board.id,
+                        boardId: board.id,
                     },
                 },
             },
@@ -355,11 +355,11 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                         cards: {
                             some: {
                                 card: {
-                                    board_id: board.id,
+                                    boardId: board.id,
                                 },
                             },
                         },
-                        creator_id: user.id,
+                        creatorId: user.id,
                     },
                 },
             });
@@ -369,9 +369,9 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
 
                 await prisma.cardLabel.createMany({
                     data: labels.map((label) => ({
-                        label_id: label.id,
-                        adder_id: user.id,
-                        card_id: card.id,
+                        labelId: label.id,
+                        adderId: user.id,
+                        cardId: card.id,
                     })),
                 });
 
@@ -386,10 +386,10 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                             name: faker.random.word(),
                             description: faker.commerce.productDescription(),
                             color: faker.color.rgb({ format: "hex" }),
-                            creator_id: user.id,
+                            creatorId: user.id,
                             cards: {
                                 create: {
-                                    card_id: card.id,
+                                    cardId: card.id,
                                 },
                             },
                         },
@@ -409,10 +409,10 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
 
             await prisma.cardUser.createMany({
                 data: members.map((member) => ({
-                    card_id: card.id,
-                    adder_id: user.id,
+                    cardId: card.id,
+                    adderId: user.id,
                     subscribed: faker.datatype.boolean(),
-                    user_id: member.id,
+                    userId: member.id,
                 })),
             });
 
@@ -426,12 +426,12 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
             const isEnded = faker.datatype.boolean();
             await prisma.cardTimer.create({
                 data: {
-                    card_id: card.id,
+                    cardId: card.id,
                     description: faker.commerce.productDescription(),
-                    started_at: faker.date.recent(2),
-                    starter_id: user.id,
-                    ended_at: isEnded ? faker.date.recent(1) : null,
-                    ender_id: isEnded ? user.id : null,
+                    startedAt: faker.date.recent(2),
+                    starterId: user.id,
+                    endedAt: isEnded ? faker.date.recent(1) : null,
+                    enderId: isEnded ? user.id : null,
                 },
             });
 
@@ -449,8 +449,8 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                 const checklist = await prisma.cardChecklist.create({
                     data: {
                         title: faker.commerce.productName(),
-                        card_id: card.id,
-                        creator_id: user.id,
+                        cardId: card.id,
+                        creatorId: user.id,
                     },
                 });
 
@@ -463,10 +463,10 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
                     const checklistItem = await prisma.cardChecklistTask.create({
                         data: {
                             title: faker.commerce.productName(),
-                            checklist_id: checklist.id,
+                            checklistId: checklist.id,
                             order: taskIndex,
                             completed: faker.datatype.boolean(),
-                            creator_id: user.id,
+                            creatorId: user.id,
                         },
                     });
 
@@ -479,9 +479,9 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
 
                         await prisma.cardChecklistTaskUser.createMany({
                             data: member.map((user) => ({
-                                task_id: checklistItem.id,
-                                adder_id: user.id,
-                                user_id: user.id,
+                                taskId: checklistItem.id,
+                                adderId: user.id,
+                                userId: user.id,
                             })),
                         });
 
@@ -515,7 +515,7 @@ export default async function fakeData(prisma: PrismaClient, roles: DefaultRoles
                 email: faker.internet.email(),
                 username: faker.internet.userName(),
                 phone: faker.phone.number(),
-                role_id: index === 0 ? roles.user.SUPER_ADMIN.id : roles.user.USER.id,
+                roleId: index === 0 ? roles.user.SUPER_ADMIN.id : roles.user.USER.id,
             },
         });
 

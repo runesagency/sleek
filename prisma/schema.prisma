@@ -57,16 +57,16 @@ model Role {
 
   // Global roles (e.g. Admin, Guest) will NOT have `organization_id`
   // Custom roles (e.g. Project Manager, Developer) will have `organization_id`
-  organization_id String?
-  organization    Organization? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organizationId String?       @map("organization_id")
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "roles_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "roles_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "roles_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "roles_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   // (User Level Permissions)
   // - These permissions are internal only, they are not exposed to the User
@@ -114,12 +114,12 @@ model Role {
   CREATE_CARD                    Boolean @default(false)
   DELETE_CARD                    Boolean @default(false)
 
-  users                 User[]
-  organization_users    OrganizationUser[]
-  project_users         ProjectUser[]
-  project_organizations ProjectOrganization[]
-  board_users           BoardUser[]
-  board_organizations   BoardOrganization[]
+  users                User[]
+  organizationUsers    OrganizationUser[]
+  projectUsers         ProjectUser[]
+  projectOrganizations ProjectOrganization[]
+  boardUsers           BoardUser[]
+  boardOrganizations   BoardOrganization[]
 
   @@map("roles")
 }
@@ -134,13 +134,13 @@ model Label {
   description String?
   color       String?
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "labels_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "labels_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "labels_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "labels_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   cards CardLabel[]
 
@@ -166,38 +166,38 @@ model AttachmentStorage {
 }
 
 model Attachment {
-  id              String @id @default(uuid())
-  title           String
-  filename_disk   String
-  filename_source String
-  size            Int
-  type            String
+  id             String @id @default(uuid())
+  title          String
+  filenameDisk   String @map("filename_disk")
+  filenameSource String @map("filename_source")
+  size           Int
+  type           String
 
-  storage_id String
-  storage    AttachmentStorage @relation(fields: [storage_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  storageId String            @map("storage_id")
+  storage   AttachmentStorage @relation(fields: [storageId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  owner_id String
-  owner    User   @relation(name: "attachments_owned", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  ownerId String @map("owner_id")
+  owner   User   @relation(name: "attachments_owned", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  uploaded_at DateTime @default(now())
-  uploader_id String?
-  uploader    User?    @relation(name: "attachments_created", fields: [uploader_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+  uploaderId String?  @map("uploader_id")
+  uploader   User?    @relation(name: "attachments_created", fields: [uploaderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "attachments_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "attachments_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  user_images User[] @relation("user_images")
-  user_covers User[] @relation("user_covers")
+  userImages User[] @relation("user_images")
+  userCovers User[] @relation("user_covers")
 
   organizations Organization[] @relation("organization_logos")
 
-  project_logos  Project[] @relation("project_logos")
-  project_covers Project[] @relation("project_covers")
+  projectLogos  Project[] @relation("project_logos")
+  projectCovers Project[] @relation("project_covers")
 
-  card_covers Card[]
+  cardCovers Card[]
 
-  cards_linked CardAttachment[]
+  cardsLinked CardAttachment[]
 
   @@map("attachments")
 }
@@ -226,90 +226,90 @@ model User {
   email    String  @unique
   phone    String?
 
-  language             String  @default("en-US")
-  subscribe_by_default Boolean @default(true)
-  subscribe_to_email   Boolean @default(true)
+  language           String  @default("en-US")
+  subscribeByDefault Boolean @default(true) @map("subscribe_by_default")
+  subscribeToEmail   Boolean @default(true) @map("subscribe_to_email")
 
-  created_at  DateTime  @default(now())
-  verified_at DateTime?
-  modified_at DateTime  @updatedAt
+  createdAt  DateTime  @default(now()) @map("created_at")
+  verifiedAt DateTime? @map("verified_at")
+  modifiedAt DateTime  @updatedAt @map("modified_at")
 
-  image_attachment_id String?
-  image               Attachment? @relation(name: "user_images", fields: [image_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  imageAttachmentId String?     @map("image_attachment_id")
+  image             Attachment? @relation(name: "user_images", fields: [imageAttachmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  cover_attachment_id String?     @unique
-  cover               Attachment? @relation(name: "user_covers", fields: [cover_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  coverAttachmentId String?     @unique @map("cover_attachment_id")
+  cover             Attachment? @relation(name: "user_covers", fields: [coverAttachmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  role_id String
-  role    Role   @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   // Roles
-  roles_created  Role[] @relation("roles_created")
-  roles_modified Role[] @relation("roles_modified")
+  rolesCreated  Role[] @relation("roles_created")
+  rolesModified Role[] @relation("roles_modified")
 
   // Labels
-  labels_created  Label[] @relation("labels_created")
-  labels_modified Label[] @relation("labels_modified")
+  labelsCreated  Label[] @relation("labels_created")
+  labelsModified Label[] @relation("labels_modified")
 
   // Attachments
-  attachments          Attachment[] @relation("attachments_owned")
-  attachments_created  Attachment[] @relation("attachments_created")
-  attachments_modified Attachment[] @relation("attachments_modified")
+  attachments         Attachment[] @relation("attachments_owned")
+  attachmentsCreated  Attachment[] @relation("attachments_created")
+  attachmentsModified Attachment[] @relation("attachments_modified")
 
   // Organizations
-  organizations_owned    Organization[] @relation("organizations_owned")
-  organizations_created  Organization[] @relation("organizations_created")
-  organizations_modified Organization[] @relation("organizations_modified")
+  organizationsOwned    Organization[] @relation("organizations_owned")
+  organizationsCreated  Organization[] @relation("organizations_created")
+  organizationsModified Organization[] @relation("organizations_modified")
 
-  organizations            OrganizationUser[] @relation("organizations_joined")
-  organization_users_added OrganizationUser[] @relation("organization_users_added")
+  organizations          OrganizationUser[] @relation("organizations_joined")
+  organizationUsersAdded OrganizationUser[] @relation("organization_users_added")
 
   // Projects
-  projects_created  Project[] @relation("projects_created")
-  projects_modified Project[] @relation("projects_modified")
+  projectsCreated  Project[] @relation("projects_created")
+  projectsModified Project[] @relation("projects_modified")
 
-  projects                    ProjectUser[]         @relation("projects_joined")
-  project_users_added         ProjectUser[]         @relation("project_users_added")
-  project_organizations_added ProjectOrganization[] @relation("project_organizations_added")
+  projects                  ProjectUser[]         @relation("projects_joined")
+  projectUsersAdded         ProjectUser[]         @relation("project_users_added")
+  projectOrganizationsAdded ProjectOrganization[] @relation("project_organizations_added")
 
   // Boards
-  boards_created  Board[] @relation("boards_created")
-  boards_modified Board[] @relation("boards_modifier")
+  boardsCreated  Board[] @relation("boards_created")
+  boardsModified Board[] @relation("boards_modifier")
 
-  boards                    BoardUser[]         @relation("boards_joined")
-  board_users_added         BoardUser[]         @relation("board_users_added")
-  board_organizations_added BoardOrganization[] @relation("board_organizations_added")
+  boards                  BoardUser[]         @relation("boards_joined")
+  boardUsersAdded         BoardUser[]         @relation("board_users_added")
+  boardOrganizationsAdded BoardOrganization[] @relation("board_organizations_added")
 
   // Lists
-  lists_created  List[] @relation("lists_created")
-  lists_modified List[] @relation("lists_modified")
+  listsCreated  List[] @relation("lists_created")
+  listsModified List[] @relation("lists_modified")
 
   // Cards
-  cards_created  Card[] @relation("cards_created")
-  cards_modified Card[] @relation("cards_modified")
+  cardsCreated  Card[] @relation("cards_created")
+  cardsModified Card[] @relation("cards_modified")
 
-  cards            CardUser[] @relation("cards_joined")
-  card_users_added CardUser[] @relation("card_users_added")
+  cards          CardUser[] @relation("cards_joined")
+  cardUsersAdded CardUser[] @relation("card_users_added")
 
-  card_timers_started CardTimer[] @relation("card_timers_started")
-  card_timers_ended   CardTimer[] @relation("card_timers_ended")
+  cardTimersStarted CardTimer[] @relation("card_timers_started")
+  cardTimersEnded   CardTimer[] @relation("card_timers_ended")
 
-  card_labels_created      CardLabel[]      @relation("card_labels_created")
-  card_attachments_created CardAttachment[] @relation("card_attachments_created")
+  cardLabelsCreated      CardLabel[]      @relation("card_labels_created")
+  cardAttachmentsCreated CardAttachment[] @relation("card_attachments_created")
 
   // Checklists
-  checklist_tasks            CardChecklistTaskUser[] @relation("checklist_tasks_joined")
-  checklist_task_users_added CardChecklistTaskUser[] @relation("checklist_task_users_added")
+  checklistTasks          CardChecklistTaskUser[] @relation("checklist_tasks_joined")
+  checklistTaskUsersAdded CardChecklistTaskUser[] @relation("checklist_task_users_added")
 
-  checklists_created  CardChecklist[] @relation("checklists_created")
-  checklists_modified CardChecklist[] @relation("checklists_modified")
+  checklistsCreated  CardChecklist[] @relation("checklists_created")
+  checklistsModified CardChecklist[] @relation("checklists_modified")
 
-  checklist_tasks_created  CardChecklistTask[] @relation("checklist_tasks_created")
-  checklist_tasks_modified CardChecklistTask[] @relation("checklist_tasks_modified")
+  checklistTasksCreated  CardChecklistTask[] @relation("checklist_tasks_created")
+  checklistTasksModified CardChecklistTask[] @relation("checklist_tasks_modified")
 
   // Activities
-  activities         Activity[]
-  activities_created Activity[] @relation("activities_created")
+  activities        Activity[]
+  activitiesCreated Activity[] @relation("activities_created")
 
   accounts UserAccount[]
   sessions UserSession[]
@@ -324,44 +324,44 @@ enum UserAccountProvider {
 }
 
 model UserAccount {
-  id      String @id @default(uuid())
-  user_id String
+  id     String @id @default(uuid())
+  userId String @map("user_id")
 
-  provider            String
-  provider_account_id String
-  type                UserAccountProvider
+  provider          String
+  providerAccountId String              @map("provider_account_id")
+  type              UserAccountProvider
 
-  scope         String?
-  session_state String?
+  scope        String?
+  sessionState String? @map("session_state")
 
-  token_id      String?
-  token_type    String?
-  refresh_token String?
-  access_token  String?
+  tokenId      String? @map("token_id")
+  tokenType    String? @map("token_type")
+  refreshToken String? @map("refresh_token")
+  accessToken  String? @map("access_token")
 
-  oauth_token_secret String?
-  oauth_token        String?
+  oauthTokenSecret String? @map("oauth_token_secret")
+  oauthToken       String? @map("oauth_token")
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  expired_at Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  expiredAt Int?     @map("expired_at")
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@unique([provider, provider_account_id])
+  @@unique([provider, providerAccountId])
   @@map("user_accounts")
 }
 
 model UserSession {
-  id            String @id @default(cuid())
-  user_id       String
-  session_token String @unique
+  id           String @id @default(cuid())
+  userId       String @map("user_id")
+  sessionToken String @unique @map("session_token")
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  expired_at DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  expiredAt DateTime @map("expired_at")
 
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("user_sessions")
 }
@@ -378,25 +378,25 @@ model Organization {
   name        String
   description String?
 
-  owner_id String
-  owner    User   @relation(name: "organizations_owned", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  ownerId String @map("owner_id")
+  owner   User   @relation(name: "organizations_owned", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  logo_attachment_id String?
-  logo               Attachment? @relation(name: "organization_logos", fields: [logo_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  logoAttachmentId String?     @map("logo_attachment_id")
+  logo             Attachment? @relation(name: "organization_logos", fields: [logoAttachmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "organizations_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "organizations_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "organizations_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "organizations_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  projects          Project[]
-  users             OrganizationUser[]
-  boards            BoardOrganization[]
-  external_projects ProjectOrganization[]
-  custom_roles      Role[]
+  projects         Project[]
+  users            OrganizationUser[]
+  boards           BoardOrganization[]
+  externalProjects ProjectOrganization[]
+  customRoles      Role[]
 
   @@map("organizations")
 }
@@ -404,18 +404,18 @@ model Organization {
 model OrganizationUser {
   id String @id @default(uuid())
 
-  organization_id String
-  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  user_id String
-  user    User   @relation(name: "organizations_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(name: "organizations_joined", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  role_id String
-  role    Role   @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "organization_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "organization_users_added", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("organization_users")
 }
@@ -429,26 +429,26 @@ model Project {
   id          String    @id @default(nanoid(8))
   name        String
   description String?
-  start_date  DateTime?
-  due_date    DateTime?
+  startDate   DateTime? @map("start_date")
+  dueDate     DateTime? @map("due_date")
   password    String?
 
-  cover_attachment_id String?
-  cover               Attachment? @relation(name: "project_covers", fields: [cover_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  coverAttachmentId String?     @map("cover_attachment_id")
+  cover             Attachment? @relation(name: "project_covers", fields: [coverAttachmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  logo_attachment_id String?
-  logo               Attachment? @relation(name: "project_logos", fields: [logo_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  logoAttachmentId String?     @map("logo_attachment_id")
+  logo             Attachment? @relation(name: "project_logos", fields: [logoAttachmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  organization_id String
-  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "projects_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "projects_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "projects_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "projects_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   boards        Board[]
   users         ProjectUser[]
@@ -460,18 +460,18 @@ model Project {
 model ProjectUser {
   id String @id @default(uuid())
 
-  project_id String
-  project    Project @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  user_id String
-  user    User   @relation(name: "projects_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(name: "projects_joined", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  role_id String
-  role    Role   @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "project_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "project_users_added", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("project_users")
 }
@@ -479,18 +479,18 @@ model ProjectUser {
 model ProjectOrganization {
   id String @id @default(uuid())
 
-  project_id String
-  project    Project @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  organization_id String
-  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  role_id String
-  role    Role   @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "project_organizations_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "project_organizations_added", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("project_organizations")
 }
@@ -506,16 +506,16 @@ model Board {
   locked      Boolean @default(false)
   password    String?
 
-  project_id String
-  project    Project @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "boards_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "boards_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "boards_modifier", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "boards_modifier", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   lists         List[]
   cards         Card[]
@@ -528,18 +528,18 @@ model Board {
 model BoardUser {
   id String @id @default(uuid())
 
-  board_id String
-  board    Board  @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  boardId String @map("board_id")
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  user_id String
-  user    User   @relation(name: "boards_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(name: "boards_joined", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  role_id String
-  role    Role   @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "board_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "board_users_added", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("board_users")
 }
@@ -547,18 +547,18 @@ model BoardUser {
 model BoardOrganization {
   id String @id @default(uuid())
 
-  board_id String
-  board    Board  @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  boardId String @map("board_id")
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  organization_id String
-  organization    Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  role_id String
-  role    Role   @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "board_organizations_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "board_organizations_added", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("board_organizations")
 }
@@ -574,18 +574,18 @@ model List {
   description String?
   order       Int
   locked      Boolean @default(false)
-  max_cards   Int?
+  maxCards    Int?    @map("max_cards")
 
-  board_id String
-  board    Board  @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  boardId String @map("board_id")
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "lists_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "lists_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "lists_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "lists_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   cards Card[]
 
@@ -601,25 +601,25 @@ model Card {
   title       String
   description String?
   order       Int
-  start_date  DateTime?
-  due_date    DateTime?
+  startDate   DateTime? @map("start_date")
+  dueDate     DateTime? @map("due_date")
 
-  board_id String
-  board    Board  @relation(fields: [board_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  boardId String @map("board_id")
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  list_id String
-  list    List   @relation(fields: [list_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  listId String @map("list_id")
+  list   List   @relation(fields: [listId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  cover_attachment_id String?     @unique
-  cover               Attachment? @relation(fields: [cover_attachment_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  coverAttachmentId String?     @unique @map("cover_attachment_id")
+  cover             Attachment? @relation(fields: [coverAttachmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "cards_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "cards_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "cards_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "cards_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   users       CardUser[]
   labels      CardLabel[]
@@ -633,15 +633,15 @@ model Card {
 model CardLabel {
   id String @id @default(uuid())
 
-  card_id String
-  card    Card   @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cardId String @map("card_id")
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  label_id String
-  label    Label  @relation(fields: [label_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  labelId String @map("label_id")
+  label   Label  @relation(fields: [labelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "card_labels_created", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "card_labels_created", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("card_labels")
 }
@@ -650,15 +650,15 @@ model CardUser {
   id         String  @id @default(uuid())
   subscribed Boolean @default(false)
 
-  user_id String
-  user    User   @relation(name: "cards_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(name: "cards_joined", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  card_id String
-  card    Card   @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cardId String @map("card_id")
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "card_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "card_users_added", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("card_users")
 }
@@ -666,15 +666,15 @@ model CardUser {
 model CardAttachment {
   id String @id @default(uuid())
 
-  card_id String
-  card    Card   @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cardId String @map("card_id")
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  attachment_id String
-  attachment    Attachment @relation(fields: [attachment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  attachmentId String     @map("attachment_id")
+  attachment   Attachment @relation(fields: [attachmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "card_attachments_created", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "card_attachments_created", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("card_attachments")
 }
@@ -683,16 +683,16 @@ model CardTimer {
   id          String  @id @default(uuid())
   description String?
 
-  card_id String
-  card    Card   @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cardId String @map("card_id")
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  started_at DateTime @default(now())
-  starter_id String?
-  stater     User?    @relation(name: "card_timers_started", fields: [starter_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  startedAt DateTime @default(now()) @map("started_at")
+  starterId String?  @map("starter_id")
+  stater    User?    @relation(name: "card_timers_started", fields: [starterId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  ended_at DateTime?
-  ender_id String?
-  ender    User?     @relation(name: "card_timers_ended", fields: [ender_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  endedAt DateTime? @map("ended_at")
+  enderId String?   @map("ender_id")
+  ender   User?     @relation(name: "card_timers_ended", fields: [enderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("card_timers")
 }
@@ -701,16 +701,16 @@ model CardChecklist {
   id    String @id @default(uuid())
   title String
 
-  card_id String
-  card    Card   @relation(fields: [card_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cardId String @map("card_id")
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "checklists_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "checklists_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "checklists_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "checklists_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   tasks CardChecklistTask[]
 
@@ -718,26 +718,26 @@ model CardChecklist {
 }
 
 model CardChecklistTask {
-  id         String    @id @default(uuid())
-  title      String
-  completed  Boolean   @default(false)
-  start_date DateTime?
-  due_date   DateTime?
-  order      Int
+  id        String    @id @default(uuid())
+  title     String
+  completed Boolean   @default(false)
+  startDate DateTime? @map("start_date")
+  dueDate   DateTime? @map("due_date")
+  order     Int
 
-  checklist_id String
-  checklist    CardChecklist @relation(fields: [checklist_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  checklistId String        @map("checklist_id")
+  checklist   CardChecklist @relation(fields: [checklistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  parent_checklist_task_id String?
-  parent_checklist_task    CardChecklistTask? @relation(name: "parent_checklist_task", fields: [parent_checklist_task_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  parentChecklistTaskId String?            @map("parent_checklist_task_id")
+  parentChecklistTask   CardChecklistTask? @relation(name: "parent_checklist_task", fields: [parentChecklistTaskId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "checklist_tasks_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "checklist_tasks_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
-  modifier_id String?
-  modifier    User?    @relation(name: "checklist_tasks_modified", fields: [modifier_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  modifiedAt DateTime @updatedAt @map("modified_at")
+  modifierId String?  @map("modifier_id")
+  modifier   User?    @relation(name: "checklist_tasks_modified", fields: [modifierId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   users    CardChecklistTaskUser[]
   subtasks CardChecklistTask[]     @relation(name: "parent_checklist_task")
@@ -748,15 +748,15 @@ model CardChecklistTask {
 model CardChecklistTaskUser {
   id String @id @default(uuid())
 
-  task_id String
-  task    CardChecklistTask @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  taskId String            @map("task_id")
+  task   CardChecklistTask @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  user_id String
-  user    User   @relation(name: "checklist_tasks_joined", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(name: "checklist_tasks_joined", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  added_at DateTime @default(now())
-  adder_id String?
-  adder    User?    @relation(name: "checklist_task_users_added", fields: [adder_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  addedAt DateTime @default(now()) @map("added_at")
+  adderId String?  @map("adder_id")
+  adder   User?    @relation(name: "checklist_task_users_added", fields: [adderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   @@map("card_checklist_task_users")
 }
@@ -800,22 +800,22 @@ model Activity {
   message  String?
   activity String?
   action   ActivityAction
-  old_data String?
-  new_data String?
+  oldData  String?        @map("old_data")
+  newData  String?        @map("new_data")
 
-  user_id String
-  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   // If object is USER, object_id is user_id, if object is ORGANIZATION, object_id is organization_id, etc. 
   // If object is GLOBAL, object_id is NULL
-  object_id   String
-  object_type ActivityObject
+  objectId   String         @map("object_id")
+  objectType ActivityObject @map("object_type")
 
-  created_at DateTime @default(now())
-  creator_id String?
-  creator    User?    @relation(name: "activities_created", fields: [creator_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  creatorId String?  @map("creator_id")
+  creator   User?    @relation(name: "activities_created", fields: [creatorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
-  modified_at DateTime @updatedAt
+  modifiedAt DateTime @updatedAt @map("modified_at")
   // No need for modifier_id, since activities are only modified by the system or the user who created it
 
   @@map("activities")

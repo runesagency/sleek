@@ -17,7 +17,7 @@ const getAdapter = (): Adapter => {
             ...user,
 
             // different from the default model
-            emailVerified: user.verified_at,
+            emailVerified: user.verifiedAt,
         };
 
         return parsedUser;
@@ -28,17 +28,17 @@ const getAdapter = (): Adapter => {
             ...account,
 
             // different from the default model
-            providerAccountId: account.provider_account_id,
-            userId: account.user_id,
-            expires_at: account.expired_at ?? undefined,
-            id_token: account.token_id ?? undefined,
+            providerAccountId: account.providerAccountId,
+            userId: account.userId,
+            expiresAt: account.expiredAt ?? undefined,
+            idToken: account.tokenId ?? undefined,
 
             // same, just altering null to undefined
-            access_token: account.access_token ?? undefined,
-            refresh_token: account.refresh_token ?? undefined,
+            accessToken: account.accessToken ?? undefined,
+            refreshToken: account.refreshToken ?? undefined,
             scope: account.scope ?? undefined,
-            session_state: account.session_state ?? undefined,
-            token_type: account.token_type ?? undefined,
+            sessionState: account.sessionState ?? undefined,
+            tokenType: account.tokenType ?? undefined,
         };
 
         return parsedAccount;
@@ -49,9 +49,9 @@ const getAdapter = (): Adapter => {
             ...session,
 
             // different from the default model
-            sessionToken: session.session_token,
-            userId: session.user_id,
-            expires: session.expired_at,
+            sessionToken: session.sessionToken,
+            userId: session.userId,
+            expires: session.expiredAt,
         };
 
         return parsedSession;
@@ -74,8 +74,8 @@ const getAdapter = (): Adapter => {
                 data: {
                     email: data.email,
                     name: data.name ?? "Guest",
-                    verified_at: data.emailVerified,
-                    role_id: defaultRole.id,
+                    verifiedAt: data.emailVerified,
+                    roleId: defaultRole.id,
                 },
             });
 
@@ -116,9 +116,9 @@ const getAdapter = (): Adapter => {
         getUserByAccount: async ({ provider, providerAccountId }) => {
             const account = await prisma.userAccount.findUnique({
                 where: {
-                    provider_provider_account_id: {
+                    provider_providerAccountId: {
                         provider,
-                        provider_account_id: providerAccountId,
+                        providerAccountId: providerAccountId,
                     },
                 },
                 select: {
@@ -141,7 +141,7 @@ const getAdapter = (): Adapter => {
                 data: {
                     name: name ?? undefined,
                     email: email,
-                    verified_at: emailVerified ?? undefined,
+                    verifiedAt: emailVerified ?? undefined,
                 },
             });
 
@@ -162,10 +162,10 @@ const getAdapter = (): Adapter => {
             const linkedAccount = await prisma.userAccount.create({
                 data: {
                     ...data,
-                    token_id: id_token,
-                    user_id: userId,
-                    provider_account_id: providerAccountId,
-                    expired_at: expires_at,
+                    tokenId: id_token,
+                    userId: userId,
+                    providerAccountId: providerAccountId,
+                    expiredAt: expires_at,
                 },
             });
 
@@ -179,9 +179,9 @@ const getAdapter = (): Adapter => {
         unlinkAccount: async ({ provider, providerAccountId }) => {
             const unlinkedAccount = await prisma.userAccount.delete({
                 where: {
-                    provider_provider_account_id: {
+                    provider_providerAccountId: {
                         provider,
-                        provider_account_id: providerAccountId,
+                        providerAccountId: providerAccountId,
                     },
                 },
             });
@@ -196,7 +196,7 @@ const getAdapter = (): Adapter => {
         getSessionAndUser: async (sessionToken) => {
             const session = await prisma.userSession.findUnique({
                 where: {
-                    session_token: sessionToken,
+                    sessionToken: sessionToken,
                 },
                 include: {
                     user: true,
@@ -218,9 +218,9 @@ const getAdapter = (): Adapter => {
         createSession: async ({ expires, sessionToken, userId }) => {
             const newSession = await prisma.userSession.create({
                 data: {
-                    expired_at: expires,
-                    session_token: sessionToken,
-                    user_id: userId,
+                    expiredAt: expires,
+                    sessionToken: sessionToken,
+                    userId: userId,
                 },
             });
 
@@ -230,12 +230,12 @@ const getAdapter = (): Adapter => {
         updateSession: async ({ sessionToken, expires, userId }) => {
             const updatedSession = await prisma.userSession.update({
                 where: {
-                    session_token: sessionToken,
+                    sessionToken: sessionToken,
                 },
                 data: {
-                    expired_at: expires,
-                    session_token: sessionToken,
-                    user_id: userId,
+                    expiredAt: expires,
+                    sessionToken: sessionToken,
+                    userId: userId,
                 },
             });
 
@@ -245,7 +245,7 @@ const getAdapter = (): Adapter => {
         deleteSession: async (sessionToken) => {
             const deletedSession = await prisma.userSession.delete({
                 where: {
-                    session_token: sessionToken,
+                    sessionToken: sessionToken,
                 },
             });
 
@@ -260,11 +260,11 @@ const getAdapter = (): Adapter => {
             return newVerificationToken;
         },
 
-        useVerificationToken: async (identifier_token) => {
+        useVerificationToken: async (identifierToken) => {
             try {
                 const verificationToken = await prisma.verificationToken.delete({
                     where: {
-                        identifier_token,
+                        identifier_token: identifierToken,
                     },
                 });
 
@@ -285,36 +285,36 @@ const getAdapter = (): Adapter => {
 const getProviders = () => {
     const providers: Provider[] = [];
 
-    if (process.env.EMAIL_SMTP_HOST && process.env.EMAIL_SMTP_PORT && process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PASSWORD && process.env.EMAIL_FROM) {
+    if (process.env.EMAILSMTPHOST && process.env.EMAILSMTPPORT && process.env.EMAILSMTPUSER && process.env.EMAILSMTPPASSWORD && process.env.EMAILFROM) {
         providers.push(
             EmailProvider({
                 server: {
-                    host: process.env.EMAIL_SMTP_HOST,
-                    port: process.env.EMAIL_SMTP_PORT,
+                    host: process.env.EMAILSMTPHOST,
+                    port: process.env.EMAILSMTPPORT,
                     auth: {
-                        user: process.env.EMAIL_SMTP_USER,
-                        pass: process.env.EMAIL_SMTP_PASSWORD,
+                        user: process.env.EMAILSMTPUSER,
+                        pass: process.env.EMAILSMTPPASSWORD,
                     },
                 },
-                from: process.env.EMAIL_FROM,
+                from: process.env.EMAILFROM,
             })
         );
     }
 
-    if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
+    if (process.env.DISCORDCLIENTID && process.env.DISCORDCLIENTSECRET) {
         providers.push(
             DiscordProvider({
-                clientId: process.env.DISCORD_CLIENT_ID,
-                clientSecret: process.env.DISCORD_CLIENT_SECRET,
+                clientId: process.env.DISCORDCLIENTID,
+                clientSecret: process.env.DISCORDCLIENTSECRET,
             })
         );
     }
 
-    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    if (process.env.GOOGLECLIENTID && process.env.GOOGLECLIENTSECRET) {
         providers.push(
             GoogleProvider({
-                clientId: process.env.GOOGLE_CLIENT_ID,
-                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                clientId: process.env.GOOGLECLIENTID,
+                clientSecret: process.env.GOOGLECLIENTSECRET,
             })
         );
     }
@@ -322,12 +322,12 @@ const getProviders = () => {
     return providers;
 };
 
-if (!process.env.NEXTAUTH_SECRET) {
-    throw new Error("NEXTAUTH_SECRET variable is not defined in .env file.");
+if (!process.env.NEXTAUTHSECRET) {
+    throw new Error("NEXTAUTHSECRET variable is not defined in .env file.");
 }
 
 export const authOptions: NextAuthOptions = {
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTHSECRET,
     adapter: getAdapter(),
     providers: getProviders(),
     session: {
