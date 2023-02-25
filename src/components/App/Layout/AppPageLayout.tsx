@@ -1,3 +1,5 @@
+import type { APIResult } from "@/lib/types";
+import type { GetResult } from "@/pages/api/organizations";
 import type { Organization } from "@prisma/client";
 
 import { Button } from "@/components/Forms";
@@ -43,9 +45,10 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 "Content-Type": "application/json",
             },
         }).then(async (res) => {
-            const data = await res.json();
+            const { result, error }: APIResult<GetResult> = await res.json();
+            if (error) return;
 
-            setOrganizations(data);
+            setOrganizations([...result.organizationsJoined, ...result.organizationsOwned]);
         });
     }, []);
 
@@ -70,12 +73,12 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
             <div className="flex flex-col gap-6 px-5">
                 <span className="text-xs font-medium opacity-50">Organization</span>
 
-                {organizations.map(({ name }, index) => (
-                    <button key={index} className="flex items-center gap-3">
+                {organizations.map(({ name, id }, index) => (
+                    <Link key={index} href={`/app/organization/${id}`} className="flex items-center gap-3">
                         <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
 
                         <p className="text-sm">{name}</p>
-                    </button>
+                    </Link>
                 ))}
 
                 <Button.Small className="!py-1" icon={IconPlus} onClick={onCreatingNewOrganization}>
