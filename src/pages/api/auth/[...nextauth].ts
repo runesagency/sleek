@@ -285,15 +285,15 @@ const getAdapter = (): Adapter => {
 const getProviders = () => {
     const providers: Provider[] = [];
 
-    if (process.env.EMAILSMTPHOST && process.env.EMAILSMTPPORT && process.env.EMAILSMTPUSER && process.env.EMAILSMTPPASSWORD && process.env.EMAILFROM) {
+    if (process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PORT && process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PASSWORD && process.env.EMAILFROM) {
         providers.push(
             EmailProvider({
                 server: {
-                    host: process.env.EMAILSMTPHOST,
-                    port: process.env.EMAILSMTPPORT,
+                    host: process.env.EMAIL_SMTP_USER,
+                    port: process.env.EMAIL_SMTP_PORT,
                     auth: {
-                        user: process.env.EMAILSMTPUSER,
-                        pass: process.env.EMAILSMTPPASSWORD,
+                        user: process.env.EMAIL_SMTP_USER,
+                        pass: process.env.EMAIL_SMTP_PASSWORD,
                     },
                 },
                 from: process.env.EMAILFROM,
@@ -301,20 +301,20 @@ const getProviders = () => {
         );
     }
 
-    if (process.env.DISCORDCLIENTID && process.env.DISCORDCLIENTSECRET) {
+    if (process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET) {
         providers.push(
             DiscordProvider({
-                clientId: process.env.DISCORDCLIENTID,
-                clientSecret: process.env.DISCORDCLIENTSECRET,
+                clientId: process.env.DISCORD_CLIENT_ID,
+                clientSecret: process.env.DISCORD_CLIENT_SECRET,
             })
         );
     }
 
-    if (process.env.GOOGLECLIENTID && process.env.GOOGLECLIENTSECRET) {
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         providers.push(
             GoogleProvider({
-                clientId: process.env.GOOGLECLIENTID,
-                clientSecret: process.env.GOOGLECLIENTSECRET,
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             })
         );
     }
@@ -322,12 +322,12 @@ const getProviders = () => {
     return providers;
 };
 
-if (!process.env.NEXTAUTHSECRET) {
-    throw new Error("NEXTAUTHSECRET variable is not defined in .env file.");
+if (!process.env.NEXTAUTH_SECRET) {
+    throw new Error("NEXTAUTH_SECRET variable is not defined in .env file.");
 }
 
 export const authOptions: NextAuthOptions = {
-    secret: process.env.NEXTAUTHSECRET,
+    secret: process.env.NEXTAUTH_SECRET,
     adapter: getAdapter(),
     providers: getProviders(),
     session: {
