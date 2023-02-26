@@ -3,7 +3,7 @@ import type { MenuSharedProps } from "@/lib/menu/components/Menu";
 
 import clsx from "clsx";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useState } from "react";
 
 type MenuContextComponentItemProps = MenuVariantContextItem & {
@@ -73,7 +73,7 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
 
                     if (list.onClick) {
                         list.onClick();
-                    } else if (list.href && router.isReady) {
+                    } else if (list.href) {
                         router.push(list.href);
                     }
 
