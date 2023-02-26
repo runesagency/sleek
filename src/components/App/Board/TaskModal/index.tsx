@@ -132,7 +132,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                                 </>
                             )}
 
-                            <button className="shrink-0 rounded-full bg-white p-2">
+                            <button className="shrink-0 rounded-full bg-dark-50 p-2">
                                 <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
                             </button>
                         </div>
@@ -166,7 +166,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                                 return <Label key={i} name={label.name} color={label.color} className="!text-sm" />;
                             })}
 
-                            <button className="shrink-0 rounded-full bg-white p-2">
+                            <button className="shrink-0 rounded-full bg-dark-50 p-2">
                                 <IconPlus height={12} width={12} className="stroke-dark-800 stroke-2" />
                             </button>
                         </div>

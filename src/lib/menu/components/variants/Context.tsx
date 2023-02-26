@@ -91,7 +91,7 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
     }, [activeIndex, closeMenu, lists, lists.length, router]);
 
     return (
-        <section ref={innerRef} {...props} className="flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
+        <section ref={innerRef} {...props} className="flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-dark-50">
             {lists.map((props, index) => (
                 <MenuContextComponentItem key={props.name} {...props} index={index} activeIndex={activeIndex} closeMenu={closeMenu} setActiveIndex={setActiveIndex} />
             ))}

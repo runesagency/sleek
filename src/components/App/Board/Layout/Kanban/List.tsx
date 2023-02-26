@@ -169,7 +169,7 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     return (
         <div
             ref={draggableRef}
-            className="group/list relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-sm text-white"
+            className="group/list relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-sm text-dark-50"
         >
             <div ref={handleRef} className={clsx("flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600", isDragging ? "bg-dark-600" : "bg-dark-900")}>
                 <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{title}</span>

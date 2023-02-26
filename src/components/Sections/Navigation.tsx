@@ -107,7 +107,7 @@ const LoginModal = ({ isOpen, closeModal }: LoginModalProps) => {
 
     return (
         <section className="fixed inset-0 z-50 flex h-full w-full items-center justify-center bg-dark-800/70 duration-200">
-            <main ref={clickOutsideRef} className="animate-fade-up flex max-w-xl flex-col gap-10 rounded-lg border border-dark-600 bg-dark-700 px-10 py-20 text-white">
+            <main ref={clickOutsideRef} className="animate-fade-up flex max-w-xl flex-col gap-10 rounded-lg border border-dark-600 bg-dark-700 px-10 py-20 text-dark-50">
                 <div className="flex flex-col gap-5 text-center">
                     <h2 className="heading-3">Log In / Sign Up</h2>
                     <p className="ts-base">Enter using your email or your social account, we will automatically create your account in your first login.</p>

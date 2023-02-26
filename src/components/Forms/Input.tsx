@@ -82,7 +82,7 @@ const SmallDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onI
         <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-3">
             {Icon && (
                 <div className="cursor-pointer py-3" onClick={onIconClick}>
-                    <Icon height={16} width={undefined} className="shrink-0 stroke-white" />
+                    <Icon height={16} width={undefined} className="shrink-0 stroke-dark-50" />
                 </div>
             )}
 
@@ -123,7 +123,7 @@ const LargeDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onI
         <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-5">
             {Icon && (
                 <div className="cursor-pointer py-5" onClick={onIconClick}>
-                    <Icon height={20} width={undefined} className="shrink-0 stroke-white" />
+                    <Icon height={20} width={undefined} className="shrink-0 stroke-dark-50" />
                 </div>
             )}
 

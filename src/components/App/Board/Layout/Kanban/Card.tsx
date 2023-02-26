@@ -110,7 +110,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         <a
             ref={cardRef}
             className={clsx(
-                "group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-white hover:border-dark-400",
+                "group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-dark-50 hover:border-dark-400",
                 isDragging && "opacity-30"
             )}
         >

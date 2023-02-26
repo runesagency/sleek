@@ -75,7 +75,7 @@ const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, inner
     );
 
     return (
-        <section ref={innerRef} {...props} className="flex w-72 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
+        <section ref={innerRef} {...props} className="flex w-72 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-dark-50">
             <header className="flex items-center justify-between gap-2 bg-dark-600 px-5 py-2">
                 {onBack ? <IconChevronLeft height={20} width={undefined} className="cursor-pointer duration-200 hover:opacity-75" onClick={onReturnBack} /> : <div />}
 

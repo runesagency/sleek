@@ -58,7 +58,7 @@ const ComparisonTable = () => {
             <div className="flex justify-between border-b border-dark-600 px-8 py-5">
                 <h3 className="shrink-0 basis-2/6 text-2xl">Feature</h3>
                 <h3 className="text-2xl">Other Products</h3>
-                <img src="/logoipsum-286.svg" className="text-white" alt="logo_ipsum" width="174" height="32" />
+                <img src="/logoipsum-286.svg" className="text-dark-50" alt="logo_ipsum" width="174" height="32" />
             </div>
 
             {comparisonDummyData?.map((val, idx) => (
