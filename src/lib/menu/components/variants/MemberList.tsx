@@ -7,7 +7,6 @@ import Avatar from "@/components/Miscellaneous/Avatar";
 
 import { IconChevronLeft } from "@tabler/icons";
 import clsx from "clsx";
-import { useRouter } from "next/router";
 import { memo, useCallback, useEffect, useState } from "react";
 
 type MenuMemberListComponentItemProps = User & {
@@ -41,7 +40,6 @@ const MenuMemberListComponentItem = ({ onItemClick, index, activeIndex, closeMen
 type MenuMemberListComponent = MenuSharedProps & Omit<MenuVariantMemberList, "type">;
 
 const MenuMemberListComponent = ({ lists, onSelect: onClick, onBack, title, innerRef, closeMenu, ...props }: MenuMemberListComponent) => {
-    const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
     const [filter, setFilter] = useState("");
 
@@ -102,7 +100,7 @@ const MenuMemberListComponent = ({ lists, onSelect: onClick, onBack, title, inne
         return () => {
             document.removeEventListener("keydown", onKeyDown);
         };
-    }, [activeIndex, closeMenu, filteredLists, filteredLists.length, onClick, router]);
+    }, [activeIndex, closeMenu, filteredLists, filteredLists.length, onClick]);
 
     return (
         <section ref={innerRef} {...props} className="flex w-72 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-white">
