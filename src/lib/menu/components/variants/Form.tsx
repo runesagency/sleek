@@ -45,7 +45,7 @@ const MenuFormComponentItem = ({ id, label, props, type, setValue }: MenuFormCom
 
 type MenuFormComponentProps = MenuSharedProps & Omit<MenuVariantForm, "type">;
 
-const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, innerRef, closeMenu, ...props }: MenuFormComponentProps) => {
+const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, innerRef, closeMenu, submitButtonLabel, ...props }: MenuFormComponentProps) => {
     const [values, setValues] = useState<Record<string, unknown>>({});
 
     const onReturnBack = useCallback(() => {
@@ -89,7 +89,7 @@ const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, inner
                     <MenuFormComponentItem key={index} {...props} setValue={onValueSet} />
                 ))}
 
-                <Button.Large type="submit">Submit</Button.Large>
+                <Button.Large type="submit">{submitButtonLabel ?? "Submit"}</Button.Large>
             </form>
         </section>
     );
