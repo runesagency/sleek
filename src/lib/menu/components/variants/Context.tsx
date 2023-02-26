@@ -3,7 +3,6 @@ import type { MenuSharedProps } from "@/lib/menu/components/Menu";
 
 import clsx from "clsx";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useState } from "react";
 
 type MenuContextComponentItemProps = MenuVariantContextItem & {
@@ -31,7 +30,7 @@ const MenuContextComponentItem = ({ icon: Icon, name, onClick: onItemClick, href
     if (!href && !onItemClick) return null;
 
     return (
-        <Component href={href ?? "#"} onClick={onClick} onMouseOver={onHover} className={clsx("flex items-center gap-3 px-5 py-3", activeIndex === index && "bg-dark-800")}>
+        <Component id={`item-${index}`} href={href ?? "#"} onClick={onClick} onMouseOver={onHover} className={clsx("flex items-center gap-3 px-5 py-3", activeIndex === index && "bg-dark-800")}>
             <Icon height={16} width={undefined} />
             <span className="ts-sm">{name}</span>
         </Component>
@@ -41,7 +40,6 @@ const MenuContextComponentItem = ({ icon: Icon, name, onClick: onItemClick, href
 type MenuContextComponentProps = MenuSharedProps & Omit<MenuVariantContext, "type">;
 
 const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuContextComponentProps) => {
-    const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
 
     useEffect(() => {
@@ -74,7 +72,11 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
                     if (list.onClick) {
                         list.onClick();
                     } else if (list.href) {
-                        router.push(list.href);
+                        const element = document.getElementById(`item-${activeIndex}`);
+
+                        if (element) {
+                            element.click();
+                        }
                     }
 
                     closeMenu();
@@ -88,7 +90,7 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
         return () => {
             document.removeEventListener("keydown", onKeyDown);
         };
-    }, [activeIndex, closeMenu, lists, lists.length, router]);
+    }, [activeIndex, closeMenu, lists, lists.length]);
 
     return (
         <section ref={innerRef} {...props} className="flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-dark-50">

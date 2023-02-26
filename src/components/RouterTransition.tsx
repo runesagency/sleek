@@ -2,37 +2,54 @@
 
 import type { LoadingBarRef } from "react-top-loading-bar";
 
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { memo, useEffect, useRef } from "react";
 import LoadingBar from "react-top-loading-bar";
 
 const RouterTransition = () => {
-    const router = useRouter();
-    const ref = useRef<LoadingBarRef>(null);
+    const loadingBarRef = useRef<LoadingBarRef>(null);
 
-    // useEffect(() => {
-    //     const onStart = (url: string) => {
-    //         if (url !== router.asPath) {
-    //             ref.current?.continuousStart();
-    //         }
-    //     };
+    const pathName = usePathname();
+    const lastPathName = useRef(pathName);
 
-    //     const onComplete = () => {
-    //         ref.current?.complete();
-    //     };
+    useEffect(() => {
+        const loadingBar = loadingBarRef.current;
+        if (!loadingBar) return;
 
-    //     router.events.on("routeChangeStart", onStart);
-    //     router.events.on("routeChangeComplete", onComplete);
-    //     router.events.on("routeChangeError", onComplete);
+        if (pathName !== lastPathName.current) {
+            loadingBarRef.current?.complete();
+            lastPathName.current = pathName;
+        }
 
-    //     return () => {
-    //         router.events.off("routeChangeStart", onStart);
-    //         router.events.off("routeChangeComplete", onComplete);
-    //         router.events.off("routeChangeError", onComplete);
-    //     };
-    // }, [router.asPath, router.events]);
+        const onAnchorClick = (event: MouseEvent) => {
+            const target = event.currentTarget;
+            if (!(target instanceof HTMLAnchorElement)) return;
 
-    return <LoadingBar ref={ref} color="#FFFFFF" shadow />;
+            const href = target.getAttribute("href");
+
+            // check if the href is a relative path and not the current path
+            if (href && href.startsWith("/") && href !== pathName) {
+                loadingBar.continuousStart();
+            }
+        };
+
+        // get all anchor tags
+        const anchors = document.querySelectorAll("a");
+
+        anchors.forEach((anchor) => {
+            anchor.addEventListener("click", onAnchorClick);
+        });
+
+        return () => {
+            anchors.forEach((anchor) => {
+                anchor.removeEventListener("click", onAnchorClick);
+            });
+
+            loadingBar.complete();
+        };
+    }, [pathName]);
+
+    return <LoadingBar ref={loadingBarRef} color="#FFFFFF" shadow />;
 };
 
 export default memo(RouterTransition);
