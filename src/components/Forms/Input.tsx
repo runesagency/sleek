@@ -61,7 +61,7 @@ export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputEle
     onSave?: (text: string) => void;
 };
 
-const Small = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+const SmallDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
     const ref = useRef<HTMLInputElement>(null);
     const { value, onKeyDown, onChange: onChangeHandler } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
     const usedRef = innerRef ?? ref;
@@ -100,7 +100,9 @@ const Small = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputCha
     );
 };
 
-const Large = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+export const Small = memo(SmallDefault);
+
+const LargeDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
     const ref = useRef<HTMLInputElement>(null);
     const { value, onKeyDown, onChange: onChangeHandler } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
     const usedRef = innerRef ?? ref;
@@ -139,9 +141,4 @@ const Large = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputCha
     );
 };
 
-const Input = {
-    Small: memo(Small),
-    Large: memo(Large),
-};
-
-export default Input;
+export const Large = memo(LargeDefault);

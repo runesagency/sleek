@@ -10,7 +10,7 @@ export type ButtonProps = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonEleme
     fit?: boolean;
 };
 
-const Small = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
+export const Small = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
     return (
         <button
             className={clsx(
@@ -26,7 +26,7 @@ const Small = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) 
     );
 };
 
-const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
+export const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) => {
     return (
         <button
             className={clsx(
@@ -41,10 +41,3 @@ const Large = ({ children, className, icon: Icon, fit, ...props }: ButtonProps) 
         </button>
     );
 };
-
-const Button = {
-    Small,
-    Large,
-};
-
-export default Button;
