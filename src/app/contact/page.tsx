@@ -1,3 +1,5 @@
+"use client";
+
 import { Button, Input, Textarea } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 import FAQ from "@/components/Sections/FAQ";

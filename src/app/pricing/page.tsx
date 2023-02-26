@@ -1,3 +1,5 @@
+"use client";
+
 import Container from "@/components/Sections/Container";
 import FAQ from "@/components/Sections/FAQ";
 import Footer from "@/components/Sections/Footer";

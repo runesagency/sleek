@@ -1,3 +1,5 @@
+"use client";
+
 import type { FeatureProps } from "@/components/Sections/Features";
 
 import { Input, Button } from "@/components/Forms";
