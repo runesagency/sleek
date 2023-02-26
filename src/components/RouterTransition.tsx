@@ -1,3 +1,5 @@
+"use client";
+
 import type { LoadingBarRef } from "react-top-loading-bar";
 
 import { useRouter } from "next/router";

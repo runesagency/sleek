@@ -1,3 +1,5 @@
+"use client";
+
 import type { TablerIcon } from "@tabler/icons";
 
 import { SwitchButton } from "@/components/Forms";

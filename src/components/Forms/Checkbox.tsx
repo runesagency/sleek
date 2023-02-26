@@ -1,3 +1,5 @@
+"use client";
+
 import { IconCheck } from "@tabler/icons";
 import clsx from "clsx";
 import { memo, useCallback, useState } from "react";

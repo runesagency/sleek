@@ -1,3 +1,5 @@
+"use client";
+
 import Container from "@/components/Sections/Container";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";

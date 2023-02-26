@@ -1,3 +1,5 @@
+"use client";
+
 import type { Options } from "@dicebear/core";
 import type { DetailedHTMLProps, ImgHTMLAttributes } from "react";
 

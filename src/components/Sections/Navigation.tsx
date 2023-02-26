@@ -1,3 +1,5 @@
+"use client";
+
 import type { ClientSafeProvider } from "next-auth/react";
 import type { TypeOptions } from "react-toastify";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import type { DetailedHTMLProps, TextareaHTMLAttributes } from "react";
 
 import { useLocalStorage } from "@mantine/hooks";
