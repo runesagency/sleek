@@ -1,3 +1,5 @@
+"use client";
+
 import type { Project as ProjectType } from "@prisma/client";
 
 import { Button } from "@/components/Forms";

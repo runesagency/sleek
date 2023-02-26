@@ -1,3 +1,5 @@
+"use client";
+
 import type { MenuContextProps } from "@/lib/menu/types.d";
 
 import { MenuAlignment, MenuDirection, MenuAnchor } from "@/lib/menu/types.d";

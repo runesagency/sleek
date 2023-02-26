@@ -1,3 +1,5 @@
+"use client";
+
 import type { APIResult } from "@/lib/types";
 import type { GetResult } from "@/pages/api/organizations";
 import type { Organization } from "@prisma/client";
