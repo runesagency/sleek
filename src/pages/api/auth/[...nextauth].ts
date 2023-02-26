@@ -6,6 +6,7 @@ import type { Provider } from "next-auth/providers";
 import { AuthHashCode } from "@/components/Sections/Navigation";
 import { prisma } from "@/lib/prisma";
 
+import { RoleLevel } from "@prisma/client";
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import EmailProvider from "next-auth/providers/email";
@@ -28,8 +29,6 @@ const getAdapter = (): Adapter => {
             ...account,
 
             // different from the default model
-            providerAccountId: account.providerAccountId,
-            userId: account.userId,
             expiresAt: account.expiredAt ?? undefined,
             idToken: account.tokenId ?? undefined,
 
@@ -49,8 +48,6 @@ const getAdapter = (): Adapter => {
             ...session,
 
             // different from the default model
-            sessionToken: session.sessionToken,
-            userId: session.userId,
             expires: session.expiredAt,
         };
 
@@ -62,7 +59,7 @@ const getAdapter = (): Adapter => {
             const defaultRole = await prisma.role.findFirst({
                 where: {
                     name: "User",
-                    level: "USER",
+                    level: RoleLevel.USER,
                 },
             });
 
@@ -70,10 +67,12 @@ const getAdapter = (): Adapter => {
                 throw new Error("No default role found for new users.");
             }
 
+            const nameFromEmail = data.email.split("@")[0];
+
             const newUser = await prisma.user.create({
                 data: {
                     email: data.email,
-                    name: data.name ?? "Guest",
+                    name: data.name ?? nameFromEmail,
                     verifiedAt: data.emailVerified,
                     roleId: defaultRole.id,
                 },
@@ -113,13 +112,10 @@ const getAdapter = (): Adapter => {
             return null;
         },
 
-        getUserByAccount: async ({ provider, providerAccountId }) => {
+        getUserByAccount: async (provider_providerAccountId) => {
             const account = await prisma.userAccount.findUnique({
                 where: {
-                    provider_providerAccountId: {
-                        provider,
-                        providerAccountId: providerAccountId,
-                    },
+                    provider_providerAccountId,
                 },
                 select: {
                     user: true,
@@ -140,7 +136,7 @@ const getAdapter = (): Adapter => {
                 },
                 data: {
                     name: name ?? undefined,
-                    email: email,
+                    email,
                     verifiedAt: emailVerified ?? undefined,
                 },
             });
@@ -158,13 +154,11 @@ const getAdapter = (): Adapter => {
             return parseUser(deletedUser);
         },
 
-        linkAccount: async ({ providerAccountId, userId, id_token, expires_at, ...data }) => {
+        linkAccount: async ({ id_token, expires_at, ...data }) => {
             const linkedAccount = await prisma.userAccount.create({
                 data: {
                     ...data,
                     tokenId: id_token,
-                    userId: userId,
-                    providerAccountId: providerAccountId,
                     expiredAt: expires_at,
                 },
             });
@@ -176,13 +170,10 @@ const getAdapter = (): Adapter => {
             return null;
         },
 
-        unlinkAccount: async ({ provider, providerAccountId }) => {
+        unlinkAccount: async (provider_providerAccountId) => {
             const unlinkedAccount = await prisma.userAccount.delete({
                 where: {
-                    provider_providerAccountId: {
-                        provider,
-                        providerAccountId: providerAccountId,
-                    },
+                    provider_providerAccountId,
                 },
             });
 
@@ -196,7 +187,7 @@ const getAdapter = (): Adapter => {
         getSessionAndUser: async (sessionToken) => {
             const session = await prisma.userSession.findUnique({
                 where: {
-                    sessionToken: sessionToken,
+                    sessionToken,
                 },
                 include: {
                     user: true,
@@ -219,8 +210,8 @@ const getAdapter = (): Adapter => {
             const newSession = await prisma.userSession.create({
                 data: {
                     expiredAt: expires,
-                    sessionToken: sessionToken,
-                    userId: userId,
+                    sessionToken,
+                    userId,
                 },
             });
 
@@ -230,12 +221,12 @@ const getAdapter = (): Adapter => {
         updateSession: async ({ sessionToken, expires, userId }) => {
             const updatedSession = await prisma.userSession.update({
                 where: {
-                    sessionToken: sessionToken,
+                    sessionToken,
                 },
                 data: {
                     expiredAt: expires,
-                    sessionToken: sessionToken,
-                    userId: userId,
+                    sessionToken,
+                    userId,
                 },
             });
 
@@ -245,7 +236,7 @@ const getAdapter = (): Adapter => {
         deleteSession: async (sessionToken) => {
             const deletedSession = await prisma.userSession.delete({
                 where: {
-                    sessionToken: sessionToken,
+                    sessionToken,
                 },
             });
 
@@ -260,11 +251,11 @@ const getAdapter = (): Adapter => {
             return newVerificationToken;
         },
 
-        useVerificationToken: async (identifierToken) => {
+        useVerificationToken: async (identifier_token) => {
             try {
                 const verificationToken = await prisma.verificationToken.delete({
                     where: {
-                        identifier_token: identifierToken,
+                        identifier_token,
                     },
                 });
 
