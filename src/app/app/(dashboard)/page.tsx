@@ -1,5 +1,4 @@
 import Project from "@/components/App/DataDisplay/Project";
-import AppPageLayout from "@/components/App/Layout/AppPageLayout";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
 
@@ -7,7 +6,7 @@ import Link from "next/link";
 
 export default function AppUserHomePage() {
     return (
-        <AppPageLayout className="flex flex-col gap-10 p-10 md:px-20">
+        <main className="flex flex-col gap-10 p-10 md:px-20">
             <section className="flex flex-col gap-5">
                 <div className="flex flex-col gap-3">
                     <h2 className="ts-2xl">Organization 001</h2>
@@ -15,7 +14,7 @@ export default function AppUserHomePage() {
                     <MemberList.Large users={[]} />
 
                     <Link href={`/app/organization/${"organizationId"}`} className="w-max">
-                        <Button.Large fit>See More</Button.Large>
+                        {/* <Button.Large fit>See More</Button.Large> */}
                     </Link>
                 </div>
 
@@ -25,6 +24,6 @@ export default function AppUserHomePage() {
                     <Project />
                 </div>
             </section>
-        </AppPageLayout>
+        </main>
     );
 }

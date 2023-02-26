@@ -1,4 +1,5 @@
-import AppPageLayout from "@/components/App/Layout/AppPageLayout";
+"use client";
+
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
 
@@ -7,7 +8,7 @@ import Link from "next/link";
 
 export default function ProjectBoardListPage() {
     return (
-        <AppPageLayout className="flex flex-col gap-6 py-9 px-16 3xl:px-36">
+        <main className="flex flex-col gap-6 py-9 px-16 3xl:px-36">
             <Link href={`/app/organization/${"organizationId"}`}>
                 <Button.Small icon={IconArrowBackUp} fit>
                     Back to Organization
@@ -48,6 +49,6 @@ export default function ProjectBoardListPage() {
                     </div>
                 </Link>
             </div>
-        </AppPageLayout>
+        </main>
     );
 }

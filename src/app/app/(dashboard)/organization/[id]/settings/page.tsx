@@ -1,4 +1,7 @@
+"use client";
+
 import { Button, Input, Textarea } from "@/components/Forms";
+
 export default function Settings() {
     return (
         <div className="flex gap-10 ">
@@ -8,8 +11,10 @@ export default function Settings() {
                 <Button.Large>Security</Button.Large>
                 <Button.Large>Roles & Permissions</Button.Large>
             </div>
+
             <div className="flex w-full flex-col gap-8">
                 <h2 className="ts-2xl">General Settings</h2>
+
                 <div className="flex flex-col gap-7">
                     <div>
                         <h3 className="ts-base">Organization Title</h3>
@@ -18,6 +23,7 @@ export default function Settings() {
                     </div>
                     <Input.Large placeholder="Enter your tittle here ..." />
                 </div>
+
                 <div className="flex flex-col gap-7">
                     <div>
                         <h3 className="ts-base">Organization Description</h3>

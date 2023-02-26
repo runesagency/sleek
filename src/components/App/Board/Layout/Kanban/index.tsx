@@ -1,5 +1,5 @@
+import type { LayoutProps } from "@/app/app/board/[id]/page";
 import type { DragEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
-import type { LayoutProps } from "@/pages/app/board/[id]";
 import type { Card as CardType } from "@prisma/client";
 
 import List, { NewCardLocation } from "@/components/App/Board/Layout/Kanban/List";

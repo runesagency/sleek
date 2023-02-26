@@ -1,3 +1,5 @@
+"use client";
+
 import { Button, Input } from "@/components/Forms";
 
 import { IconPlus, IconSearch } from "@tabler/icons";
@@ -133,19 +135,23 @@ export default function Members() {
                     <h2 className="ts-xl">Members</h2>
                     <p className="ts-sm w-1/2">Manage members here, or set up a domain, so everyone with allowed email domains can join the organization automatically.</p>
                 </div>
+
                 <div className="flex h-11 justify-between">
                     <Button.Large fit icon={IconPlus}>
                         Add New Member
                     </Button.Large>
+
                     <Input.Large icon={IconSearch} placeholder="Filter by email or name..." />
                 </div>
             </div>
+
             <div className="flex flex-col gap-5">
                 <div className="flex justify-between border-b border-dark-600 py-4">
                     <h3 className="ts-sm shrink-0 basis-2/6">User</h3>
                     <h3 className="ts-sm">Last Active</h3>
                     <h3 className="ts-sm">Organization permissions</h3>
                 </div>
+
                 {dummyUsersData.map((val, idx) => {
                     return <User key={idx} index={idx} name={val.name} email={val.email} lastActive={val.lastActive} perms={val.perms} />;
                 })}
