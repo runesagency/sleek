@@ -300,7 +300,7 @@ const Menu = () => {
                             const pos = posY + height;
 
                             if (!colliderOffsetY && pos + menuElement.offsetHeight > windowHeight) {
-                                colliderOffsetY = pos - windowHeight - menuElement.offsetHeight;
+                                colliderOffsetY = pos + menuElement.offsetHeight - windowHeight;
                             }
 
                             usedY = pos - colliderOffsetY;
