@@ -1,10 +1,32 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import type { DefaultConfigurations, DefaultRoles } from "./defaults";
 import type { Board, List, Organization, PrismaClient, Project, User } from "@prisma/client";
+
+import { DefaultRolesIds } from "@/lib/constants";
 
 import { faker } from "@faker-js/faker";
 
-const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: User) => {
+import { writeFileSync } from "fs";
+
+let prisma: PrismaClient;
+
+const fakeDataIds: Record<"users" | "organizations" | "projects" | "boards" | "lists" | "cards", string[]> = {
+    users: [],
+    organizations: [],
+    projects: [],
+    boards: [],
+    lists: [],
+    cards: [],
+};
+
+/**
+ * Save fake data ids to a file, in case if the database seeding
+ * is a mistake, we can use this file to delete the fake data
+ */
+const saveFakeDataIds = async () => {
+    writeFileSync("./fake-data-ids.json", JSON.stringify(fakeDataIds, null, 4));
+};
+
+const getFakeOrganizations = async (user: User) => {
     const length = faker.datatype.number({ min: 0, max: 2 });
     if (length === 0) return;
 
@@ -26,6 +48,7 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
             },
         });
 
+        fakeDataIds.organizations.push(organization.id);
         console.log(`> 🛡 He/She then creating an organization named ${organization.name}...`);
 
         // Add users to the organization
@@ -39,35 +62,35 @@ const fakeOrganizations = async (prisma: PrismaClient, roles: DefaultRoles, conf
             });
 
             for (const invitedUser of anotherUsers) {
-                const roleGiven = faker.helpers.arrayElement([roles.organization.ADMIN, roles.organization.MANAGER, roles.organization.MEMBER]);
+                const roleId = faker.helpers.arrayElement([DefaultRolesIds.ORGANIZATION_ADMIN, DefaultRolesIds.ORGANIZATION_MANAGER, DefaultRolesIds.ORGANIZATION_MEMBER]);
 
                 await prisma.organizationUser.create({
                     data: {
                         userId: invitedUser.id,
                         organizationId: organization.id,
-                        roleId: roleGiven.id,
+                        roleId,
                         adderId: user.id,
                     },
                 });
 
-                if (roleGiven.id !== roles.organization.MEMBER.id) {
+                if (roleId !== DefaultRolesIds.ORGANIZATION_MEMBER) {
                     members.push(invitedUser);
                 }
 
-                console.log(`*User ${invitedUser.name} is added to the organization by ${invitedUser.name} users and given the role ${roleGiven.name}*`);
+                console.log(`*User ${invitedUser.name} is added to the organization by ${invitedUser.name} users and given the role ${roleId}*`);
             }
         }
 
         // Done, now create projects
         for (const user of members) {
-            await fakeProjects(prisma, roles, configurations, user, organization);
+            await getFakeProjects(user, organization);
         }
 
         index++;
     }
 };
 
-const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: User, organization: Organization) => {
+const getFakeProjects = async (user: User, organization: Organization) => {
     const length = faker.datatype.number({ min: 0, max: 2 });
     if (length === 0) return;
 
@@ -96,11 +119,12 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
             data: {
                 userId: user.id,
                 projectId: project.id,
-                roleId: roles.project.ADMIN.id,
+                roleId: DefaultRolesIds.PROJECT_ADMIN,
                 adderId: user.id,
             },
         });
 
+        fakeDataIds.projects.push(project.id);
         console.log(`> 🧪 He/She then initiate project named ${project.name}...`);
 
         // Add users to the project
@@ -114,22 +138,22 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
             });
 
             for (const invitedUser of anotherUsers) {
-                const roleGiven = faker.helpers.arrayElement([roles.project.ADMIN, roles.project.MEMBER]);
+                const roleId = faker.helpers.arrayElement([DefaultRolesIds.PROJECT_ADMIN, DefaultRolesIds.PROJECT_MEMBER]);
 
                 await prisma.projectUser.create({
                     data: {
                         userId: invitedUser.id,
                         projectId: project.id,
-                        roleId: roleGiven.id,
+                        roleId,
                         adderId: user.id,
                     },
                 });
 
-                if (roleGiven.id !== roles.project.MEMBER.id) {
+                if (roleId !== DefaultRolesIds.PROJECT_MEMBER) {
                     members.push(invitedUser);
                 }
 
-                console.log(`*User ${invitedUser.name} is joining ${user.name} project and given the role ${roleGiven.name}*`);
+                console.log(`*User ${invitedUser.name} is joining ${user.name} project and given the role ${roleId}*`);
             }
         }
 
@@ -149,35 +173,35 @@ const fakeProjects = async (prisma: PrismaClient, roles: DefaultRoles, configura
             });
 
             for (const invitedOrganization of anotherOrganizations) {
-                const roleGiven = faker.helpers.arrayElement([roles.project.ADMIN, roles.project.MEMBER]);
+                const roleId = faker.helpers.arrayElement([DefaultRolesIds.PROJECT_ADMIN, DefaultRolesIds.PROJECT_MEMBER]);
 
                 await prisma.projectOrganization.create({
                     data: {
                         organizationId: invitedOrganization.id,
                         projectId: project.id,
-                        roleId: roleGiven.id,
+                        roleId,
                         adderId: user.id,
                     },
                 });
 
-                if (roleGiven.id !== roles.project.MEMBER.id) {
+                if (roleId !== DefaultRolesIds.PROJECT_MEMBER) {
                     members.push(user);
                 }
 
-                console.log(`*Organization ${invitedOrganization.name} is joining ${user.name} project and given the role ${roleGiven.name}*`);
+                console.log(`*Organization ${invitedOrganization.name} is joining ${user.name} project and given the role ${roleId}*`);
             }
         }
 
         // Done, now create boards
         for (const user of members) {
-            await fakeBoards(prisma, roles, configurations, user, project);
+            await getFakeBoards(user, project);
         }
 
         index++;
     }
 };
 
-const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations, user: User, project: Project) => {
+const getFakeBoards = async (user: User, project: Project) => {
     const length = faker.datatype.number({ min: 0, max: 5 });
     if (length === 0) return;
 
@@ -205,11 +229,12 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
             data: {
                 userId: user.id,
                 boardId: board.id,
-                roleId: roles.board.ADMIN.id,
+                roleId: DefaultRolesIds.BOARD_ADMIN,
                 adderId: user.id,
             },
         });
 
+        fakeDataIds.boards.push(board.id);
         console.log(`> 📟 And by that, ${board.name} board is created...`);
 
         // Add users to the board
@@ -223,22 +248,22 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
             });
 
             for (const invitedUser of anotherUsers) {
-                const roleGiven = faker.helpers.arrayElement([roles.board.ADMIN, roles.board.MEMBER, roles.board.GUEST]);
+                const roleId = faker.helpers.arrayElement([DefaultRolesIds.BOARD_ADMIN, DefaultRolesIds.BOARD_MEMBER, DefaultRolesIds.BOARD_GUEST]);
 
                 await prisma.boardUser.create({
                     data: {
                         userId: invitedUser.id,
                         boardId: board.id,
-                        roleId: roleGiven.id,
+                        roleId,
                         adderId: user.id,
                     },
                 });
 
-                if (roleGiven.id !== roles.board.GUEST.id) {
+                if (roleId !== DefaultRolesIds.BOARD_GUEST) {
                     members.push(invitedUser);
                 }
 
-                console.log(`*User ${invitedUser.name} is joining ${user.name} board and given the role ${roleGiven.name}*`);
+                console.log(`*User ${invitedUser.name} is joining ${user.name} board and given the role ${roleId}*`);
             }
         }
 
@@ -258,35 +283,35 @@ const fakeBoards = async (prisma: PrismaClient, roles: DefaultRoles, configurati
             });
 
             for (const invitedOrganization of anotherOrganizations) {
-                const roleGiven = faker.helpers.arrayElement([roles.board.ADMIN, roles.board.MEMBER, roles.board.GUEST]);
+                const roleId = faker.helpers.arrayElement([DefaultRolesIds.BOARD_ADMIN, DefaultRolesIds.BOARD_MEMBER, DefaultRolesIds.BOARD_GUEST]);
 
                 await prisma.boardOrganization.create({
                     data: {
                         organizationId: invitedOrganization.id,
                         boardId: board.id,
-                        roleId: roleGiven.id,
+                        roleId,
                         adderId: user.id,
                     },
                 });
 
-                if (roleGiven.id !== roles.board.GUEST.id) {
+                if (roleId !== DefaultRolesIds.BOARD_GUEST) {
                     members.push(user);
                 }
 
-                console.log(`*Organization ${invitedOrganization.name} is joining ${user.name} board and given the role ${roleGiven.name}*`);
+                console.log(`*Organization ${invitedOrganization.name} is joining ${user.name} board and given the role ${roleId}*`);
             }
         }
 
         // Done, now create lists
         for (const user of members) {
-            await fakeLists(prisma, configurations, user, board);
+            await getFakeLists(user, board);
         }
 
         index++;
     }
 };
 
-const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: User, board: Board) => {
+const getFakeLists = async (user: User, board: Board) => {
     const length = faker.datatype.number({ min: 1, max: 5 });
 
     console.log(`> To make ${board.name} successful, ${user.name} then create ${length} lists (steps) for the board...`);
@@ -305,15 +330,16 @@ const fakeLists = async (prisma: PrismaClient, configurations: DefaultConfigurat
             },
         });
 
+        fakeDataIds.lists.push(list.id);
         console.log(`List: *${index + 1}. ${list.title}*`);
 
-        await fakeCards(prisma, configurations, user, board, list);
+        await getFakeCards(user, board, list);
 
         index++;
     }
 };
 
-const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurations, user: User, board: Board, list: List) => {
+const getFakeCards = async (user: User, board: Board, list: List) => {
     const length = faker.datatype.number({ min: 0, max: 6 });
     if (length === 0) return;
 
@@ -333,6 +359,7 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
             },
         });
 
+        fakeDataIds.cards.push(card.id);
         console.log(`Card: *${index + 1}. ${card.title}*`);
 
         const availableBoardMembers = await prisma.user.findMany({
@@ -499,7 +526,9 @@ const fakeCards = async (prisma: PrismaClient, configurations: DefaultConfigurat
     }
 };
 
-export default async function fakeData(prisma: PrismaClient, roles: DefaultRoles, configurations: DefaultConfigurations) {
+export default async function getFakeData(prismaInstance: PrismaClient) {
+    prisma = prismaInstance;
+
     console.log("\n📖 A Story of the Confused Person by Rafly Maulana 🎈");
     console.log("> 🌆 Once upon a time...");
 
@@ -515,17 +544,28 @@ export default async function fakeData(prisma: PrismaClient, roles: DefaultRoles
                 email: faker.internet.email(),
                 username: faker.internet.userName(),
                 phone: faker.phone.number(),
-                roleId: index === 0 ? roles.user.SUPER_ADMIN.id : roles.user.USER.id,
+                roleId: index === 0 ? DefaultRolesIds.SUPER_ADMIN : DefaultRolesIds.USER,
             },
         });
 
+        fakeDataIds.users.push(user.id);
         console.log(`\n> 😎 A person named ${user.name} is creating an account...`);
 
         if (index === 0) {
-            console.log(`(Assuming that ${user.name} was the first user to be created, ${user.name} then assigned the user role "${roles.user.SUPER_ADMIN.name}" by the system)`);
+            console.log(`(Assuming that ${user.name} was the first user to be created, ${user.name} then assigned the user role "${DefaultRolesIds.SUPER_ADMIN}" by the system)`);
         }
 
-        await fakeOrganizations(prisma, roles, configurations, user);
+        await getFakeOrganizations(user);
         index++;
     }
+
+    saveFakeDataIds();
 }
+
+const abortedEvents = ["SIGABRT", "SIGINT", "SIGTERM"];
+
+abortedEvents.forEach((event) => {
+    process.on(event, () => {
+        saveFakeDataIds();
+    });
+});

@@ -1,275 +1,289 @@
 import type { PrismaClient } from "@prisma/client";
 
-export type DefaultRoles = Awaited<ReturnType<typeof defaultRoles>>;
+import { DefaultRolesIds, DefaultStorageIds } from "@/lib/constants";
 
-const defaultRoles = async (prisma: PrismaClient) => {
-    const user = async () => {
-        const SUPER_ADMIN = await prisma.role.create({
-            data: {
-                name: "Super Admin",
-                description: "Can do everything",
-                level: "USER",
+import { StorageProvider, RoleLevel } from "@prisma/client";
 
-                VIEW_USER: true,
-                EDIT_USER: true,
-                DELETE_USER: true,
-                ADD_ORGANIZATION_TO_USER: true,
-                REMOVE_ORGANIZATION_FROM_USER: true,
+let prisma: PrismaClient;
 
-                EDIT_ORGANIZATION: true,
-                DELETE_ORGANIZATION: true,
-                ADD_USER_TO_ORGANIZATION: true,
-                REMOVE_USER_FROM_ORGANIZATION: true,
-                CREATE_PROJECT: true,
+export type DefaultRoles = Awaited<ReturnType<typeof getDefaultRoles>>;
 
-                VIEW_PROJECT: true,
-                EDIT_PROJECT: true,
-                DELETE_PROJECT: true,
-                ADD_USER_TO_PROJECT: true,
-                REMOVE_USER_FROM_PROJECT: true,
-                ADD_ORGANIZATION_TO_PROJECT: true,
-                REMOVE_ORGANIZATION_FROM_PROJECT: true,
-                CREATE_BOARD: true,
+const getDefaultRoles = async () => {
+    // SUPER_ADMIN
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.SUPER_ADMIN,
+        },
+        create: {
+            id: DefaultRolesIds.SUPER_ADMIN,
+            name: "Super Admin",
+            description: "Can do everything",
+            level: RoleLevel.USER,
 
-                VIEW_BOARD: true,
-                EDIT_BOARD: true,
-                DELETE_BOARD: true,
-                ADD_USER_TO_BOARD: true,
-                REMOVE_USER_FROM_BOARD: true,
-                ADD_ORGANIZATION_TO_BOARD: true,
-                REMOVE_ORGANIZATION_FROM_BOARD: true,
-                CREATE_LIST: true,
-                DELETE_LIST: true,
-                CREATE_CARD: true,
-                DELETE_CARD: true,
-            },
-        });
+            VIEW_USER: true,
+            EDIT_USER: true,
+            DELETE_USER: true,
+            ADD_ORGANIZATION_TO_USER: true,
+            REMOVE_ORGANIZATION_FROM_USER: true,
 
-        const USER = await prisma.role.create({
-            data: {
-                name: "User",
-                description: "Basic user",
-                level: "USER",
-            },
-        });
+            EDIT_ORGANIZATION: true,
+            DELETE_ORGANIZATION: true,
+            ADD_USER_TO_ORGANIZATION: true,
+            REMOVE_USER_FROM_ORGANIZATION: true,
+            CREATE_PROJECT: true,
 
-        return {
-            SUPER_ADMIN,
-            USER,
-        };
-    };
+            VIEW_PROJECT: true,
+            EDIT_PROJECT: true,
+            DELETE_PROJECT: true,
+            ADD_USER_TO_PROJECT: true,
+            REMOVE_USER_FROM_PROJECT: true,
+            ADD_ORGANIZATION_TO_PROJECT: true,
+            REMOVE_ORGANIZATION_FROM_PROJECT: true,
+            CREATE_BOARD: true,
 
-    const organization = async () => {
-        const ADMIN = await prisma.role.create({
-            data: {
-                name: "Admin",
-                description: "Control everything in the organization, have the ability same as the owner",
-                level: "ORGANIZATION",
+            VIEW_BOARD: true,
+            EDIT_BOARD: true,
+            DELETE_BOARD: true,
+            ADD_USER_TO_BOARD: true,
+            REMOVE_USER_FROM_BOARD: true,
+            ADD_ORGANIZATION_TO_BOARD: true,
+            REMOVE_ORGANIZATION_FROM_BOARD: true,
+            CREATE_LIST: true,
+            DELETE_LIST: true,
+            CREATE_CARD: true,
+            DELETE_CARD: true,
+        },
+        update: {},
+    });
 
-                EDIT_ORGANIZATION: true,
-                DELETE_ORGANIZATION: true,
-                ADD_USER_TO_ORGANIZATION: true,
-                REMOVE_USER_FROM_ORGANIZATION: true,
-                CREATE_PROJECT: true,
+    // USER
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.USER,
+        },
+        create: {
+            name: DefaultRolesIds.USER,
+            description: "Basic user",
+            level: RoleLevel.USER,
+        },
+        update: {},
+    });
 
-                VIEW_PROJECT: true,
-                EDIT_PROJECT: true,
-                DELETE_PROJECT: true,
-                ADD_USER_TO_PROJECT: true,
-                REMOVE_USER_FROM_PROJECT: true,
-                ADD_ORGANIZATION_TO_PROJECT: true,
-                REMOVE_ORGANIZATION_FROM_PROJECT: true,
-                CREATE_BOARD: true,
+    // ORGANIZATION_ADMIN
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.ORGANIZATION_ADMIN,
+        },
+        create: {
+            name: "Admin",
+            description: "Control everything in the organization, have the ability same as the owner",
+            level: "ORGANIZATION",
 
-                VIEW_BOARD: true,
-                EDIT_BOARD: true,
-                DELETE_BOARD: true,
-                ADD_USER_TO_BOARD: true,
-                REMOVE_USER_FROM_BOARD: true,
-                ADD_ORGANIZATION_TO_BOARD: true,
-                REMOVE_ORGANIZATION_FROM_BOARD: true,
-                CREATE_LIST: true,
-                DELETE_LIST: true,
-                CREATE_CARD: true,
-                DELETE_CARD: true,
-            },
-        });
+            EDIT_ORGANIZATION: true,
+            DELETE_ORGANIZATION: true,
+            ADD_USER_TO_ORGANIZATION: true,
+            REMOVE_USER_FROM_ORGANIZATION: true,
+            CREATE_PROJECT: true,
 
-        const MANAGER = await prisma.role.create({
-            data: {
-                name: "Manager",
-                description: "Have administator permission in the organization projects",
-                level: "ORGANIZATION",
+            VIEW_PROJECT: true,
+            EDIT_PROJECT: true,
+            DELETE_PROJECT: true,
+            ADD_USER_TO_PROJECT: true,
+            REMOVE_USER_FROM_PROJECT: true,
+            ADD_ORGANIZATION_TO_PROJECT: true,
+            REMOVE_ORGANIZATION_FROM_PROJECT: true,
+            CREATE_BOARD: true,
 
-                CREATE_PROJECT: true,
+            VIEW_BOARD: true,
+            EDIT_BOARD: true,
+            DELETE_BOARD: true,
+            ADD_USER_TO_BOARD: true,
+            REMOVE_USER_FROM_BOARD: true,
+            ADD_ORGANIZATION_TO_BOARD: true,
+            REMOVE_ORGANIZATION_FROM_BOARD: true,
+            CREATE_LIST: true,
+            DELETE_LIST: true,
+            CREATE_CARD: true,
+            DELETE_CARD: true,
+        },
+        update: {},
+    });
 
-                VIEW_PROJECT: true,
-                EDIT_PROJECT: true,
-                DELETE_PROJECT: true,
-                ADD_USER_TO_PROJECT: true,
-                REMOVE_USER_FROM_PROJECT: true,
-                ADD_ORGANIZATION_TO_PROJECT: true,
-                REMOVE_ORGANIZATION_FROM_PROJECT: true,
-                CREATE_BOARD: true,
+    // ORGANIZATION_MANAGER
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.ORGANIZATION_MANAGER,
+        },
+        create: {
+            name: "Manager",
+            description: "Have administator permission in the organization projects",
+            level: "ORGANIZATION",
 
-                VIEW_BOARD: true,
-                EDIT_BOARD: true,
-                DELETE_BOARD: true,
-                ADD_USER_TO_BOARD: true,
-                REMOVE_USER_FROM_BOARD: true,
-                ADD_ORGANIZATION_TO_BOARD: true,
-                REMOVE_ORGANIZATION_FROM_BOARD: true,
-                CREATE_LIST: true,
-                DELETE_LIST: true,
-                CREATE_CARD: true,
-                DELETE_CARD: true,
-            },
-        });
+            CREATE_PROJECT: true,
 
-        const MEMBER = await prisma.role.create({
-            data: {
-                name: "Member",
-                description: "Member of the organization",
-                level: "ORGANIZATION",
-            },
-        });
+            VIEW_PROJECT: true,
+            EDIT_PROJECT: true,
+            DELETE_PROJECT: true,
+            ADD_USER_TO_PROJECT: true,
+            REMOVE_USER_FROM_PROJECT: true,
+            ADD_ORGANIZATION_TO_PROJECT: true,
+            REMOVE_ORGANIZATION_FROM_PROJECT: true,
+            CREATE_BOARD: true,
 
-        return {
-            ADMIN,
-            MANAGER,
-            MEMBER,
-        };
-    };
+            VIEW_BOARD: true,
+            EDIT_BOARD: true,
+            DELETE_BOARD: true,
+            ADD_USER_TO_BOARD: true,
+            REMOVE_USER_FROM_BOARD: true,
+            ADD_ORGANIZATION_TO_BOARD: true,
+            REMOVE_ORGANIZATION_FROM_BOARD: true,
+            CREATE_LIST: true,
+            DELETE_LIST: true,
+            CREATE_CARD: true,
+            DELETE_CARD: true,
+        },
+        update: {},
+    });
 
-    const project = async () => {
-        const ADMIN = await prisma.role.create({
-            data: {
-                name: "Admin",
-                description: "Control everything in the project",
-                level: "PROJECT",
+    // ORGANIZATION_MEMBER
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.ORGANIZATION_MEMBER,
+        },
+        create: {
+            name: "Member",
+            description: "Member of the organization",
+            level: "ORGANIZATION",
+        },
+        update: {},
+    });
 
-                VIEW_PROJECT: true,
-                EDIT_PROJECT: true,
-                DELETE_PROJECT: true,
-                ADD_USER_TO_PROJECT: true,
-                REMOVE_USER_FROM_PROJECT: true,
-                ADD_ORGANIZATION_TO_PROJECT: true,
-                REMOVE_ORGANIZATION_FROM_PROJECT: true,
-                CREATE_BOARD: true,
+    // PROJECT_ADMIN
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.PROJECT_ADMIN,
+        },
+        create: {
+            name: "Admin",
+            description: "Control everything in the project",
+            level: "PROJECT",
 
-                VIEW_BOARD: true,
-                EDIT_BOARD: true,
-                DELETE_BOARD: true,
-                ADD_USER_TO_BOARD: true,
-                REMOVE_USER_FROM_BOARD: true,
-                ADD_ORGANIZATION_TO_BOARD: true,
-                REMOVE_ORGANIZATION_FROM_BOARD: true,
-                CREATE_LIST: true,
-                DELETE_LIST: true,
-                CREATE_CARD: true,
-                DELETE_CARD: true,
-            },
-        });
+            VIEW_PROJECT: true,
+            EDIT_PROJECT: true,
+            DELETE_PROJECT: true,
+            ADD_USER_TO_PROJECT: true,
+            REMOVE_USER_FROM_PROJECT: true,
+            ADD_ORGANIZATION_TO_PROJECT: true,
+            REMOVE_ORGANIZATION_FROM_PROJECT: true,
+            CREATE_BOARD: true,
 
-        const MEMBER = await prisma.role.create({
-            data: {
-                name: "Member",
-                description: "Member of the project",
-                level: "PROJECT",
+            VIEW_BOARD: true,
+            EDIT_BOARD: true,
+            DELETE_BOARD: true,
+            ADD_USER_TO_BOARD: true,
+            REMOVE_USER_FROM_BOARD: true,
+            ADD_ORGANIZATION_TO_BOARD: true,
+            REMOVE_ORGANIZATION_FROM_BOARD: true,
+            CREATE_LIST: true,
+            DELETE_LIST: true,
+            CREATE_CARD: true,
+            DELETE_CARD: true,
+        },
+        update: {},
+    });
 
-                VIEW_PROJECT: true,
-            },
-        });
+    // PROJECT_MEMBER
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.PROJECT_MEMBER,
+        },
+        create: {
+            name: "Member",
+            description: "Member of the project",
+            level: "PROJECT",
 
-        return {
-            ADMIN,
-            MEMBER,
-        };
-    };
+            VIEW_PROJECT: true,
+        },
+        update: {},
+    });
 
-    const board = async () => {
-        const ADMIN = await prisma.role.create({
-            data: {
-                name: "Admin",
-                description: "Control everything in the board",
-                level: "BOARD",
+    // BOARD_ADMIN
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.BOARD_ADMIN,
+        },
+        create: {
+            name: "Admin",
+            description: "Control everything in the board",
+            level: "BOARD",
 
-                VIEW_BOARD: true,
-                EDIT_BOARD: true,
-                DELETE_BOARD: true,
-                ADD_USER_TO_BOARD: true,
-                REMOVE_USER_FROM_BOARD: true,
-                ADD_ORGANIZATION_TO_BOARD: true,
-                REMOVE_ORGANIZATION_FROM_BOARD: true,
-                CREATE_LIST: true,
-                DELETE_LIST: true,
-                CREATE_CARD: true,
-                DELETE_CARD: true,
-            },
-        });
+            VIEW_BOARD: true,
+            EDIT_BOARD: true,
+            DELETE_BOARD: true,
+            ADD_USER_TO_BOARD: true,
+            REMOVE_USER_FROM_BOARD: true,
+            ADD_ORGANIZATION_TO_BOARD: true,
+            REMOVE_ORGANIZATION_FROM_BOARD: true,
+            CREATE_LIST: true,
+            DELETE_LIST: true,
+            CREATE_CARD: true,
+            DELETE_CARD: true,
+        },
+        update: {},
+    });
 
-        const MEMBER = await prisma.role.create({
-            data: {
-                name: "Member",
-                description: "Member of the board",
-                level: "BOARD",
+    // BOARD_MEMBER
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.BOARD_MEMBER,
+        },
+        create: {
+            name: "Member",
+            description: "Member of the board",
+            level: "BOARD",
 
-                VIEW_BOARD: true,
-                CREATE_LIST: true,
-                DELETE_LIST: true,
-                CREATE_CARD: true,
-                DELETE_CARD: true,
-            },
-        });
+            VIEW_BOARD: true,
+            CREATE_LIST: true,
+            DELETE_LIST: true,
+            CREATE_CARD: true,
+            DELETE_CARD: true,
+        },
+        update: {},
+    });
 
-        const GUEST = await prisma.role.create({
-            data: {
-                name: "Guest",
-                description: "Guest of the board",
-                level: "BOARD",
+    // BOARD_GUEST
+    await prisma.role.upsert({
+        where: {
+            id: DefaultRolesIds.BOARD_GUEST,
+        },
+        create: {
+            name: "Guest",
+            description: "Guest of the board",
+            level: "BOARD",
 
-                VIEW_BOARD: true,
-            },
-        });
-
-        return {
-            ADMIN,
-            MEMBER,
-            GUEST,
-        };
-    };
-
-    return {
-        user: await user(),
-        organization: await organization(),
-        project: await project(),
-        board: await board(),
-    };
+            VIEW_BOARD: true,
+        },
+        update: {},
+    });
 };
 
-export type DefaultConfigurations = Awaited<ReturnType<typeof defaultConfigurations>>;
-
-const defaultConfigurations = async (prisma: PrismaClient) => {
-    const attachmentStorage = async () => {
-        const LOCAL = await prisma.attachmentStorage.create({
-            data: {
-                provider: "LOCAL",
-            },
-        });
-
-        return {
-            LOCAL,
-        };
-    };
-
-    return {
-        attachmentStorage: await attachmentStorage(),
-    };
+const getDefaultConfigurations = async () => {
+    // LOCAL
+    await prisma.storage.upsert({
+        where: {
+            id: DefaultStorageIds.LOCAL,
+        },
+        create: {
+            id: DefaultStorageIds.LOCAL,
+            provider: StorageProvider.LOCAL,
+        },
+        update: {},
+    });
 };
 
-export default async function defaultData(prisma: PrismaClient) {
-    return {
-        roles: await defaultRoles(prisma),
-        configurations: await defaultConfigurations(prisma),
-    };
+export default async function getDefaultData(prismaInstance: PrismaClient) {
+    prisma = prismaInstance;
+
+    await getDefaultRoles();
+    await getDefaultConfigurations();
 }

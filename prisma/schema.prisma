@@ -148,21 +148,21 @@ model Label {
 }
 
 // ------------------------------
-// [Attachments]
+// [Storage & Attachments]
 // ------------------------------
 
-enum AttachmentProvider {
+enum StorageProvider {
   LOCAL
   S3
 }
 
-model AttachmentStorage {
-  id       String             @id @default(uuid())
-  provider AttachmentProvider
+model Storage {
+  id       String          @id @default(uuid())
+  provider StorageProvider
 
   attachments Attachment[]
 
-  @@map("attachment_storage")
+  @@map("storage")
 }
 
 model Attachment {
@@ -173,8 +173,8 @@ model Attachment {
   size           Int
   type           String
 
-  storageId String            @map("storage_id")
-  storage   AttachmentStorage @relation(fields: [storageId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  storageId String  @map("storage_id")
+  storage   Storage @relation(fields: [storageId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   ownerId String @map("owner_id")
   owner   User   @relation(name: "attachments_owned", fields: [ownerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
