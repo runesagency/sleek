@@ -1,11 +1,11 @@
-/* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import type { Board, List, Organization, PrismaClient, Project, User } from "@prisma/client";
 
-import { DefaultRolesIds } from "@/lib/constants";
+import { DefaultRolesIds } from "../../src/lib/constants";
 
 import { faker } from "@faker-js/faker";
 
-import { writeFileSync } from "fs";
+import { existsSync, lstatSync, mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
 
 let prisma: PrismaClient;
 
@@ -22,8 +22,34 @@ const fakeDataIds: Record<"users" | "organizations" | "projects" | "boards" | "l
  * Save fake data ids to a file, in case if the database seeding
  * is a mistake, we can use this file to delete the fake data
  */
-const saveFakeDataIds = async () => {
-    writeFileSync("./fake-data-ids.json", JSON.stringify(fakeDataIds, null, 4));
+const saveFakeDataIds = () => {
+    // create a date with format DD-MM-YYYY_HH-MM-SS
+    const date = new Date()
+        .toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        })
+        .replace(/\//g, "-")
+        .replace(/:/g, "-");
+
+    // cd or create a directory named "generated" above this directory
+    // and create a file named "fake-data-ids.json" in it
+    const folderPath = join(__dirname, "..", "generated");
+    const isFolderExists = existsSync(folderPath) && lstatSync(folderPath).isDirectory();
+
+    console.log(`> 📁 Saving fake data ids to ${folderPath}/fake-data-ids-${date}.json...`);
+
+    if (!isFolderExists) {
+        console.log(`> 📁 Creating a directory named "generated" above this directory...`);
+        mkdirSync(folderPath);
+    }
+
+    const filePath = join(folderPath, `fake-data-ids-${date}.json`);
+    writeFileSync(filePath, JSON.stringify(fakeDataIds, null, 4));
 };
 
 const getFakeOrganizations = async (user: User) => {
@@ -526,7 +552,7 @@ const getFakeCards = async (user: User, board: Board, list: List) => {
     }
 };
 
-export default async function getFakeData(prismaInstance: PrismaClient) {
+export default async function generateFakeData(prismaInstance: PrismaClient) {
     prisma = prismaInstance;
 
     console.log("\n📖 A Story of the Confused Person by Rafly Maulana 🎈");
@@ -562,10 +588,15 @@ export default async function getFakeData(prismaInstance: PrismaClient) {
     saveFakeDataIds();
 }
 
-const abortedEvents = ["SIGABRT", "SIGINT", "SIGTERM"];
+const exitEvents = ["beforeExit", "SIGINT", "SIGUSR1", "SIGUSR2", "SIGTERM"];
 
-abortedEvents.forEach((event) => {
-    process.on(event, () => {
+exitEvents.forEach((eventName) => {
+    process.once(eventName, () => {
+        process.stdin.resume();
+
         saveFakeDataIds();
+
+        console.log("\n👋 Goodbye! 😊");
+        process.exit();
     });
 });

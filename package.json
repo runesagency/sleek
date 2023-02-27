@@ -8,8 +8,8 @@
         "start": "next start",
         "lint": "next lint",
         "git:prepare": "husky install",
-        "db:seed": "ts-node prisma/seeder/index.ts",
-        "db:reset": "prisma migrate reset && prisma db push"
+        "database:seed": "ts-node prisma/cli/seed.ts",
+        "database:reset": "ts-node prisma/cli/reset.ts"
     },
     "eslintConfig": {
         "parser": "@typescript-eslint/parser",

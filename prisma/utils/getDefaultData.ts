@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 
-import { DefaultRolesIds, DefaultStorageIds } from "@/lib/constants";
+import { DefaultRolesIds, DefaultStorageIds } from "../../src/lib/constants";
 
 import { StorageProvider, RoleLevel } from "@prisma/client";
 
@@ -62,7 +62,8 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.USER,
         },
         create: {
-            name: DefaultRolesIds.USER,
+            id: DefaultRolesIds.USER,
+            name: "User",
             description: "Basic user",
             level: RoleLevel.USER,
         },
@@ -75,6 +76,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.ORGANIZATION_ADMIN,
         },
         create: {
+            id: DefaultRolesIds.ORGANIZATION_ADMIN,
             name: "Admin",
             description: "Control everything in the organization, have the ability same as the owner",
             level: "ORGANIZATION",
@@ -115,6 +117,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.ORGANIZATION_MANAGER,
         },
         create: {
+            id: DefaultRolesIds.ORGANIZATION_MANAGER,
             name: "Manager",
             description: "Have administator permission in the organization projects",
             level: "ORGANIZATION",
@@ -151,6 +154,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.ORGANIZATION_MEMBER,
         },
         create: {
+            id: DefaultRolesIds.ORGANIZATION_MEMBER,
             name: "Member",
             description: "Member of the organization",
             level: "ORGANIZATION",
@@ -164,6 +168,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.PROJECT_ADMIN,
         },
         create: {
+            id: DefaultRolesIds.PROJECT_ADMIN,
             name: "Admin",
             description: "Control everything in the project",
             level: "PROJECT",
@@ -198,6 +203,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.PROJECT_MEMBER,
         },
         create: {
+            id: DefaultRolesIds.PROJECT_MEMBER,
             name: "Member",
             description: "Member of the project",
             level: "PROJECT",
@@ -213,6 +219,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.BOARD_ADMIN,
         },
         create: {
+            id: DefaultRolesIds.BOARD_ADMIN,
             name: "Admin",
             description: "Control everything in the board",
             level: "BOARD",
@@ -238,6 +245,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.BOARD_MEMBER,
         },
         create: {
+            id: DefaultRolesIds.BOARD_MEMBER,
             name: "Member",
             description: "Member of the board",
             level: "BOARD",
@@ -257,6 +265,7 @@ const getDefaultRoles = async () => {
             id: DefaultRolesIds.BOARD_GUEST,
         },
         create: {
+            id: DefaultRolesIds.BOARD_GUEST,
             name: "Guest",
             description: "Guest of the board",
             level: "BOARD",
