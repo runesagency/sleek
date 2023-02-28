@@ -1,6 +1,6 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import generateFakeData from "../utils/generateFakeData";
-import getDefaultData from "../utils/getDefaultData";
+import generateFakeData from "../utils/generate-fake-data";
+import getDefaultData from "../utils/get-default-data";
 
 import { PrismaClient } from "@prisma/client";
 
