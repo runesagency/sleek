@@ -4,9 +4,9 @@ import type { AdapterAccount, Adapter, AdapterUser, AdapterSession } from "next-
 import type { Provider } from "next-auth/providers";
 
 import { AuthHashCode } from "@/components/Sections/Navigation";
+import { DefaultRolesIds } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
-import { RoleLevel } from "@prisma/client";
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import EmailProvider from "next-auth/providers/email";
@@ -56,17 +56,6 @@ const getAdapter = (): Adapter => {
 
     return {
         createUser: async (data) => {
-            const defaultRole = await prisma.role.findFirst({
-                where: {
-                    name: "User",
-                    level: RoleLevel.USER,
-                },
-            });
-
-            if (!defaultRole) {
-                throw new Error("No default role found for new users.");
-            }
-
             const nameFromEmail = data.email.split("@")[0];
 
             const newUser = await prisma.user.create({
@@ -74,7 +63,7 @@ const getAdapter = (): Adapter => {
                     email: data.email,
                     name: data.name ?? nameFromEmail,
                     verifiedAt: data.emailVerified,
-                    roleId: defaultRole.id,
+                    roleId: DefaultRolesIds.USER,
                 },
             });
 
