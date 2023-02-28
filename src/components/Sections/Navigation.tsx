@@ -38,6 +38,9 @@ const LoginModal = ({ isOpen, closeModal }: LoginModalProps) => {
         setHash("");
     });
 
+    const filteredLoginProviders = loginProviders.filter((provider) => provider.id !== "email" && provider.id !== "credentials");
+    const isEmailLoginAvailable = loginProviders.find((provider) => provider.id === "email");
+
     const onLogin = useCallback(async (e: React.MouseEvent | string) => {
         if (typeof e !== "string") {
             e.preventDefault();
@@ -96,9 +99,6 @@ const LoginModal = ({ isOpen, closeModal }: LoginModalProps) => {
                 const list: ClientSafeProvider[] = [];
 
                 Object.values(providers).map((value) => {
-                    if (value.id === "credentials") return;
-                    if (value.id === "email") return;
-
                     list.push(value);
                 });
 
@@ -117,9 +117,9 @@ const LoginModal = ({ isOpen, closeModal }: LoginModalProps) => {
                     <p className="ts-base">Enter using your email or your social account, we will automatically create your account in your first login.</p>
                 </div>
 
-                {loginProviders.length > 0 && (
+                {filteredLoginProviders.length > 0 && (
                     <div className="flex flex-col gap-5 text-center">
-                        {loginProviders.map(({ name, id }) => {
+                        {filteredLoginProviders.map(({ name, id }) => {
                             const Icon = () => <img src={`https://authjs.dev/img/providers/${id}.svg`} alt={name} loading="lazy" className="mr-2 h-5" />;
 
                             return (
@@ -131,22 +131,24 @@ const LoginModal = ({ isOpen, closeModal }: LoginModalProps) => {
                     </div>
                 )}
 
-                <div className="flex flex-col gap-5 text-center">
-                    <Input.Large
-                        name="email"
-                        type="email"
-                        placeholder="Email"
-                        innerRef={inputRef} //
-                        icon={IconMail}
-                        onSave={onLogin}
-                        saveOnEnter
-                        disabled={isLoading}
-                    />
+                {isEmailLoginAvailable && (
+                    <div className="flex flex-col gap-5 text-center">
+                        <Input.Large
+                            name="email"
+                            type="email"
+                            placeholder="Email"
+                            innerRef={inputRef} //
+                            icon={IconMail}
+                            onSave={onLogin}
+                            saveOnEnter
+                            disabled={isLoading}
+                        />
 
-                    <Button.Large icon={IconLogin} onClick={onLogin} disabled={isLoading}>
-                        Log In / Sign In
-                    </Button.Large>
-                </div>
+                        <Button.Large icon={IconLogin} onClick={onLogin} disabled={isLoading}>
+                            Log In / Sign In
+                        </Button.Large>
+                    </div>
+                )}
             </main>
         </section>
     );
