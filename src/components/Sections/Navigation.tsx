@@ -38,7 +38,11 @@ const LoginModal = ({ isOpen, closeModal }: LoginModalProps) => {
         setHash("");
     });
 
-    const onLogin = useCallback(async () => {
+    const onLogin = useCallback(async (e: React.MouseEvent | string) => {
+        if (typeof e !== "string") {
+            e.preventDefault();
+        }
+
         const email = inputRef?.current?.value.trim();
         if (!email) return;
 
