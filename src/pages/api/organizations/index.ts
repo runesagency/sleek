@@ -1,6 +1,7 @@
 import type { ApiRequest, APIResponse } from "@/lib/types";
 import type { Organization } from "@prisma/client";
 
+import { DefaultRolesIds } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
@@ -111,6 +112,12 @@ router.post(async (req, res) => {
         data: {
             name,
             ownerId: user.id,
+            users: {
+                create: {
+                    userId: user.id,
+                    roleId: DefaultRolesIds.ORGANIZATION_ADMIN,
+                },
+            },
         },
     });
 
