@@ -22,6 +22,12 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
     const [organizationOnCreate, setOrganizationOnCreate] = useState<string | null>(null);
     const { toggleMenu } = useMenu();
 
+    // All path are prefixed with /app
+    const links = [
+        { name: "All Projects", path: "/", icon: IconCards },
+        { name: "Your Settings", path: "#", icon: IconSettings },
+    ];
+
     const onCreatingNewOrganization = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
             toggleMenu(e, {
@@ -79,15 +85,12 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
             <div className="flex flex-col gap-6 px-5">
                 <span className="text-xs font-medium opacity-50">Personal</span>
 
-                <Link href="/app" className="flex items-center gap-3">
-                    <IconCards width={20} height={undefined} className="shrink-0" />
-                    <p className="text-sm">All Projects</p>
-                </Link>
-
-                <button className="flex items-center gap-3">
-                    <IconSettings width={20} height={undefined} className="shrink-0" />
-                    <p className="text-sm">Your Settings</p>
-                </button>
+                {links.map(({ name, path, icon: Icon }, index) => (
+                    <Link key={index} href={"/app" + path} className="flex items-center gap-3 duration-200 hover:opacity-75">
+                        <Icon width={20} height={undefined} className="shrink-0" />
+                        <p className="text-sm">{name}</p>
+                    </Link>
+                ))}
             </div>
 
             <hr className="border-dark-600" />
@@ -96,7 +99,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 <span className="text-xs font-medium opacity-50">Organization</span>
 
                 {organizations.map(({ name, id }, index) => (
-                    <Link key={index} href={`/app/organization/${id}`} className="flex items-center gap-3">
+                    <Link key={index} href={`/app/organization/${id}`} className="flex items-center gap-3 duration-200 hover:opacity-75">
                         <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
 
                         <p className="text-sm">{name}</p>
