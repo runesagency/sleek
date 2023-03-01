@@ -3,13 +3,17 @@
 import "react-toastify/dist/ReactToastify.css";
 import "@/styles/globals.css";
 
-import RouterTransition from "@/components/RouterTransition";
+import type { LoadingBarRef } from "react-top-loading-bar";
+
 import { Menu, MenuProvider } from "@/lib/menu";
 
 import clsx from "clsx";
 import { Manrope } from "next/font/google";
+import { usePathname } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
+import { useEffect, useRef } from "react";
 import { ToastContainer } from "react-toastify";
+import LoadingBar from "react-top-loading-bar";
 
 const manrope = Manrope({
     variable: "--font-manrope",
@@ -21,6 +25,56 @@ const manrope = Manrope({
     style: ["normal"],
     subsets: ["latin", "latin-ext"],
 });
+
+const RouterTransition = () => {
+    const loadingBarRef = useRef<LoadingBarRef>(null);
+
+    const pathName = usePathname();
+    const lastPathName = useRef(pathName);
+
+    useEffect(() => {
+        const loadingBar = loadingBarRef.current;
+        if (!loadingBar) return;
+
+        if (pathName !== lastPathName.current) {
+            loadingBarRef.current?.complete();
+            lastPathName.current = pathName;
+        }
+
+        const onAnchorClick = (event: MouseEvent) => {
+            const target = event.currentTarget;
+            if (!(target instanceof HTMLAnchorElement)) return;
+
+            const href = target.getAttribute("href");
+
+            if (!href) return;
+
+            const cleanHref = href.split("#")[0];
+
+            // check if the href is a relative path and not the current path
+            if (cleanHref.startsWith("/") && cleanHref !== pathName) {
+                loadingBar.continuousStart();
+            }
+        };
+
+        // get all anchor tags
+        const anchors = document.querySelectorAll("a");
+
+        anchors.forEach((anchor) => {
+            anchor.addEventListener("click", onAnchorClick);
+        });
+
+        return () => {
+            anchors.forEach((anchor) => {
+                anchor.removeEventListener("click", onAnchorClick);
+            });
+
+            loadingBar.complete();
+        };
+    }, [pathName]);
+
+    return <LoadingBar ref={loadingBarRef} color="#FFFFFF" shadow />;
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
