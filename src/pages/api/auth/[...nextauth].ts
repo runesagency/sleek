@@ -265,15 +265,15 @@ const getAdapter = (): Adapter => {
 const getProviders = () => {
     const providers: Provider[] = [];
 
-    if (process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PORT && process.env.EMAIL_SMTP_USER && process.env.EMAIL_SMTP_PASSWORD && process.env.EMAIL_FROM) {
+    if (process.env.EMAIL_SERVER_HOST && process.env.EMAIL_SERVER_PORT && process.env.EMAIL_SERVER_USER && process.env.EMAIL_SERVER_PASSWORD && process.env.EMAIL_FROM) {
         providers.push(
             EmailProvider({
                 server: {
-                    host: process.env.EMAIL_SMTP_USER,
-                    port: process.env.EMAIL_SMTP_PORT,
+                    host: process.env.EMAIL_SERVER_HOST,
+                    port: process.env.EMAIL_SERVER_PORT,
                     auth: {
-                        user: process.env.EMAIL_SMTP_USER,
-                        pass: process.env.EMAIL_SMTP_PASSWORD,
+                        user: process.env.EMAIL_SERVER_USER,
+                        pass: process.env.EMAIL_SERVER_PASSWORD,
                     },
                 },
                 from: process.env.EMAIL_FROM,
