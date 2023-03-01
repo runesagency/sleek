@@ -27,8 +27,12 @@ const RouterTransition = () => {
 
             const href = target.getAttribute("href");
 
+            if (!href) return;
+
+            const cleanHref = href.split("#")[0];
+
             // check if the href is a relative path and not the current path
-            if (href && href.startsWith("/") && href !== pathName) {
+            if (cleanHref.startsWith("/") && cleanHref !== pathName) {
                 loadingBar.continuousStart();
             }
         };
