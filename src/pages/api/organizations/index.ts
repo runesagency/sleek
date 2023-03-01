@@ -43,10 +43,7 @@ router.use(async (req, res, next) => {
     return res.status(401).end();
 });
 
-export type GetResult = {
-    organizationsOwned: Organization[];
-    organizationsJoined: Organization[];
-};
+export type GetResult = Organization[];
 
 const GetSchema = z.object({});
 
@@ -64,7 +61,6 @@ router.get(async (req, res) => {
             email: req.user.email,
         },
         select: {
-            organizationsOwned: true,
             organizations: {
                 select: {
                     organization: true,
@@ -83,10 +79,7 @@ router.get(async (req, res) => {
     }
 
     return res.status(200).json({
-        result: {
-            organizationsOwned: user.organizationsOwned,
-            organizationsJoined: user.organizations.map(({ organization }) => organization),
-        } as GetResult,
+        result: user.organizations.map(({ organization }) => organization) as GetResult,
     });
 });
 
