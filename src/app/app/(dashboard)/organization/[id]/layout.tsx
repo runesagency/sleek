@@ -4,14 +4,14 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type DashboardLayoutProps = {
+type OrganizationPageLayoutProps = {
     children: React.ReactNode;
     params: {
         id: string;
     };
 };
 
-export default function DashboardLayout({ children, params: { id } }: DashboardLayoutProps) {
+export default function OrganizationPageLayout({ children, params: { id } }: OrganizationPageLayoutProps) {
     const pathname = usePathname();
     const page = pathname?.split("/").pop();
     const pagePath = page === id ? "/" : `/${page}`;
