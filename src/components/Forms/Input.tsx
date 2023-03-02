@@ -3,6 +3,7 @@
 import type { TablerIcon } from "@tabler/icons";
 import type { DetailedHTMLProps, HTMLInputTypeAttribute, InputHTMLAttributes } from "react";
 
+import clsx from "clsx";
 import { useRef, memo, useCallback, useState } from "react";
 
 type UseInputOptions = {
@@ -51,7 +52,7 @@ const useInput = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter }: 
     };
 };
 
-export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref"> & {
+export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref" | "className"> & {
     icon?: TablerIcon;
     type?: HTMLInputTypeAttribute;
     innerRef?: React.RefObject<HTMLInputElement>;
@@ -59,9 +60,10 @@ export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputEle
     saveOnEnter?: boolean;
     onClose?: () => void;
     onSave?: (text: string) => void;
+    className?: Partial<Record<"input" | "icon" | "container", string>>;
 };
 
-const SmallDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+const SmallDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", className, ...props }: InputProps) => {
     const ref = useRef<HTMLInputElement>(null);
     const { value, onKeyDown, onChange: onChangeHandler } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
     const usedRef = innerRef ?? ref;
@@ -79,9 +81,9 @@ const SmallDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onI
     );
 
     return (
-        <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-3">
+        <div className={clsx("flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 pl-3", className?.container)}>
             {Icon && (
-                <div className="cursor-pointer py-3" onClick={onIconClick}>
+                <div className={clsx("cursor-pointer py-3", className?.icon)} onClick={onIconClick}>
                     <Icon height={16} width={undefined} className="shrink-0 stroke-dark-50" />
                 </div>
             )}
@@ -89,7 +91,7 @@ const SmallDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onI
             <input
                 ref={usedRef}
                 type={type}
-                className="ts-sm w-full bg-transparent py-3 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
+                className={clsx("ts-sm w-full bg-transparent py-3 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30", className?.input)}
                 placeholder="Enter your card title here" //
                 value={value}
                 onKeyDown={onKeyDown}
@@ -102,7 +104,7 @@ const SmallDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onI
 
 export const Small = memo(SmallDefault);
 
-const LargeDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", ...props }: InputProps) => {
+const LargeDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onInputChange, saveOnEnter, innerRef, type = "text", className, ...props }: InputProps) => {
     const ref = useRef<HTMLInputElement>(null);
     const { value, onKeyDown, onChange: onChangeHandler } = useInput({ defaultValue, onSave, onClose, saveOnEnter });
     const usedRef = innerRef ?? ref;
@@ -120,9 +122,9 @@ const LargeDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onI
     );
 
     return (
-        <div className="flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 px-5">
+        <div className={clsx("flex items-center gap-3 overflow-hidden rounded-lg bg-dark-500 pl-5", className?.container)}>
             {Icon && (
-                <div className="cursor-pointer py-5" onClick={onIconClick}>
+                <div className={clsx("cursor-pointer py-5", className?.icon)} onClick={onIconClick}>
                     <Icon height={20} width={undefined} className="shrink-0 stroke-dark-50" />
                 </div>
             )}
@@ -130,7 +132,7 @@ const LargeDefault = ({ defaultValue, icon: Icon, onSave, onClose, onChange: onI
             <input
                 ref={usedRef}
                 type={type}
-                className="ts-sm w-full bg-transparent py-5 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30"
+                className={clsx("ts-sm w-full bg-transparent py-5 focus:outline-none disabled:cursor-not-allowed disabled:opacity-30", className?.input)}
                 placeholder="Enter your card title here" //
                 value={value}
                 onKeyDown={onKeyDown}
