@@ -14,7 +14,7 @@ export default function AppUserHomePage() {
                     <MemberList.Large users={[]} />
 
                     <Link href={`/app/organization/${"organizationId"}`} className="w-max">
-                        {/* <Button.Large fit>See More</Button.Large> */}
+                        <Button.Large fit>See More</Button.Large>
                     </Link>
                 </div>
 
