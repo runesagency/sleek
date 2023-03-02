@@ -69,11 +69,6 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                 "Content-Type": "application/json",
             },
         }).then(async (res) => {
-            if (!res.ok) {
-                toast.error("An error occured while fetching organization data");
-                return router.push("/app");
-            }
-
             const { result, error }: APIResult<GetResult> = await res.json();
 
             if (error) {
