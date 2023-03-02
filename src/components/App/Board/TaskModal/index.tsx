@@ -113,7 +113,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                         <div className="flex items-center gap-3">
                             {card.creator ? (
                                 <>
-                                    <Avatar config={{ seed: card.creator.name }} alt={card.creator.name} className="h-10 w-10 rounded-full" />
+                                    <Avatar seed={card.creator.name} className="h-10 w-10 rounded-full" />
                                     <p>{card.creator.name}</p>
                                 </>
                             ) : (

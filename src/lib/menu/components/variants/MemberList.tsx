@@ -31,7 +31,7 @@ const MenuMemberListComponentItem = ({ onItemClick, index, activeIndex, closeMen
 
     return (
         <button key={index} onClick={onClick} onMouseOver={onHover} className={clsx("flex items-center gap-2 rounded-lg p-2", activeIndex === index && "bg-dark-800")}>
-            <Avatar className="h-6 w-6 rounded-full" config={{ seed: name }} />
+            <Avatar className="h-6 w-6 rounded-full" seed={name} />
             <span className="ts-sm">{name}</span>
         </button>
     );

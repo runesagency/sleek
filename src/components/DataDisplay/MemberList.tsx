@@ -16,17 +16,7 @@ const Small = ({ users, max }: MemberListProps) => {
 
                 const title = max ? (i !== max - 1 ? user.name : `+${users.length - max}`) : "";
 
-                return (
-                    <Avatar
-                        key={i} //
-                        alt={title}
-                        title={title}
-                        className="h-6 w-6 rounded-full border border-dark-600 object-cover object-center"
-                        config={{
-                            seed: title,
-                        }}
-                    />
-                );
+                return <Avatar key={i} className="h-6 w-6 rounded-full border border-dark-600 object-cover object-center" seed={title} />;
             })}
         </div>
     );
@@ -40,17 +30,7 @@ const Large = ({ users, max }: MemberListProps) => {
 
                 const title = max ? (i !== max - 1 ? user.name : `+${users.length - max}`) : "";
 
-                return (
-                    <Avatar
-                        key={i} //
-                        alt={title}
-                        title={title}
-                        className="h-10 w-10 rounded-full border border-dark-600 object-cover object-center"
-                        config={{
-                            seed: title,
-                        }}
-                    />
-                );
+                return <Avatar key={i} className="h-10 w-10 rounded-full border border-dark-600 object-cover object-center" seed={title} />;
             })}
         </div>
     );

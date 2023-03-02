@@ -1,24 +1,18 @@
 "use client";
 
-import type { initials } from "@dicebear/collection";
-import type { Options } from "@dicebear/core";
-import type { DetailedHTMLProps, ImgHTMLAttributes } from "react";
+import type { AvatarFullConfig, NiceAvatarProps } from "react-nice-avatar";
 
-import { createAvatar } from "@dicebear/core";
 import { useMemo } from "react";
+import NiceAvatar, { genConfig } from "react-nice-avatar";
 
-type AvatarProps = Omit<DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>, "src" | "loading"> & {
-    config?: Partial<initials.Options & Options>;
+type AvatarProps = NiceAvatarProps & {
+    seed?: string | AvatarFullConfig;
 };
 
-const Avatar = ({ config, alt, ...props }: AvatarProps) => {
-    // const avatar = useMemo(() => {
-    //     return createAvatar(initials, config).toDataUriSync();
-    // }, [config]);
+const Avatar = ({ seed, ...props }: AvatarProps) => {
+    const config = useMemo(() => genConfig(seed), [seed]);
 
-    // return <img src={avatar} loading="lazy" alt={alt || "Avatar"} {...props} />;
-
-    return null;
+    return <NiceAvatar {...config} {...props} />;
 };
 
 export default Avatar;
