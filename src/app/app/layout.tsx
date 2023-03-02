@@ -4,13 +4,15 @@ import type { APIResult } from "@/lib/types";
 import type { GetResult, PostResult } from "@/pages/api/organizations";
 import type { Organization } from "@prisma/client";
 
-import { Button } from "@/components/Forms";
+import { Button, Input } from "@/components/Forms";
+import Avatar from "@/components/Miscellaneous/Avatar";
 import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
-import { IconBell, IconUsers, IconCards, IconPlus, IconSettings, IconMenu2, IconLoader2 } from "@tabler/icons";
+import { IconBell, IconUsers, IconCards, IconPlus, IconSettings, IconMenu2, IconLoader2, IconSearch } from "@tabler/icons";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 
 type SidebarProps = {
@@ -128,6 +130,7 @@ type DashboardLayoutProps = {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const pathname = usePathname();
+    const { data } = useSession();
 
     const pathWithoutSidebar = [
         "/board", //
@@ -146,9 +149,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </Link>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <IconUsers height={20} />
-                    <IconBell height={20} />
+                <div className="flex items-center gap-7">
+                    <Input.Small
+                        icon={IconSearch}
+                        placeholder="Search"
+                        className={{
+                            icon: "!py-2",
+                            input: "!py-2",
+                        }}
+                    />
+
+                    <IconUsers className="h-5 shrink-0" />
+
+                    <IconBell className="h-5 shrink-0" />
+
+                    {data && (
+                        <Button.Large fit>
+                            <Avatar seed={data.user?.email || ""} className="h-5 w-5" />
+                            <p className="ts-base">{data.user?.name || ""}</p>
+                        </Button.Large>
+                    )}
                 </div>
             </nav>
 
