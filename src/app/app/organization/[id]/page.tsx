@@ -1,10 +1,16 @@
 "use client";
 
+import { OrganizationContext } from "@/app/app/organization/[id]/layout";
 import Project from "@/components/App/DataDisplay/Project";
 
 import { IconFolder } from "@tabler/icons";
+import { useContext } from "react";
 
 export default function OrganizationProjectListPage() {
+    const {
+        organization: { projects },
+    } = useContext(OrganizationContext);
+
     return (
         <main className="flex flex-col gap-10">
             {/* Folders (Future Development) */}
@@ -17,7 +23,9 @@ export default function OrganizationProjectListPage() {
 
             {/* Project List */}
             <div className="grid grid-cols-3 gap-5">
-                <Project />
+                {projects.map((project) => (
+                    <Project key={project.id} {...project} />
+                ))}
             </div>
         </main>
     );

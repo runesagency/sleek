@@ -1,19 +1,13 @@
 "use client";
 
+import { OrganizationContext } from "@/app/app/organization/[id]/layout";
 import { Button, Input } from "@/components/Forms";
 
+import { User } from "@prisma/client";
 import { IconPlus, IconSearch } from "@tabler/icons";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 
-type UserProps = {
-    index: number;
-    name: string;
-    email: string;
-    lastActive: number | string;
-    perms: number;
-};
-
-const User = ({ index, name, email, lastActive, perms }: UserProps) => {
+const User = ({ name, email, roleId }: User) => {
     const convertSecond = useCallback((second: number | string) => {
         const oneMinute = 60;
         const oneHour = 3600;
@@ -55,82 +49,38 @@ const User = ({ index, name, email, lastActive, perms }: UserProps) => {
 
     return (
         <div className="flex items-center justify-between">
-            <div className="flex shrink-0 basis-2/6 items-center gap-4">
-                <img src={"https://i.pravatar.cc/200?img=" + index} className="h-8 w-8 rounded-full" alt="avatar" />
+            <section className="flex shrink-0 basis-2/6 items-center gap-4">
+                <img src="https://i.pravatar.cc/200" className="h-8 w-8 rounded-full" alt="avatar" />
+
                 <div className="flex flex-col">
                     <p className="ts-sm">{name}</p>
                     <p className="ts-xs">{email}</p>
                 </div>
-            </div>
-            <div className="w-44 min-w-max text-center">
-                <p className="ts-sm">{convertSecond(lastActive)}</p>
-            </div>
-            <div className="w-44 min-w-max text-end">
-                <select defaultValue={perms} className="cursor-pointer appearance-none rounded-lg bg-dark-500 p-2 text-center outline-none" name="cars" id="cars" form="carform">
+            </section>
+
+            <section className="w-44 min-w-max text-center">
+                <p className="ts-sm">{convertSecond(1000)}</p>
+            </section>
+
+            <section className="w-44 min-w-max text-end">
+                <select defaultValue={roleId} className="cursor-pointer appearance-none rounded-lg bg-dark-500 p-2 text-center outline-none" name="cars" id="cars" form="carform">
                     <option value="1">Owner</option>
                     <option value="2">Administrator</option>
                     <option value="3">Member</option>
                 </select>
-            </div>
+            </section>
         </div>
     );
 };
 
 export default function Members() {
-    const dummyUsersData = [
-        {
-            name: "El Abror",
-            email: "mohamad.el@gmail.com",
-            lastActive: 70,
-            perms: 1,
-        },
-        {
-            name: "Jajang Nurjaman",
-            email: "djajangpersib@gmail.com",
-            lastActive: 103300,
-            perms: 2,
-        },
-        {
-            name: "Edward Joe",
-            email: "edward@gmail.com",
-            lastActive: "ONLINE",
-            perms: 3,
-        },
-        {
-            name: "Andre Taulany",
-            email: "taulany@gmail.com",
-            lastActive: 2592342,
-            perms: 3,
-        },
-        {
-            name: "Sule Prikitiw",
-            email: "prikitiww@gmail.com",
-            lastActive: 31104000,
-            perms: 3,
-        },
-        {
-            name: "Angelia Clarent",
-            email: "angelc@gmail.com",
-            lastActive: 442355,
-            perms: 3,
-        },
-        {
-            name: "Yadi Sembako",
-            email: "yadisk@gmail.com",
-            lastActive: 42345,
-            perms: 3,
-        },
-        {
-            name: "Asep Knalpot",
-            email: "asep@gmail.com",
-            lastActive: 311040002,
-            perms: 3,
-        },
-    ];
+    const {
+        organization: { users },
+    } = useContext(OrganizationContext);
 
     return (
         <div className="flex flex-col gap-10">
-            <div className="flex flex-col gap-7">
+            <section className="flex flex-col gap-7">
                 <div>
                     <h2 className="ts-xl">Members</h2>
                     <p className="ts-sm w-1/2">Manage members here, or set up a domain, so everyone with allowed email domains can join the organization automatically.</p>
@@ -143,19 +93,19 @@ export default function Members() {
 
                     <Input.Large icon={IconSearch} placeholder="Filter by email or name..." />
                 </div>
-            </div>
+            </section>
 
-            <div className="flex flex-col gap-5">
+            <section className="flex flex-col gap-5">
                 <div className="flex justify-between border-b border-dark-600 py-4">
-                    <h3 className="ts-sm shrink-0 basis-2/6">User</h3>
-                    <h3 className="ts-sm">Last Active</h3>
-                    <h3 className="ts-sm">Organization permissions</h3>
+                    <p className="ts-sm shrink-0 basis-2/6">User</p>
+                    <p className="ts-sm">Last Active</p>
+                    <p className="ts-sm">Organization permissions</p>
                 </div>
 
-                {dummyUsersData.map((val, idx) => {
-                    return <User key={idx} index={idx} name={val.name} email={val.email} lastActive={val.lastActive} perms={val.perms} />;
+                {users.map((user, index) => {
+                    return <User key={index} {...user} />;
                 })}
-            </div>
+            </section>
         </div>
     );
 }
