@@ -17,10 +17,8 @@ const MenuContextComponentItem = ({ icon: Icon, name, onClick: onItemClick, href
 
     const onClick = useCallback(() => {
         if (onItemClick) {
-            onItemClick();
+            onItemClick(closeMenu);
         }
-
-        closeMenu();
     }, [closeMenu, onItemClick]);
 
     const onHover = useCallback(() => {
@@ -70,7 +68,7 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
                     if (!list) return;
 
                     if (list.onClick) {
-                        list.onClick();
+                        list.onClick(closeMenu);
                     } else if (list.href) {
                         const element = document.getElementById(`item-${activeIndex}`);
 
@@ -79,7 +77,6 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
                         }
                     }
 
-                    closeMenu();
                     break;
                 }
             }

@@ -34,7 +34,7 @@ export type MenuVariantContextItem = {
           onClick?: never;
       }
     | {
-          onClick: () => void;
+          onClick: (closeMenu: () => void) => void;
           href?: never;
       }
 );
