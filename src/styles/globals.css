@@ -103,6 +103,23 @@
             transform: translateY(0);
         }
     }
+
+    .animate-shimmer {
+        @apply relative overflow-hidden;
+    }
+
+    .animate-shimmer::after {
+        @apply absolute inset-0 bg-gradient-to-r from-transparent via-dark-50/5 to-transparent;
+        transform: translateX(-100%);
+        animation: animate-shimmer 2s infinite;
+        content: "";
+    }
+
+    @keyframes animate-shimmer {
+        100% {
+            transform: translateX(100%);
+        }
+    }
 }
 
 .EasyMDEContainer .editor-toolbar {
