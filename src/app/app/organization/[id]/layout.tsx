@@ -9,12 +9,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-type OrganizationContextProps = {
+type OrganizationLayoutContextProps = {
     isLoading: boolean;
     organization: GetResult;
 };
 
-const defaultContextValue: OrganizationContextProps = {
+const defaultContextValue: OrganizationLayoutContextProps = {
     isLoading: true,
     organization: {
         id: "",
@@ -33,7 +33,7 @@ const defaultContextValue: OrganizationContextProps = {
     },
 };
 
-export const OrganizationContext = createContext<OrganizationContextProps>(defaultContextValue);
+export const OrganizationLayoutContext = createContext<OrganizationLayoutContextProps>(defaultContextValue);
 
 type OrganizationPageLayoutProps = {
     children: React.ReactNode;
@@ -43,7 +43,7 @@ type OrganizationPageLayoutProps = {
 };
 
 export default function OrganizationPageLayout({ children, params: { id } }: OrganizationPageLayoutProps) {
-    const [contextValue, setContextValue] = useState<OrganizationContextProps>(defaultContextValue);
+    const [contextValue, setContextValue] = useState<OrganizationLayoutContextProps>(defaultContextValue);
 
     const {
         isLoading,
@@ -81,7 +81,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
     }, [id, router]);
 
     return (
-        <OrganizationContext.Provider value={contextValue}>
+        <OrganizationLayoutContext.Provider value={contextValue}>
             <main className="flex flex-col">
                 {isLoading ? (
                     <div className="h-60 w-full animate-pulse bg-dark-700" /> //
@@ -119,6 +119,6 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
 
                 <div className="py-9 px-16 3xl:px-36">{children}</div>
             </main>
-        </OrganizationContext.Provider>
+        </OrganizationLayoutContext.Provider>
     );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { OrganizationContext } from "@/app/app/organization/[id]/layout";
+import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
 import { Button, Input } from "@/components/Forms";
 
 import { User } from "@prisma/client";
@@ -76,7 +76,7 @@ const User = ({ name, email, roleId }: User) => {
 export default function Members() {
     const {
         organization: { users },
-    } = useContext(OrganizationContext);
+    } = useContext(OrganizationLayoutContext);
 
     return (
         <div className="flex flex-col gap-10">
