@@ -14,7 +14,7 @@ export default function AppUserHomePage() {
 
     const {
         isLoading,
-        user: { organizations },
+        data: { organizations },
     } = useContext(DashboardLayoutContext);
 
     return (

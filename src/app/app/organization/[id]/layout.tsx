@@ -11,12 +11,12 @@ import { toast } from "react-toastify";
 
 type OrganizationLayoutContextProps = {
     isLoading: boolean;
-    organization: GetResult;
+    data: GetResult;
 };
 
 const defaultContextValue: OrganizationLayoutContextProps = {
     isLoading: true,
-    organization: {
+    data: {
         id: "",
         createdAt: new Date(),
         creatorId: "",
@@ -47,7 +47,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
 
     const {
         isLoading,
-        organization: { name },
+        data: { name },
     } = contextValue;
 
     const router = useRouter();
@@ -76,7 +76,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                 return router.push("/app");
             }
 
-            setContextValue({ isLoading: false, organization: result });
+            setContextValue({ isLoading: false, data: result });
         });
     }, [id, router]);
 

@@ -75,7 +75,7 @@ const User = ({ name, email, roleId }: User) => {
 
 export default function Members() {
     const {
-        organization: { users },
+        data: { users },
     } = useContext(OrganizationLayoutContext);
 
     return (

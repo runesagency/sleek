@@ -19,12 +19,12 @@ import { toast } from "react-toastify";
 
 type DashboardLayoutContextProps = {
     isLoading: boolean;
-    user: GetResultUser;
+    data: GetResultUser;
 };
 
 const defaultContextValue: DashboardLayoutContextProps = {
     isLoading: true,
-    user: {
+    data: {
         createdAt: new Date(),
         email: "",
         id: "",
@@ -186,7 +186,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 return router.push("/");
             }
 
-            setContextValue({ isLoading: false, user: result });
+            setContextValue({ isLoading: false, data: result });
         });
     }, [data, router]);
 
