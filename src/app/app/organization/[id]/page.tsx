@@ -28,6 +28,10 @@ export default function OrganizationProjectListPage() {
                 {projects.map((project) => (
                     <Project key={project.id} {...project} />
                 ))}
+                        <button onClick={onCreateNewProject} className="flex flex-wrap items-center justify-center gap-2 rounded-lg bg-dark-700/50 p-4 duration-200 hover:bg-dark-700/100">
+                            <IconPlus height={40} />
+                            <span className="ts-base">Create New Project</span>
+                        </button>
             </div>
         </main>
     );
