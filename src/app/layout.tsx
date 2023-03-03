@@ -37,7 +37,7 @@ const RouterTransition = () => {
         if (!loadingBar) return;
 
         if (pathName !== lastPathName.current) {
-            loadingBarRef.current?.complete();
+            loadingBar.complete();
             lastPathName.current = pathName;
         }
 
