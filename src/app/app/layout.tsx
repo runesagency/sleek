@@ -1,6 +1,7 @@
 "use client";
 
 import type { APIResult } from "@/lib/types";
+import type { GetResult as GetResultUser } from "@/pages/api/@me";
 import type { GetResult, PostResult } from "@/pages/api/organizations";
 import type { Organization } from "@prisma/client";
 
@@ -11,9 +12,38 @@ import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu
 import { IconBell, IconUsers, IconCards, IconPlus, IconSettings, IconMenu2, IconLoader2, IconSearch } from "@tabler/icons";
 import clsx from "clsx";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, createContext } from "react";
+import { toast } from "react-toastify";
+
+type DashboardLayoutContextProps = {
+    isLoading: boolean;
+    user: GetResultUser;
+};
+
+const defaultContextValue: DashboardLayoutContextProps = {
+    isLoading: true,
+    user: {
+        createdAt: new Date(),
+        email: "",
+        id: "",
+        language: "",
+        modifiedAt: new Date(),
+        name: "",
+        organizations: [],
+        roleId: "",
+        subscribeByDefault: false,
+        subscribeToEmail: false,
+        username: "",
+        coverAttachmentId: "",
+        imageAttachmentId: "",
+        phone: "",
+        verifiedAt: new Date(),
+    },
+};
+
+export const DashboardLayoutContext = createContext<DashboardLayoutContextProps>(defaultContextValue);
 
 type SidebarProps = {
     isOpen: boolean;
@@ -128,7 +158,9 @@ type DashboardLayoutProps = {
 };
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+    const [contextValue, setContextValue] = useState<DashboardLayoutContextProps>(defaultContextValue);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const router = useRouter();
     const pathname = usePathname();
     const { data } = useSession();
 
@@ -138,45 +170,72 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     const isUsingSidebar = pathname && !pathWithoutSidebar.includes(pathname);
 
+    useEffect(() => {
+        if (!data) return;
+
+        fetch(`/api/@me`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(async (res) => {
+            const { result, error }: APIResult<GetResultUser> = await res.json();
+
+            if (error) {
+                toast.error(error.message);
+                return router.push("/");
+            }
+
+            setContextValue({ isLoading: false, user: result });
+        });
+    }, [data, router]);
+
     return (
-        <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
-            <nav className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-10 py-5 md:px-20">
-                <div className="flex items-center gap-4">
-                    <IconMenu2 className="lg:hidden" height={20} onClick={() => setSidebarOpen(!sidebarOpen)} />
+        <DashboardLayoutContext.Provider value={contextValue}>
+            <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
+                <nav className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-10 py-3 md:px-20">
+                    <div className="flex items-center gap-4">
+                        <IconMenu2 className="lg:hidden" height={20} onClick={() => setSidebarOpen(!sidebarOpen)} />
 
-                    <Link href="/app">
-                        <img src="/assets/images/logo.svg" alt="Logo" loading="lazy" className="h-6" />
-                    </Link>
-                </div>
+                        <Link href="/app">
+                            <img src="/assets/images/logo.svg" alt="Logo" loading="lazy" className="h-6" />
+                        </Link>
+                    </div>
 
-                <div className="flex items-center gap-7">
-                    <Input.Small
-                        icon={IconSearch}
-                        placeholder="Search"
-                        className={{
-                            icon: "!py-2",
-                            input: "!py-2",
-                        }}
-                    />
+                    <div className="flex items-stretch gap-7">
+                        <Input.Small
+                            icon={IconSearch}
+                            placeholder="Search"
+                            className={{
+                                icon: "!py-2",
+                                input: "!py-2",
+                            }}
+                        />
 
-                    <IconUsers className="h-5 shrink-0" />
+                        <IconUsers className="my-auto h-5 shrink-0" />
 
-                    <IconBell className="h-5 shrink-0" />
+                        <IconBell className="my-auto h-5 shrink-0" />
 
-                    {data && (
-                        <Button.Large fit>
-                            <Avatar seed={data.user?.email || ""} className="h-5 w-5" />
-                            <p className="ts-base">{data.user?.name || ""}</p>
-                        </Button.Large>
-                    )}
-                </div>
-            </nav>
+                        {data && data.user ? (
+                            <Button.Large fit>
+                                <Avatar seed={data.user.name || ""} className="h-5 w-5" />
+                                <p className="ts-sm">{data.user.name || ""}</p>
+                            </Button.Large>
+                        ) : (
+                            <Button.Large fit className="animate-pulse">
+                                <IconLoader2 height={20} width={20} className="animate-spin" />
+                                <p className="ts-sm">Loading...</p>
+                            </Button.Large>
+                        )}
+                    </div>
+                </nav>
 
-            <main className="flex h-full w-full items-start overflow-auto">
-                {isUsingSidebar && <Sidebar isOpen={sidebarOpen} />}
+                <main className="flex h-full w-full items-start overflow-auto">
+                    {isUsingSidebar && <Sidebar isOpen={sidebarOpen} />}
 
-                <section className="h-full max-h-full w-full flex-1 overflow-auto">{children}</section>
+                    <section className="h-full max-h-full w-full flex-1 overflow-auto">{children}</section>
+                </main>
             </main>
-        </main>
+        </DashboardLayoutContext.Provider>
     );
 }
