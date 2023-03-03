@@ -3,6 +3,8 @@ import type { Server as NetServer, Socket } from "net";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Server as SocketIOServer } from "socket.io";
 
+export * as ApiMethod from "./api-methods.d";
+
 export type ApiRequest = NextApiRequest & {
     params: Record<string, string>;
     user: User;

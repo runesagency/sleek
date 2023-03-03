@@ -1,7 +1,6 @@
 "use client";
 
-import type { APIResult } from "@/lib/types";
-import type { GetResult } from "@/pages/api/organizations/[id]";
+import type { APIResult, ApiMethod } from "@/lib/types";
 
 import clsx from "clsx";
 import Link from "next/link";
@@ -11,7 +10,7 @@ import { toast } from "react-toastify";
 
 type OrganizationLayoutContextProps = {
     isLoading: boolean;
-    data: GetResult;
+    data: ApiMethod.Organization.GetResult;
 };
 
 const defaultContextValue: OrganizationLayoutContextProps = {
@@ -69,7 +68,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                 "Content-Type": "application/json",
             },
         }).then(async (res) => {
-            const { result, error }: APIResult<GetResult> = await res.json();
+            const { result, error }: APIResult<ApiMethod.Organization.GetResult> = await res.json();
 
             if (error) {
                 toast.error(error.message);
