@@ -220,7 +220,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 <p className="ts-sm">{data.user.name || ""}</p>
                             </Button.Large>
                         ) : (
-                            <Button.Large fit className="animate-pulse">
+                            <Button.Large fit className="animate-shimmer">
                                 <IconLoader2 height={20} width={20} className="animate-spin" />
                                 <p className="ts-sm">Loading...</p>
                             </Button.Large>

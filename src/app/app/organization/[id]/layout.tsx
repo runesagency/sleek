@@ -83,7 +83,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
         <OrganizationLayoutContext.Provider value={contextValue}>
             <main className="flex flex-col">
                 {isLoading ? (
-                    <div className="h-60 w-full animate-pulse bg-dark-700" /> //
+                    <div className="animate-shimmer h-60 w-full bg-dark-700" /> //
                 ) : (
                     <img src="https://picsum.photos/1080" alt="banner" className="h-60 w-full object-cover object-center" />
                 )}
@@ -92,8 +92,8 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                     <div className="flex items-center gap-5 py-5">
                         {isLoading ? (
                             <>
-                                <div className="h-12 w-12 animate-pulse rounded-full bg-dark-700" />
-                                <div className="h-5 w-full max-w-xs animate-pulse rounded-lg bg-dark-700" />
+                                <div className="animate-shimmer h-12 w-12 rounded-full bg-dark-700" />
+                                <div className="animate-shimmer h-5 w-full max-w-xs rounded-lg bg-dark-700" />
                             </>
                         ) : (
                             <>
