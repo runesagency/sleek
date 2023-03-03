@@ -45,17 +45,7 @@ router.use(async (req, res, next) => {
 
 export type GetResult = Organization[];
 
-const GetSchema = z.object({});
-
 router.get(async (req, res) => {
-    const parsedBody = GetSchema.safeParse(req.body);
-
-    if (!parsedBody.success) {
-        return res.status(400).json({
-            error: parsedBody.error,
-        });
-    }
-
     const user = await prisma.user.findUnique({
         where: {
             email: req.user.email,
