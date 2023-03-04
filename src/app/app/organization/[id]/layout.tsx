@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 type OrganizationLayoutContextProps = {
     isLoading: boolean;
     data: ApiMethod.Organization.GetResult;
+    setData: (data: ApiMethod.Organization.GetResult) => void;
 };
 
 const defaultContextValue: OrganizationLayoutContextProps = {
@@ -29,6 +30,9 @@ const defaultContextValue: OrganizationLayoutContextProps = {
         ownerId: "",
         projects: [],
         users: [],
+    },
+    setData: () => {
+        throw new Error("setData is not defined");
     },
 };
 
@@ -75,7 +79,16 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                 return router.push("/app");
             }
 
-            setContextValue({ isLoading: false, data: result });
+            setContextValue({
+                isLoading: false,
+                data: result,
+                setData: (data) => {
+                    setContextValue((prev) => ({
+                        ...prev,
+                        data,
+                    }));
+                },
+            });
         });
     }, [id, router]);
 
