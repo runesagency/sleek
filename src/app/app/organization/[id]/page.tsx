@@ -56,7 +56,7 @@ export default function OrganizationProjectListPage() {
     };
 
     return (
-        <main className="flex flex-col gap-10" onContextMenu={onContextMenu}>
+        <main className="flex h-full flex-col gap-10" onContextMenu={onContextMenu}>
             {/* Folders (Future Development) */}
             {/* {!isLoading && (
                 <div className="flex flex-wrap gap-5">

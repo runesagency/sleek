@@ -81,14 +81,14 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
 
     return (
         <OrganizationLayoutContext.Provider value={contextValue}>
-            <main className="flex flex-col">
+            <main className="flex h-full flex-col">
                 {isLoading ? (
-                    <div className="animate-shimmer h-60 w-full bg-dark-700" /> //
+                    <div className="animate-shimmer h-60 w-full shrink-0 bg-dark-700" /> //
                 ) : (
-                    <img src="https://picsum.photos/1080" alt="banner" className="h-60 w-full object-cover object-center" />
+                    <img src="https://picsum.photos/1080" alt="banner" className="h-60 w-full shrink-0 object-cover object-center" />
                 )}
 
-                <nav className="flex flex-col border-b border-b-dark-600 bg-dark-800 px-12">
+                <nav className="flex shrink-0 flex-col border-b border-b-dark-600 bg-dark-800 px-12">
                     <div className="flex items-center gap-5 py-5">
                         {isLoading ? (
                             <>
@@ -116,7 +116,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                     </div>
                 </nav>
 
-                <div className="py-9 px-16 3xl:px-36">{children}</div>
+                <div className="h-full py-9 px-16 3xl:px-36">{children}</div>
             </main>
         </OrganizationLayoutContext.Provider>
     );
