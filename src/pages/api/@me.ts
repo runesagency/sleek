@@ -45,7 +45,11 @@ export type GetResult = User & {
         _count: {
             users: number;
         };
-        projects: Project[];
+        projects: (Project & {
+            _count: {
+                boards: number;
+            };
+        })[];
         users: User[];
     })[];
 };
@@ -67,6 +71,13 @@ router.get(async (req, res) => {
                             },
                             projects: {
                                 take: 5,
+                                include: {
+                                    _count: {
+                                        select: {
+                                            boards: true,
+                                        },
+                                    },
+                                },
                             },
                             users: {
                                 take: 5,
