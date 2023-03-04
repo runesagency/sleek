@@ -7,7 +7,7 @@ import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
 import Project from "@/components/App/DataDisplay/Project";
 import { MenuAnchor, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
-import { IconPlus } from "@tabler/icons";
+import { IconLoader2, IconPlus } from "@tabler/icons";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -31,6 +31,8 @@ export default function OrganizationProjectListPage() {
         onSubmit({ name }: { name: string }) {
             if (!name) return;
 
+            setProjectOnCreate(name);
+
             fetch("/api/projects", {
                 method: "POST",
                 headers: {
@@ -51,6 +53,8 @@ export default function OrganizationProjectListPage() {
                     ...data,
                     projects: [...projects, result],
                 });
+
+                setProjectOnCreate(null);
             });
         },
     };
@@ -96,6 +100,19 @@ export default function OrganizationProjectListPage() {
                     [...Array(6)].map((_, i) => <div key={i} className="animate-shimmer h-32 w-full rounded-lg bg-dark-800" />)
                 ) : (
                     <>
+                        {projectOnCreate && (
+                            <button className="animate-shimmer flex flex-col items-start gap-4 rounded-lg border border-dark-600 bg-dark-700 p-4 xl:flex-row">
+                                <div className="animate-shimmer h-32 w-full shrink-0 rounded-lg bg-dark-600 object-cover object-center xl:h-full xl:w-1/3" />
+
+                                <div className="flex flex-col gap-4 overflow-hidden">
+                                    <div className="flex items-center gap-2">
+                                        <IconLoader2 className="h-5 w-5 shrink-0 animate-spin rounded-full object-cover object-center" />
+                                        <h3 className="text-base font-bold">Creating {projectOnCreate}...</h3>
+                                    </div>
+                                </div>
+                            </button>
+                        )}
+
                         {projects.map((project) => (
                             <Project key={project.id} {...project} />
                         ))}
