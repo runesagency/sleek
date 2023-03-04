@@ -1,34 +1,57 @@
 "use client";
 
 import type { MenuOptions } from "@/lib/menu/hooks/use-menu";
+import type { ApiMethod, APIResult } from "@/lib/types";
 
 import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
 import Project from "@/components/App/DataDisplay/Project";
 import { MenuAnchor, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { IconPlus } from "@tabler/icons";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function OrganizationProjectListPage() {
     const { openMenu, toggleMenu } = useMenu();
+    const [projectOnCreate, setProjectOnCreate] = useState<string | null>(null);
 
-    const {
-        isLoading,
-        data: { projects },
-    } = useContext(OrganizationLayoutContext);
+    const { isLoading, data, setData } = useContext(OrganizationLayoutContext);
+    const { projects, id } = data;
 
     const newProjectMenuOptions: MenuOptions = {
         type: MenuVariant.Forms,
         title: "Create New Project",
         lists: [
             {
-                id: "title",
+                id: "name",
                 label: "Project Title",
                 type: MenuFormVariant.Input,
             },
         ],
-        onSubmit({ title }: { title: string }) {
-            console.log(title);
+        onSubmit({ name }: { name: string }) {
+            if (!name) return;
+
+            fetch("/api/projects", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name,
+                    organizationId: id,
+                }),
+            }).then(async (res) => {
+                const { result, error }: APIResult<ApiMethod.Project.PostResult> = await res.json();
+
+                if (error) {
+                    return toast.error(error.message);
+                }
+
+                setData({
+                    ...data,
+                    projects: [...projects, result],
+                });
+            });
         },
     };
 
