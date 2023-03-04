@@ -7,12 +7,14 @@ import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
 import Project from "@/components/App/DataDisplay/Project";
 import { MenuAnchor, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { IconLoader2, IconPlus } from "@tabler/icons";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function OrganizationProjectListPage() {
     const { openMenu, toggleMenu } = useMenu();
+    const [autoAnimateRef] = useAutoAnimate();
     const [projectOnCreate, setProjectOnCreate] = useState<string | null>(null);
 
     const { isLoading, data, setData } = useContext(OrganizationLayoutContext);
@@ -51,7 +53,7 @@ export default function OrganizationProjectListPage() {
 
                 setData({
                     ...data,
-                    projects: [...projects, result],
+                    projects: [result, ...projects],
                 });
 
                 setProjectOnCreate(null);
@@ -95,7 +97,7 @@ export default function OrganizationProjectListPage() {
             )} */}
 
             {/* Project List */}
-            <div className="grid grid-cols-3 gap-5">
+            <div ref={autoAnimateRef} className="grid grid-cols-3 gap-5">
                 {isLoading ? (
                     [...Array(6)].map((_, i) => <div key={i} className="animate-shimmer h-32 w-full rounded-lg bg-dark-800" />)
                 ) : (

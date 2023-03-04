@@ -7,6 +7,7 @@ import { Button, Input } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
 import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { IconBell, IconUsers, IconCards, IconPlus, IconSettings, IconMenu2, IconLoader2, IconSearch } from "@tabler/icons";
 import clsx from "clsx";
 import Link from "next/link";
@@ -50,6 +51,7 @@ type SidebarProps = {
 const Sidebar = ({ isOpen }: SidebarProps) => {
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [organizationOnCreate, setOrganizationOnCreate] = useState<string | null>(null);
+    const [autoAnimateRef] = useAutoAnimate();
     const { toggleMenu } = useMenu();
 
     // All path are prefixed with /app
@@ -125,7 +127,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
 
             <hr className="border-dark-600" />
 
-            <div className="flex flex-col gap-6 px-5">
+            <div ref={autoAnimateRef} className="flex flex-col gap-6 px-5">
                 <span className="text-xs font-medium opacity-50">Organization</span>
 
                 {organizations.map(({ name, id }, index) => (
