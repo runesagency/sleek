@@ -1,8 +1,10 @@
-import type { LayoutProps } from "@/app/app/board/[id]/page";
-import type { DragEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
-import type { Card as CardType } from "@prisma/client";
+"use client";
 
-import List, { NewCardLocation } from "@/components/App/Board/Layout/Kanban/List";
+import type { BoardCard } from "@/app/app/board/[id]/layout";
+import type { DragEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
+
+import List, { NewCardLocation } from "@/app/app/board/[id]/view/kanban/List";
+import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
 import { Button } from "@/components/Forms";
 import useDragDropContext from "@/lib/drag-and-drop/use-drag-drop-context";
 import useDroppable, { SortableDirection } from "@/lib/drag-and-drop/use-droppable";
@@ -11,18 +13,19 @@ import { arrayMoveImmutable } from "@/lib/utils/array-move";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useMergedRef } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons";
-import { memo, useCallback } from "react";
+import { useCallback, useContext } from "react";
 
 export enum SortableType {
     List = "list",
     Card = "card",
 }
 
-const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps) => {
+export default function KanbanLayoutPage() {
+    const { cards, lists, setCards, setLists, board } = useContext(BoardLayoutContext);
     const { ref: dndContextRef, onDragEnd } = useDragDropContext();
 
     const { ref: droppableRef } = useDroppable({
-        id: boardId,
+        id: board.id,
         accepts: [SortableType.List],
         sortable: true,
         sortableDirection: SortableDirection.Horizontal,
@@ -42,13 +45,13 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
             const list = lists.find((list) => list.id === listId);
             if (!list) return;
 
-            const otherCards = cards.filter((card) => card.list_id !== listId);
-            const listCards = cards.filter((card) => card.list_id === listId);
+            const otherCards = cards.filter((card) => card.listId !== listId);
+            const listCards = cards.filter((card) => card.listId === listId);
 
-            const newCard: Partial<CardType> = {
+            const newCard: Partial<BoardCard> = {
                 title: parsedName,
-                list_id: listId,
-                board_id: list.board_id,
+                listId: listId,
+                boardId: list.boardId,
                 order: location === NewCardLocation.UP ? 0 : listCards.length,
             };
 
@@ -60,9 +63,9 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                 body: JSON.stringify(newCard),
             });
 
-            const card: CardType = await res.json();
+            const card: BoardCard = await res.json();
 
-            let updatedCards: CardType[] = [];
+            let updatedCards: BoardCard[] = [];
 
             if (location === NewCardLocation.UP) {
                 updatedCards = [
@@ -99,7 +102,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
 
     onDragEnd(async ({ dragged, dropped }: DragEvent) => {
         // List to List
-        if (dragged.type === SortableType.List && dropped.id === boardId) {
+        if (dragged.type === SortableType.List && dropped.id === board.id) {
             const list = lists.find((list) => list.id === dragged.id);
             if (!list) return;
 
@@ -118,8 +121,8 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
             let updatedCards = cards;
 
             // Card to Card (same list)
-            if (currentCard.list_id === dropped.id) {
-                const cardsOnList = cards.filter((card) => card.list_id === currentCard.list_id).sort((a, b) => a.order - b.order);
+            if (currentCard.listId === dropped.id) {
+                const cardsOnList = cards.filter((card) => card.listId === currentCard.listId).sort((a, b) => a.order - b.order);
 
                 const newListCards = arrayMoveImmutable(cardsOnList, currentCard.order, dropped.index).map((card, index) => ({
                     ...card,
@@ -127,7 +130,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                 }));
 
                 updatedCards = [
-                    ...cards.filter((card) => card.list_id !== currentCard.list_id), //
+                    ...cards.filter((card) => card.listId !== currentCard.listId), //
                     ...newListCards,
                 ];
             }
@@ -135,20 +138,20 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
             // Card to Card (different list)
             else {
                 const cardsOnOldList = cards
-                    .filter((card) => card.list_id === currentCard.list_id)
+                    .filter((card) => card.listId === currentCard.listId)
                     .filter((card) => card.id !== currentCard.id)
                     .sort((a, b) => a.order - b.order)
                     .map((card, index) => ({ ...card, order: index }));
 
                 let cardsOnNewList = cards //
-                    .filter((card) => card.list_id === dropped.id)
+                    .filter((card) => card.listId === dropped.id)
                     .sort((a, b) => a.order - b.order);
 
                 if (dropped.index === 0) {
                     cardsOnNewList = [
                         {
                             ...currentCard,
-                            list_id: dropped.id,
+                            listId: dropped.id,
                             order: 0,
                         },
                         ...cardsOnNewList.map((card) => ({
@@ -168,7 +171,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                         ...cardsBefore, //
                         {
                             ...currentCard,
-                            list_id: dropped.id,
+                            listId: dropped.id,
                             order: dropped.index,
                         },
                         ...cardsAfter,
@@ -178,7 +181,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                 updatedCards = [
                     ...cardsOnOldList, //
                     ...cardsOnNewList,
-                    ...cards.filter((card) => card.list_id !== dropped.id && card.list_id !== currentCard.list_id),
+                    ...cards.filter((card) => card.listId !== dropped.id && card.listId !== currentCard.listId),
                 ];
             }
 
@@ -194,7 +197,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                         const currentCard = cards.find((c) => c.id === card.id);
                         if (!currentCard) return false;
 
-                        return currentCard.order !== card.order || currentCard.list_id !== card.list_id;
+                        return currentCard.order !== card.order || currentCard.listId !== card.listId;
                     })
                 ),
             });
@@ -207,7 +210,7 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
                 {lists
                     .sort((a, b) => a.order - b.order)
                     .map((list) => {
-                        return <List key={list.id} {...list} cards={cards.filter((card) => card.list_id === list.id)} onCardAdded={onCardAdded} />;
+                        return <List key={list.id} {...list} cards={cards.filter((card) => card.listId === list.id)} onCardAdded={onCardAdded} />;
                     })}
 
                 <Button.Large className="h-max w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
@@ -216,6 +219,4 @@ const KanbanLayout = ({ lists, setLists, cards, setCards, boardId }: LayoutProps
             </div>
         </section>
     );
-};
-
-export default memo(KanbanLayout);
+}

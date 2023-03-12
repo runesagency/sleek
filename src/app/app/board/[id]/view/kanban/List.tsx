@@ -1,9 +1,9 @@
-import type { CardProps } from "@/components/App/Board/Layout/Kanban/Card";
-import type { List as ListType } from "@prisma/client";
+"use client";
 
-import { SortableType } from ".";
+import type { BoardCard, BoardList } from "@/app/app/board/[id]/layout";
 
-import Card from "@/components/App/Board/Layout/Kanban/Card";
+import Card from "@/app/app/board/[id]/view/kanban/Card";
+import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import { Button, Textarea } from "@/components/Forms";
 import useDraggable from "@/lib/drag-and-drop/use-draggable";
 import useDroppable, { SortableDirection } from "@/lib/drag-and-drop/use-droppable";
@@ -45,14 +45,14 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
     );
 };
 
-type ListProps = ListType & {
-    cards: Omit<CardProps, "setIsDragging">[];
+type ListProps = BoardList & {
+    cards: BoardCard[];
     onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
 };
 
 const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
-    const [isAnyCardDragging, setIsAnyCardDragging] = useState(false);
+    const [isAnyCardDragging] = useState(false);
     const [isOnView, setIsOnView] = useState(false);
     const [isOnHover, setIsOnHover] = useState(false);
 
@@ -192,7 +192,7 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
 
                 {(isOnView || isAnyCardDragging || isDragging) &&
                     cards.map((card) => {
-                        return <Card key={card.id} {...card} setIsDragging={setIsAnyCardDragging} />;
+                        return <Card key={card.id} {...card} />;
                     })}
 
                 {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}

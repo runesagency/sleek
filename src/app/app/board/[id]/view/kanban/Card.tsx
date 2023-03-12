@@ -1,15 +1,16 @@
-import type { Activity, Attachment, Card as CardType, CardAttachment, CardChecklist, CardChecklistTask, CardLabel, CardUser, User, Label as LabelType } from "@prisma/client";
+"use client";
 
-import { SortableType } from ".";
+import type { BoardCard } from "@/app/app/board/[id]/layout";
+import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
+import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import Label from "@/components/DataDisplay/Label";
 import { Button } from "@/components/Forms";
 import useDraggable from "@/lib/drag-and-drop/use-draggable";
-import useCustomEvent from "@/lib/hooks/use-custom-event";
 
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
 import clsx from "clsx";
-import { useCallback, useRef, useState, memo, useEffect } from "react";
+import { useCallback, useRef, useState, memo } from "react";
 
 export type TasksProgressProps = {
     innerRef?: React.Ref<HTMLButtonElement>;
@@ -60,23 +61,7 @@ const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
     );
 };
 
-export type CardProps = CardType & {
-    setIsDragging: (isDragging: boolean) => void;
-    cover: Attachment | null;
-    attachments: CardAttachment[];
-    activities: Activity[];
-    checklists: (CardChecklist & {
-        tasks: CardChecklistTask[];
-    })[];
-    labels: (CardLabel & {
-        label: LabelType;
-    })[];
-    users: (CardUser & {
-        user: User;
-    })[];
-};
-
-const Card = ({ id, title, attachments, activities, cover, checklists, labels, due_date, users, setIsDragging }: CardProps) => {
+const Card = ({ id, title, attachments, activities, cover, checklists, labels, dueDate, users }: BoardCard) => {
     const {
         ref: cardRef,
         isDragging,
@@ -85,8 +70,6 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         id,
         type: SortableType.Card,
     });
-
-    const { emit } = useCustomEvent<string>("card-clicked", false);
 
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const taskButtonRef = useRef<HTMLButtonElement>(null);
@@ -100,11 +83,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
         // if e.target is Menu or Task List button or its children, return
         if (menuButtonRef.current?.contains(e.target as Node)) return;
         if (taskButtonRef.current?.contains(e.target as Node)) return;
-
-        emit(id);
     });
-
-    useEffect(() => setIsDragging(isDragging), [isDragging, setIsDragging]);
 
     return (
         <a
@@ -115,7 +94,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
             )}
         >
             {/* Cover Image */}
-            {cover && <img src={cover.filename_disk} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
+            {cover && <img src={cover.filenameDisk} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
 
             {/* Head */}
             <div className="flex max-w-full items-start justify-between gap-2">
@@ -141,11 +120,11 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
             {checklists.length > 0 && <TasksProgress innerRef={taskButtonRef} checklists={checklists} />}
 
             {/* Dates & Timer */}
-            {due_date && (
+            {dueDate && (
                 <section className="flex items-end justify-between gap-4">
-                    {due_date && (
+                    {dueDate && (
                         <Button.Small className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
-                            <p className="truncate text-xs">{due_date.toString()}</p>
+                            <p className="truncate text-xs">{dueDate.toString()}</p>
                         </Button.Small>
                     )}
 
@@ -178,7 +157,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
 
                     {users.length > 0 && (
                         <div className="box-border flex shrink-0 flex-wrap items-center -space-x-2">
-                            {users.map(({ user }, i) => {
+                            {users.map((user, i) => {
                                 if (!user || i > 5) return null;
 
                                 const title = i !== 5 ? user.name : `${users.length - 5} more...`;
