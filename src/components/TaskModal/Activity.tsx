@@ -1,10 +1,12 @@
+"use client";
+
 import { IconArrowBackUp, IconDots, IconPencil, IconSquare, IconTrash } from "@tabler/icons";
 import ReactMarkdown from "react-markdown";
 
 type ActivityProps = {
     sender: string;
     content?: string;
-    timestamp: string;
+    timestamp: Date;
     details?: string;
 };
 
@@ -21,7 +23,7 @@ const Activity = ({ sender, content, timestamp, details }: ActivityProps) => {
 
                     <IconSquare className="h-1 w-1 rounded-full bg-dark-50/50" />
 
-                    <p className="text-xs opacity-50">{timestamp}</p>
+                    <p className="text-xs opacity-50">{timestamp.toString()}</p>
                 </section>
 
                 <section className="hidden shrink-0 items-center gap-4 rounded-lg bg-dark-600 px-3 py-2 group-hover/activity:flex">

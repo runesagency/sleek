@@ -1,20 +1,22 @@
-import type { Card as CardType } from "@prisma/client";
+"use client";
+
+import type { BoardCard } from "@/app/app/board/[id]/layout";
 import type { ReactNode } from "react";
 
-import Activity from "@/components/App/Board/TaskModal/Activity";
-import Attachment from "@/components/App/Board/TaskModal/Attachment";
-import Checklist from "@/components/App/Board/TaskModal/Checklist";
-import Description from "@/components/App/Board/TaskModal/Description";
-import Title from "@/components/App/Board/TaskModal/Title";
+import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
 import Label from "@/components/DataDisplay/Label";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button, Textarea } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
-import useCustomEvent from "@/lib/hooks/use-custom-event";
+import Activity from "@/components/TaskModal/Activity";
+import Attachment from "@/components/TaskModal/Attachment";
+import Checklist from "@/components/TaskModal/Checklist";
+import Description from "@/components/TaskModal/Description";
+import Title from "@/components/TaskModal/Title";
 
 import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons";
 import clsx from "clsx";
-import { useCallback, memo } from "react";
+import { useContext, useCallback, memo } from "react";
 
 type SectionProps = {
     children: ReactNode;
@@ -47,23 +49,30 @@ const Information = ({ label, children, alignStart }: InformationProps) => {
     );
 };
 
-type TaskModalProps = {
-    cards: CardType[];
-    onUpdate: (card: CardType) => void;
-};
-
-const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
-    const { data: cardId, setData: setCardId } = useCustomEvent<string>("card-clicked", false);
-    const card = cards.find((card) => card.id === cardId);
+const TaskModal = () => {
+    const { activeCard: card, setCards, cards, setActiveCard } = useContext(BoardLayoutContext);
 
     const updateCard = useCallback(
-        (newData: Partial<CardType>) => {
+        async (newData: Partial<BoardCard>) => {
             if (!card) return;
-            console.log("updated");
 
-            onUpdate({ ...card, ...newData });
+            const foundCardIndex = cards.findIndex(({ id }) => id === card.id);
+            if (foundCardIndex === -1) return;
+
+            const updatedCards = [...cards];
+            updatedCards[foundCardIndex] = { ...card, ...newData };
+
+            setCards(updatedCards);
+
+            await fetch(`/api/cards/${card.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(card),
+            });
         },
-        [card, onUpdate]
+        [card, cards, setCards]
     );
 
     const onTitleUpdate = useCallback(
@@ -80,12 +89,16 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
         [updateCard]
     );
 
+    const onModalClose = useCallback(() => {
+        setActiveCard(undefined);
+    }, [setActiveCard]);
+
     if (!card) return null;
 
     // count total timer from card.timers, count between start and end date, if there's no end date then keep the count going
     const totalTimer = card.timers.reduce((acc, timer) => {
-        const start = new Date(timer.started_at);
-        const end = timer.ended_at ? new Date(timer.ended_at) : new Date();
+        const start = new Date(timer.startedAt);
+        const end = timer.endedAt ? new Date(timer.endedAt) : new Date();
 
         return acc + (end.getTime() - start.getTime());
     }, 0);
@@ -93,7 +106,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
     return (
         <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto">
             {/* Use this blocker instead useClickOutside hooks to prevent outside click bug when editing description using React SimpleMDE editor */}
-            <div className="fixed top-0 left-0 z-10 h-full w-full bg-dark-900/50" onClick={() => setCardId(null)} />
+            <div className="fixed top-0 left-0 z-10 h-full w-full bg-dark-900/50" onClick={onModalClose} />
 
             <br />
 
@@ -126,8 +139,7 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                         <div className="flex items-center gap-2">
                             {card.users.length > 0 && (
                                 <>
-                                    <MemberList.Large users={card.users.map(({ user }) => user)} max={10} />
-
+                                    <MemberList.Large users={card.users} max={10} />
                                     {card.users.length > 10 && <p>+{card.users.length - 10} Members</p>}
                                 </>
                             )}
@@ -141,13 +153,13 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                     <Information label="Start Date &#8594; Due Date">
                         <div className="flex w-full items-center gap-2">
                             <Button.Small icon={IconCalendar} fit>
-                                {card.start_date ? card.start_date : "No Start Date"}
+                                {card.startDate ? card.startDate.toString() : "No Start Date"}
                             </Button.Small>
 
                             <span>&#8594;</span>
 
                             <Button.Small icon={IconCalendar} fit>
-                                {card.due_date ? card.due_date : "No Due Date"}
+                                {card.dueDate ? card.dueDate.toString() : "No Due Date"}
                             </Button.Small>
                         </div>
                     </Information>
@@ -161,8 +173,6 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                     <Information label="Labels" alignStart>
                         <div className="flex flex-wrap items-center gap-3">
                             {card.labels.map(({ label }, i) => {
-                                if (!label) return null;
-
                                 return <Label key={i} name={label.name} color={label.color} className="!text-sm" />;
                             })}
 
@@ -197,8 +207,8 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                 <Section title="Attachments">
                     {card.attachments.length > 0 && (
                         <div className="mb-4 flex gap-4 overflow-x-auto">
-                            {card.attachments.map(({ attachment, added_at }, i) => (
-                                <Attachment key={i} title={attachment.title} timestamp={added_at} />
+                            {card.attachments.map(({ attachment, addedAt }, i) => (
+                                <Attachment key={i} title={attachment.title} timestamp={addedAt} />
                             ))}
                         </div>
                     )}
@@ -211,8 +221,8 @@ const TaskModal = ({ onUpdate, cards }: TaskModalProps) => {
                 {/* Activities */}
                 <Section title="Activities">
                     <div className="flex flex-col gap-7">
-                        {card.activities.map(({ activity, user, message, created_at }, i) => (
-                            <Activity key={i} sender={user.name} details={activity || undefined} content={message || undefined} timestamp={created_at} />
+                        {card.activities.map(({ activity, user, message, createdAt }, i) => (
+                            <Activity key={i} sender={user.name} details={activity || undefined} content={message || undefined} timestamp={createdAt} />
                         ))}
 
                         <section className="flex flex-col gap-3">

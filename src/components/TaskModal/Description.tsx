@@ -1,3 +1,5 @@
+"use client";
+
 import type EasyMDE from "easymde";
 
 import { Button } from "@/components/Forms";

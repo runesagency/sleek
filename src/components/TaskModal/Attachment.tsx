@@ -1,8 +1,10 @@
+"use client";
+
 import { IconDots, IconMessageDots, IconPencil, IconTrash } from "@tabler/icons";
 
 type AttachmentProps = {
     title: string;
-    timestamp: string;
+    timestamp: Date;
 };
 
 const Attachment = ({ title, timestamp }: AttachmentProps) => {
@@ -15,7 +17,7 @@ const Attachment = ({ title, timestamp }: AttachmentProps) => {
                     {title}
                 </p>
 
-                <span className="truncate text-sm">{timestamp}</span>
+                <span className="truncate text-sm">{timestamp.toString()}</span>
 
                 <div className="flex gap-5 pt-2">
                     <IconPencil />

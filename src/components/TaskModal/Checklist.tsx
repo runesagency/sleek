@@ -1,3 +1,5 @@
+"use client";
+
 import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
 import { Button, Checkbox } from "@/components/Forms";

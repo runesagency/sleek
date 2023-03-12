@@ -1,3 +1,5 @@
+"use client";
+
 import { useDebouncedValue } from "@mantine/hooks";
 import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
