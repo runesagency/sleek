@@ -121,24 +121,39 @@ export default function BoardPageLayout({ children, params: { id: boardId } }: B
                 </div>
 
                 <div className="flex items-center gap-6 px-11 py-6">
-                    <Link href={`/app/project/${project.id}`}>
-                        <Button.Small icon={IconArrowBackUp} fit>
-                            Back
-                        </Button.Small>
-                    </Link>
+                    {isLoading ? (
+                        <>
+                            <div className="animate-shimmer h-10 w-40 shrink-0 rounded-lg bg-dark-700" />
+                            <div className="animate-shimmer h-10 w-64 shrink-0 rounded-lg bg-dark-700" />
+                            <div className="animate-shimmer h-10 w-20 shrink-0 rounded-lg bg-dark-700" />
+                        </>
+                    ) : (
+                        <>
+                            <Link href={`/app/project/${project.id}`}>
+                                <Button.Small icon={IconArrowBackUp} fit>
+                                    Back
+                                </Button.Small>
+                            </Link>
 
-                    <h2 className="ts-2xl">{board.name}</h2>
+                            <h2 className="ts-2xl">{board.name}</h2>
 
-                    <MemberList.Large users={board.users} />
+                            <MemberList.Large users={board.users} />
 
-                    <Button.Large icon={IconFilter} fit>
-                        Filter
-                    </Button.Large>
+                            <Button.Large icon={IconFilter} fit>
+                                Filter
+                            </Button.Large>
+                        </>
+                    )}
                 </div>
 
-                {children}
+                {isLoading ? (
+                    <div className="h-full w-full px-11 pb-6">
+                        <div className="animate-shimmer h-full w-full shrink-0 rounded-lg bg-dark-700" />{" "}
+                    </div>
+                ) : (
+                    children
+                )}
 
-                {/* Absolute */}
                 <TaskModal />
             </main>
         </BoardLayoutContext.Provider>
