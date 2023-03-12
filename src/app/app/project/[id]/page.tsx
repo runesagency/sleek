@@ -3,23 +3,12 @@
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
 
-import { IconArrowBackUp, IconFilter, IconPlus, IconShare } from "@tabler/icons";
+import { IconFilter, IconPlus, IconShare } from "@tabler/icons";
 import Link from "next/link";
 
 export default function ProjectBoardListPage() {
     return (
-        <main className="flex flex-col gap-6 py-9 px-16 3xl:px-36">
-            <Link href={`/app/organization/${"organizationId"}`}>
-                <Button.Small icon={IconArrowBackUp} fit>
-                    Back to Organization
-                </Button.Small>
-            </Link>
-
-            <div className="flex max-w-md flex-col gap-4">
-                <h1 className="heading-4">Project 001</h1>
-                <p className="ts-sm">Oat cake danish pie croissant jujubes pastry. Dragée macaroon pastry toffee macaroon gummies gummi bears</p>
-            </div>
-
+        <main className="flex flex-col gap-6">
             <div className="flex items-center gap-5">
                 <MemberList.Large users={[]} />
 
