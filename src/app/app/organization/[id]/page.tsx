@@ -129,7 +129,7 @@ export default function OrganizationProjectListPage() {
                     organizationId: id,
                 }),
             }).then(async (res) => {
-                const { result, error }: ApiResult<ApiMethod.Project.PostResult> = await res.json();
+                const { result, error }: ApiResult<ApiMethod.Projects.PostResult> = await res.json();
 
                 if (error) {
                     return toast.error(error.message);
