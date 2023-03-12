@@ -1,7 +1,7 @@
 "use client";
 
 import type { MenuOptions } from "@/lib/menu/hooks/use-menu";
-import type { ApiMethod, APIResult } from "@/lib/types";
+import type { ApiMethod, ApiResult } from "@/lib/types";
 import type { Project as ProjectType } from "@prisma/client";
 
 import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
@@ -129,7 +129,7 @@ export default function OrganizationProjectListPage() {
                     organizationId: id,
                 }),
             }).then(async (res) => {
-                const { result, error }: APIResult<ApiMethod.Project.PostResult> = await res.json();
+                const { result, error }: ApiResult<ApiMethod.Project.PostResult> = await res.json();
 
                 if (error) {
                     return toast.error(error.message);

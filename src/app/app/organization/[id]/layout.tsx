@@ -1,6 +1,6 @@
 "use client";
 
-import type { APIResult, ApiMethod } from "@/lib/types";
+import type { ApiResult, ApiMethod } from "@/lib/types";
 
 import clsx from "clsx";
 import Link from "next/link";
@@ -72,7 +72,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                 "Content-Type": "application/json",
             },
         }).then(async (res) => {
-            const { result, error }: APIResult<ApiMethod.Organization.GetResult> = await res.json();
+            const { result, error }: ApiResult<ApiMethod.Organization.GetResult> = await res.json();
 
             if (error) {
                 toast.error(error.message);

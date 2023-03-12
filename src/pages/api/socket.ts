@@ -1,11 +1,11 @@
-import type { ApiRequest, APIResponse } from "@/lib/types";
+import type { ApiRequest, ApiResponse } from "@/lib/types";
 import type { Http2SecureServer } from "http2";
 import type { Server as NetServer } from "net";
 
 import { createRouter } from "next-connect";
 import { Server as SocketIO } from "socket.io";
 
-const router = createRouter<ApiRequest, APIResponse>();
+const router = createRouter<ApiRequest, ApiResponse>();
 
 router.all((req, res) => {
     if (!res.socket.server.io) {

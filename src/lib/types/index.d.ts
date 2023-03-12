@@ -10,7 +10,7 @@ export type ApiRequest = NextApiRequest & {
     user: User;
 };
 
-export type APIResult<Result = unknown> =
+export type ApiResult<Result = unknown> =
     | {
           result: Result;
           error?: never;
@@ -20,7 +20,7 @@ export type APIResult<Result = unknown> =
           error: Error;
       };
 
-export type APIResponse<Result = unknown> = NextApiResponse<APIResult<Result>> & {
+export type ApiResponse<Result = unknown> = NextApiResponse<ApiResult<Result>> & {
     socket: Socket & {
         server: NetServer & {
             io: SocketIOServer;

@@ -1,6 +1,6 @@
 "use client";
 
-import type { APIResult, ApiMethod } from "@/lib/types";
+import type { ApiResult, ApiMethod } from "@/lib/types";
 import type { Organization } from "@prisma/client";
 
 import { Button, Input } from "@/components/Forms";
@@ -86,7 +86,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                             name,
                         }),
                     }).then(async (res) => {
-                        const { result, error }: APIResult<ApiMethod.Organizations.PostResult> = await res.json();
+                        const { result, error }: ApiResult<ApiMethod.Organizations.PostResult> = await res.json();
                         if (error) return;
 
                         setOrganizations((prev) => [...prev, result]);
@@ -105,7 +105,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 "Content-Type": "application/json",
             },
         }).then(async (res) => {
-            const { result, error }: APIResult<ApiMethod.Organizations.GetResult> = await res.json();
+            const { result, error }: ApiResult<ApiMethod.Organizations.GetResult> = await res.json();
             if (error) return;
 
             setOrganizations(result);
@@ -179,7 +179,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 "Content-Type": "application/json",
             },
         }).then(async (res) => {
-            const { result, error }: APIResult<ApiMethod.CurrentUser.GetResult> = await res.json();
+            const { result, error }: ApiResult<ApiMethod.CurrentUser.GetResult> = await res.json();
 
             if (error) {
                 toast.error(error.message);

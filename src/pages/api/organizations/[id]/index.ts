@@ -1,4 +1,4 @@
-import type { ApiRequest, APIResponse } from "@/lib/types";
+import type { ApiRequest, ApiResponse } from "@/lib/types";
 import type { Organization, Project, Role, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
@@ -8,7 +8,7 @@ import { getServerSession } from "next-auth/next";
 import { createRouter } from "next-connect";
 import { z } from "zod";
 
-const router = createRouter<ApiRequest, APIResponse>();
+const router = createRouter<ApiRequest, ApiResponse>();
 
 router.use(async (req, res, next) => {
     const session = await getServerSession(req, res, authOptions);
