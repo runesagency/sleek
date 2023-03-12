@@ -168,7 +168,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         "/board", //
     ];
 
-    const isUsingSidebar = pathname && !pathWithoutSidebar.includes(pathname);
+    const isUsingSidebar = pathname && !pathWithoutSidebar.some((path) => pathname.includes(path));
 
     useEffect(() => {
         if (!data) return;
