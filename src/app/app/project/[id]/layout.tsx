@@ -88,7 +88,7 @@ export default function ProjectPageLayout({ children, params: { id } }: ProjectP
 
     return (
         <ProjectLayoutContext.Provider value={contextValue}>
-            <main className="flex flex-col gap-6 py-9 px-16 3xl:px-36">
+            <main className="flex h-full flex-col gap-6 py-9 px-16 3xl:px-36">
                 {!isLoading && (
                     <Link href={`/app/organization/${organizationId}`}>
                         <Button.Small icon={IconArrowBackUp} fit>
@@ -100,10 +100,10 @@ export default function ProjectPageLayout({ children, params: { id } }: ProjectP
                 <div className="flex max-w-md flex-col gap-4">
                     {isLoading ? (
                         <>
-                            <div className="animate-shimmer h-10 w-12 rounded-full bg-dark-700" />
+                            <div className="animate-shimmer h-10 w-48 rounded-lg bg-dark-700" />
                             <div className="flex flex-col gap-2">
                                 <div className="animate-shimmer h-5 w-full max-w-xs rounded-lg bg-dark-700" />
-                                <div className="animate-shimmer h-5 w-72 rounded-lg bg-dark-700" />
+                                <div className="animate-shimmer h-5 w-64 rounded-lg bg-dark-700" />
                             </div>
                         </>
                     ) : (
