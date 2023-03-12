@@ -33,7 +33,6 @@ export type BoardCard = Card & {
 
 type BoardLayoutContextProps = {
     isLoading: boolean;
-    project: Project;
     lists: BoardList[];
     cards: BoardCard[];
     activeCard?: BoardCard;
@@ -47,21 +46,6 @@ type BoardLayoutContextProps = {
 
 const defaultContextValue: BoardLayoutContextProps = {
     isLoading: true,
-    project: {
-        id: "",
-        createdAt: new Date(),
-        creatorId: "",
-        description: "",
-        coverAttachmentId: "",
-        dueDate: new Date(),
-        logoAttachmentId: "",
-        modifiedAt: new Date(),
-        modifierId: "",
-        name: "",
-        password: "",
-        organizationId: "",
-        startDate: new Date(),
-    },
     board: {
         id: "",
         createdAt: new Date(),
@@ -100,7 +84,6 @@ type BoardPageLayoutProps = {
 
 export default function BoardPageLayout({ children, params: { id: boardId } }: BoardPageLayoutProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [project, setProject] = useState<BoardLayoutContextProps["project"]>(defaultContextValue.project);
     const [board, setBoard] = useState<BoardLayoutContextProps["board"]>(defaultContextValue.board);
     const [lists, setLists] = useState<BoardList[]>([]);
     const [cards, setCards] = useState<BoardCard[]>([]);
@@ -111,7 +94,7 @@ export default function BoardPageLayout({ children, params: { id: boardId } }: B
     }, []);
 
     return (
-        <BoardLayoutContext.Provider value={{ isLoading, project, board, lists, cards, activeCard, setLists, setCards, setActiveCard }}>
+        <BoardLayoutContext.Provider value={{ isLoading, board, lists, cards, activeCard, setLists, setCards, setActiveCard }}>
             <main className="box-border flex h-full w-full flex-col">
                 <div className="flex bg-dark-700 px-11">
                     <SwitchButton>About</SwitchButton>
@@ -129,7 +112,7 @@ export default function BoardPageLayout({ children, params: { id: boardId } }: B
                         </>
                     ) : (
                         <>
-                            <Link href={`/app/project/${project.id}`}>
+                            <Link href={`/app/project/${board.projectId}`}>
                                 <Button.Small icon={IconArrowBackUp} fit>
                                     Back
                                 </Button.Small>
