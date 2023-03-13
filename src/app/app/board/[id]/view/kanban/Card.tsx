@@ -61,7 +61,7 @@ const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
     );
 };
 
-const Card = ({ id, title, attachments, activities, cover, checklists, labels, dueDate, users }: BoardCard) => {
+const Card = ({ id, title, attachments, activities, coverAttachmentId, checklists, labels, dueDate, users }: BoardCard) => {
     const {
         ref: cardRef,
         isDragging,
@@ -94,7 +94,7 @@ const Card = ({ id, title, attachments, activities, cover, checklists, labels, d
             )}
         >
             {/* Cover Image */}
-            {cover && <img src={cover.filenameDisk} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
+            {coverAttachmentId && <img src={coverAttachmentId} alt="Card Cover" className="h-40 w-full rounded-lg object-cover object-center" loading="lazy" />}
 
             {/* Head */}
             <div className="flex max-w-full items-start justify-between gap-2">

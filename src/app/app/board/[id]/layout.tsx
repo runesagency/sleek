@@ -1,6 +1,6 @@
 "use client";
 
-import type { Activity, Attachment, Board, Card, CardAttachment, CardChecklist, CardChecklistTask, CardLabel, CardTimer, Label, List, Project, User } from "@prisma/client";
+import type { ApiMethod } from "@/lib/types";
 
 import MemberList from "@/components/DataDisplay/MemberList";
 import { SwitchButton, Button } from "@/components/Forms";
@@ -8,37 +8,16 @@ import TaskModal from "@/components/TaskModal";
 
 import { IconArrowBackUp, IconFilter } from "@tabler/icons";
 import Link from "next/link";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 
-export type BoardList = List;
+export type BoardList = ApiMethod.Board.GetResult["lists"][0];
 
-export type BoardCard = Card & {
-    users: User[];
-    timers: CardTimer[];
-    creator: User;
-    cover: Attachment;
-    labels: (CardLabel & {
-        label: Label;
-    })[];
-    checklists: (CardChecklist & {
-        tasks: CardChecklistTask[];
-    })[];
-    attachments: (CardAttachment & {
-        attachment: Attachment;
-    })[];
-    activities: (Activity & {
-        user: User;
-    })[];
-};
+export type BoardCard = ApiMethod.Board.GetResult["cards"][0];
 
 type BoardLayoutContextProps = {
     isLoading: boolean;
-    lists: BoardList[];
-    cards: BoardCard[];
     activeCard?: BoardCard;
-    board: Board & {
-        users: User[];
-    };
+    data: ApiMethod.Board.GetResult;
     setLists: (lists: BoardList[]) => void;
     setCards: (cards: BoardCard[]) => void;
     setActiveCard: (card: BoardCard | undefined) => void;
@@ -46,7 +25,7 @@ type BoardLayoutContextProps = {
 
 const defaultContextValue: BoardLayoutContextProps = {
     isLoading: true,
-    board: {
+    data: {
         id: "",
         createdAt: new Date(),
         creatorId: "",
@@ -58,9 +37,9 @@ const defaultContextValue: BoardLayoutContextProps = {
         password: "",
         projectId: "",
         users: [],
+        lists: [],
+        cards: [],
     },
-    lists: [],
-    cards: [],
     activeCard: undefined,
     setLists: () => {
         throw new Error("setLists is not defined");
@@ -84,17 +63,31 @@ type BoardPageLayoutProps = {
 
 export default function BoardPageLayout({ children, params: { id: boardId } }: BoardPageLayoutProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [board, setBoard] = useState<BoardLayoutContextProps["board"]>(defaultContextValue.board);
-    const [lists, setLists] = useState<BoardList[]>([]);
-    const [cards, setCards] = useState<BoardCard[]>([]);
+    const [data, setData] = useState<BoardLayoutContextProps["data"]>(defaultContextValue.data);
     const [activeCard, setActiveCard] = useState<BoardCard | undefined>(undefined);
+
+    const { projectId, name, users } = data;
+
+    const setLists = useCallback((lists: BoardList[]) => {
+        setData((prev) => ({
+            ...prev,
+            lists,
+        }));
+    }, []);
+
+    const setCards = useCallback((cards: BoardCard[]) => {
+        setData((prev) => ({
+            ...prev,
+            cards,
+        }));
+    }, []);
 
     useEffect(() => {
         // TODO: Fetch data
     }, []);
 
     return (
-        <BoardLayoutContext.Provider value={{ isLoading, board, lists, cards, activeCard, setLists, setCards, setActiveCard }}>
+        <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, setLists, setCards, setActiveCard }}>
             <main className="box-border flex h-full w-full flex-col">
                 <div className="flex bg-dark-700 px-11">
                     <SwitchButton>About</SwitchButton>
@@ -112,15 +105,15 @@ export default function BoardPageLayout({ children, params: { id: boardId } }: B
                         </>
                     ) : (
                         <>
-                            <Link href={`/app/project/${board.projectId}`}>
+                            <Link href={`/app/project/${projectId}`}>
                                 <Button.Small icon={IconArrowBackUp} fit>
                                     Back
                                 </Button.Small>
                             </Link>
 
-                            <h2 className="ts-2xl">{board.name}</h2>
+                            <h2 className="ts-2xl">{name}</h2>
 
-                            <MemberList.Large users={board.users} />
+                            <MemberList.Large users={users} />
 
                             <Button.Large icon={IconFilter} fit>
                                 Filter
@@ -131,7 +124,7 @@ export default function BoardPageLayout({ children, params: { id: boardId } }: B
 
                 {isLoading ? (
                     <div className="h-full w-full px-11 pb-6">
-                        <div className="animate-shimmer h-full w-full shrink-0 rounded-lg bg-dark-700" />{" "}
+                        <div className="animate-shimmer h-full w-full shrink-0 rounded-lg bg-dark-700" />
                     </div>
                 ) : (
                     children

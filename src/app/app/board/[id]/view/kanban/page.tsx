@@ -3,8 +3,8 @@
 import type { BoardCard } from "@/app/app/board/[id]/layout";
 import type { DragEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
 
-import List, { NewCardLocation } from "@/app/app/board/[id]/view/kanban/List";
 import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
+import List, { NewCardLocation } from "@/app/app/board/[id]/view/kanban/List";
 import { Button } from "@/components/Forms";
 import useDragDropContext from "@/lib/drag-and-drop/use-drag-drop-context";
 import useDroppable, { SortableDirection } from "@/lib/drag-and-drop/use-droppable";
@@ -21,11 +21,15 @@ export enum SortableType {
 }
 
 export default function KanbanLayoutPage() {
-    const { cards, lists, setCards, setLists, board } = useContext(BoardLayoutContext);
+    const {
+        data: { id, cards, lists },
+        setCards,
+        setLists,
+    } = useContext(BoardLayoutContext);
     const { ref: dndContextRef, onDragEnd } = useDragDropContext();
 
     const { ref: droppableRef } = useDroppable({
-        id: board.id,
+        id: id,
         accepts: [SortableType.List],
         sortable: true,
         sortableDirection: SortableDirection.Horizontal,
@@ -102,7 +106,7 @@ export default function KanbanLayoutPage() {
 
     onDragEnd(async ({ dragged, dropped }: DragEvent) => {
         // List to List
-        if (dragged.type === SortableType.List && dropped.id === board.id) {
+        if (dragged.type === SortableType.List && dropped.id === id) {
             const list = lists.find((list) => list.id === dragged.id);
             if (!list) return;
 

@@ -50,7 +50,12 @@ const Information = ({ label, children, alignStart }: InformationProps) => {
 };
 
 const TaskModal = () => {
-    const { activeCard: card, setCards, cards, setActiveCard } = useContext(BoardLayoutContext);
+    const {
+        activeCard: card,
+        setCards,
+        setActiveCard,
+        data: { cards },
+    } = useContext(BoardLayoutContext);
 
     const updateCard = useCallback(
         async (newData: Partial<BoardCard>) => {
