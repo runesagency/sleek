@@ -2,6 +2,8 @@ import type { ApiRequest, ApiResponse } from "@/lib/types";
 import type { Organization, Project, Role, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { getOrganizationPermissionsForBoard, getOrganizationPermissionsForProject } from "@/lib/utils/get-organization-permission";
+import { getUserPermissionsForProject } from "@/lib/utils/get-user-permission";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 import { getServerSession } from "next-auth/next";
@@ -83,61 +85,11 @@ router.get(async (req, res) => {
         });
     }
 
-    const projects = await prisma.project.findMany({
+    let projects: Project[] = [];
+
+    const allProjects = await prisma.project.findMany({
         where: {
-            AND: [
-                { organizationId },
-                {
-                    OR: [
-                        // User is a member of one of the boards of the project
-                        {
-                            boards: {
-                                some: {
-                                    users: {
-                                        some: {
-                                            id: user.id,
-                                            role: {
-                                                VIEW_BOARD: true,
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                        // User is a member of the project
-                        {
-                            users: {
-                                some: {
-                                    id: user.id,
-                                    role: {
-                                        VIEW_PROJECT: true,
-                                    },
-                                },
-                            },
-                        },
-                        // User has VIEW_PROJECT roles on the organization level that
-                        // allows to see all projects of the organization
-                        {
-                            organization: {
-                                users: {
-                                    some: {
-                                        id: user.id,
-                                        role: {
-                                            VIEW_PROJECT: true,
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                        // User is the owner of the organization
-                        {
-                            organization: {
-                                ownerId: user.id,
-                            },
-                        },
-                    ],
-                },
-            ],
+            organizationId,
         },
         include: {
             _count: {
@@ -148,52 +100,39 @@ router.get(async (req, res) => {
         },
     });
 
-    const externalProjects = await prisma.project.findMany({
+    for (const project of allProjects) {
+        const permission = await getUserPermissionsForProject(user.id, project.id);
+
+        if (permission.VIEW_PROJECT) {
+            projects.push(project);
+        }
+    }
+
+    let externalProjects: Project[] = [];
+
+    const allExternalProjects = await prisma.project.findMany({
         where: {
-            AND: [
-                {
-                    organizationId: {
-                        not: organizationId,
-                    },
+            AND: {
+                organizationId: {
+                    not: organizationId,
                 },
-                {
-                    OR: [
-                        // The current organization is a member
-                        // of one of the boards in the project
-                        {
-                            boards: {
-                                some: {
-                                    organizations: {
-                                        some: {
-                                            id: organizationId,
-                                            role: {
-                                                VIEW_BOARD: true,
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                            users: {
-                                some: {
-                                    id: user.id,
-                                },
-                            },
+                OR: {
+                    organizations: {
+                        some: {
+                            organizationId,
                         },
-                        // The current organization was added
-                        // as a member on the project
-                        {
+                    },
+                    boards: {
+                        some: {
                             organizations: {
                                 some: {
-                                    id: organizationId,
-                                    role: {
-                                        VIEW_PROJECT: true,
-                                    },
+                                    organizationId,
                                 },
                             },
                         },
-                    ],
+                    },
                 },
-            ],
+            },
         },
         include: {
             _count: {
@@ -203,6 +142,14 @@ router.get(async (req, res) => {
             },
         },
     });
+
+    for (const project of allExternalProjects) {
+        const permission = await getOrganizationPermissionsForProject(organizationId, project.id);
+
+        if (permission.VIEW_PROJECT) {
+            externalProjects.push(project);
+        }
+    }
 
     const users = organization.users.map(({ user }) => user);
 
@@ -210,8 +157,8 @@ router.get(async (req, res) => {
         result: {
             ...organization,
             users,
-            projects,
-            externalProjects,
+            projects: allProjects,
+            externalProjects: allExternalProjects,
         } as GetResult,
     });
 });
