@@ -1,6 +1,6 @@
 "use client";
 
-import type { ApiMethod } from "@/lib/types";
+import type { ApiMethod, ApiResult } from "@/lib/types";
 
 import MemberList from "@/components/DataDisplay/MemberList";
 import { SwitchButton, Button } from "@/components/Forms";
@@ -8,7 +8,9 @@ import TaskModal from "@/components/TaskModal";
 
 import { IconArrowBackUp, IconFilter } from "@tabler/icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createContext, useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export type BoardList = ApiMethod.Board.GetResult["lists"][0];
 
@@ -61,11 +63,12 @@ type BoardPageLayoutProps = {
     };
 };
 
-export default function BoardPageLayout({ children, params: { id: boardId } }: BoardPageLayoutProps) {
+export default function BoardPageLayout({ children, params: { id } }: BoardPageLayoutProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState<BoardLayoutContextProps["data"]>(defaultContextValue.data);
     const [activeCard, setActiveCard] = useState<BoardCard | undefined>(undefined);
 
+    const router = useRouter();
     const { projectId, name, users } = data;
 
     const setLists = useCallback((lists: BoardList[]) => {
@@ -83,8 +86,23 @@ export default function BoardPageLayout({ children, params: { id: boardId } }: B
     }, []);
 
     useEffect(() => {
-        // TODO: Fetch data
-    }, []);
+        fetch(`/api/boards/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then(async (res) => {
+            const { result, error }: ApiResult<ApiMethod.Board.GetResult> = await res.json();
+
+            if (error) {
+                toast.error(error.message);
+                return router.push("/app");
+            }
+
+            setIsLoading(false);
+            setData(result);
+        });
+    }, [id, router]);
 
     return (
         <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, setLists, setCards, setActiveCard }}>
