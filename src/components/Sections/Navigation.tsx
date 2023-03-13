@@ -258,7 +258,7 @@ const Navigation = ({ className }: NavigationProps) => {
     return (
         <Container as="nav" className={[clsx("relative z-50", className), "ts-base flex justify-between py-8"]}>
             <div className="flex items-center gap-12">
-                <Link href="/">
+                <Link href={Routes.Home}>
                     <img src="/assets/images/logo.svg" alt="Logo" className="h-8" />
                 </Link>
 

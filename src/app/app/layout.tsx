@@ -55,9 +55,8 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
     const [autoAnimateRef] = useAutoAnimate();
     const { toggleMenu } = useMenu();
 
-    // All path are prefixed with /app
     const links = [
-        { name: "All Projects", path: "/", icon: IconCards },
+        { name: "All Projects", path: Routes.App, icon: IconCards },
         { name: "Your Settings", path: "#", icon: IconSettings },
     ];
 
@@ -119,7 +118,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 <span className="text-xs font-medium opacity-50">Personal</span>
 
                 {links.map(({ name, path, icon: Icon }, index) => (
-                    <Link key={index} href={Routes.App + path} className="flex items-center gap-3 duration-200 hover:opacity-75">
+                    <Link key={index} href={path} className="flex items-center gap-3 duration-200 hover:opacity-75">
                         <Icon width={20} height={undefined} className="shrink-0" />
                         <p className="text-sm">{name}</p>
                     </Link>
@@ -184,7 +183,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             if (error) {
                 toast.error(error.message);
-                return router.push("/");
+                return router.push(Routes.Home);
             }
 
             setContextValue({ isLoading: false, data: result });

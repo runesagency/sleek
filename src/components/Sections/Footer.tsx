@@ -31,7 +31,7 @@ const Footer = () => {
     return (
         <Container as="footer" className={["bg-dark-700 text-dark-50", "flex flex-col justify-between gap-y-12 py-14 lg:flex-row"]}>
             <section className="flex shrink-0 flex-col gap-5 lg:w-72">
-                <Link href="/">
+                <Link href={Routes.Home}>
                     <img src="/assets/images/logo.svg" alt="Logo" className="h-8" />
                 </Link>
 
@@ -49,7 +49,7 @@ const Footer = () => {
                 <FooterSection
                     title="Product"
                     links={[
-                        { title: "Home", href: "/" },
+                        { title: "Home", href: Routes.Home },
                         { title: "Features", href: "/features" },
                         { title: "Pricing", href: Routes.Pricing },
                         { title: "Changelog", href: "/changelog" },
