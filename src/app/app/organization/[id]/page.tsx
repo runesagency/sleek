@@ -6,6 +6,7 @@ import type { Project as ProjectType } from "@prisma/client";
 
 import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
 import { Button } from "@/components/Forms";
+import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -75,7 +76,7 @@ export const Project = ({ id, name, description, coverAttachmentId, logoAttachme
     );
 
     return (
-        <Link href={`/app/project/${id}`} onContextMenu={onContextMenu} className="flex flex-col items-start gap-4 rounded-lg border border-dark-500 bg-dark-600 p-4 xl:flex-row">
+        <Link href={Routes.Project(id)} onContextMenu={onContextMenu} className="flex flex-col items-start gap-4 rounded-lg border border-dark-500 bg-dark-600 p-4 xl:flex-row">
             {coverAttachmentId && <img src="https://picsum.photos/1080" alt="banner" className="h-32 w-full shrink-0 rounded-lg object-cover object-center xl:h-full xl:w-1/3" />}
 
             <div className="flex flex-col gap-4 overflow-hidden">
@@ -119,7 +120,7 @@ export default function OrganizationProjectListPage() {
 
             setProjectOnCreate(name);
 
-            fetch("/api/projects", {
+            fetch(ApiRoutes.Projects, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

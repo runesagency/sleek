@@ -2,6 +2,8 @@
 
 import type { ApiResult, ApiMethod } from "@/lib/types";
 
+import { ApiRoutes, Routes } from "@/lib/constants";
+
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -66,7 +68,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
     ];
 
     useEffect(() => {
-        fetch(`/api/organizations/${id}`, {
+        fetch(ApiRoutes.Organization(id), {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -76,7 +78,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
 
             if (error) {
                 toast.error(error.message);
-                return router.push("/app");
+                return router.push(Routes.App);
             }
 
             setContextValue({
@@ -120,7 +122,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                         {links.map(({ name, path }, index) => (
                             <Link
                                 key={index}
-                                href={`/app/organization/${id}` + path}
+                                href={Routes.Organization(id) + path}
                                 className={clsx("ts-sm border-b-2 px-4 py-2 duration-200 hover:border-b-dark-500", pagePath === path ? "border-b-dark-400" : "border-b-transparent")}
                             >
                                 {name}

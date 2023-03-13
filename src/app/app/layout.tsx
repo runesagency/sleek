@@ -5,6 +5,7 @@ import type { Organization } from "@prisma/client";
 
 import { Button, Input } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
+import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -77,7 +78,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 onSubmit({ name }: { name: string }) {
                     setOrganizationOnCreate(name);
 
-                    fetch("/api/organizations", {
+                    fetch(ApiRoutes.Organizations, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -99,7 +100,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
     );
 
     useEffect(() => {
-        fetch("/api/organizations", {
+        fetch(ApiRoutes.Organizations, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -118,7 +119,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 <span className="text-xs font-medium opacity-50">Personal</span>
 
                 {links.map(({ name, path, icon: Icon }, index) => (
-                    <Link key={index} href={"/app" + path} className="flex items-center gap-3 duration-200 hover:opacity-75">
+                    <Link key={index} href={Routes.App + path} className="flex items-center gap-3 duration-200 hover:opacity-75">
                         <Icon width={20} height={undefined} className="shrink-0" />
                         <p className="text-sm">{name}</p>
                     </Link>
@@ -131,7 +132,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 <span className="text-xs font-medium opacity-50">Organization</span>
 
                 {organizations.map(({ name, id }, index) => (
-                    <Link key={index} href={`/app/organization/${id}`} className="flex items-center gap-3 duration-200 hover:opacity-75">
+                    <Link key={index} href={Routes.Organization(id)} className="flex items-center gap-3 duration-200 hover:opacity-75">
                         <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
 
                         <p className="text-sm">{name}</p>
@@ -173,7 +174,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     useEffect(() => {
         if (!data) return;
 
-        fetch(`/api/@me`, {
+        fetch(ApiRoutes.CurrentUser, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -197,7 +198,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <div className="flex items-center gap-4">
                         <IconMenu2 className="lg:hidden" height={20} onClick={() => setSidebarOpen(!sidebarOpen)} />
 
-                        <Link href="/app">
+                        <Link href={Routes.App}>
                             <img src="/assets/images/logo.svg" alt="Logo" loading="lazy" className="h-6" />
                         </Link>
                     </div>

@@ -3,6 +3,7 @@
 import type { ApiMethod, ApiResult } from "@/lib/types";
 
 import { Button } from "@/components/Forms";
+import { ApiRoutes, Routes } from "@/lib/constants";
 
 import { IconArrowBackUp } from "@tabler/icons";
 import Link from "next/link";
@@ -60,7 +61,7 @@ export default function ProjectPageLayout({ children, params: { id } }: ProjectP
     const router = useRouter();
 
     useEffect(() => {
-        fetch(`/api/projects/${id}`, {
+        fetch(ApiRoutes.Project(id), {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -70,7 +71,7 @@ export default function ProjectPageLayout({ children, params: { id } }: ProjectP
 
             if (error) {
                 toast.error(error.message);
-                return router.push("/app");
+                return router.push(Routes.App);
             }
 
             setContextValue({
@@ -90,7 +91,7 @@ export default function ProjectPageLayout({ children, params: { id } }: ProjectP
         <ProjectLayoutContext.Provider value={contextValue}>
             <main className="flex h-full flex-col gap-6 py-9 px-16 3xl:px-36">
                 {!isLoading && (
-                    <Link href={`/app/organization/${organizationId}`}>
+                    <Link href={Routes.Organization(organizationId)}>
                         <Button.Small icon={IconArrowBackUp} fit>
                             Back to Organization
                         </Button.Small>

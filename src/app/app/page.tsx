@@ -4,6 +4,7 @@ import { DashboardLayoutContext } from "@/app/app/layout";
 import { Project } from "@/app/app/organization/[id]/page";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
+import { Routes } from "@/lib/constants";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Link from "next/link";
@@ -43,7 +44,7 @@ export default function AppUserHomePage() {
 
                               <MemberList.Large users={users} min={5} />
 
-                              <Link href={`/app/organization/${id}`} className="w-max">
+                              <Link href={Routes.Organization(id)} className="w-max">
                                   <Button.Large fit>See More</Button.Large>
                               </Link>
                           </div>

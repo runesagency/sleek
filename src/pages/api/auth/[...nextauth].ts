@@ -4,7 +4,7 @@ import type { AdapterAccount, Adapter, AdapterUser, AdapterSession } from "next-
 import type { Provider } from "next-auth/providers";
 
 import { AuthHashCode } from "@/components/Sections/Navigation";
-import { DefaultRolesIds } from "@/lib/constants";
+import { DefaultRolesIds, Routes } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
 import NextAuth from "next-auth";
@@ -318,7 +318,7 @@ export const authOptions: NextAuthOptions = {
         signOut: `/#${AuthHashCode.Logout}`,
         error: `/#${AuthHashCode.Error}`,
         verifyRequest: `/#${AuthHashCode.Pending}`,
-        newUser: "/app",
+        newUser: Routes.App,
     },
 };
 

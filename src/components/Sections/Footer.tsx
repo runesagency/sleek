@@ -1,5 +1,6 @@
 import { Button, Input } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
+import { Routes } from "@/lib/constants";
 
 import { IconBrandDiscord, IconBrandTwitter, IconMail } from "@tabler/icons";
 import Link from "next/link";
@@ -50,7 +51,7 @@ const Footer = () => {
                     links={[
                         { title: "Home", href: "/" },
                         { title: "Features", href: "/features" },
-                        { title: "Pricing", href: "/pricing" },
+                        { title: "Pricing", href: Routes.Pricing },
                         { title: "Changelog", href: "/changelog" },
                     ]}
                 />
@@ -59,7 +60,7 @@ const Footer = () => {
                     title="Company"
                     links={[
                         { title: "About", href: "/about" },
-                        { title: "Contact", href: "/contact" },
+                        { title: "Contact", href: Routes.Contact },
                     ]}
                 />
 

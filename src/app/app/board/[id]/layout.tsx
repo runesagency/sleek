@@ -5,6 +5,7 @@ import type { ApiMethod, ApiResult } from "@/lib/types";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { SwitchButton, Button } from "@/components/Forms";
 import TaskModal from "@/components/TaskModal";
+import { ApiRoutes, Routes } from "@/lib/constants";
 
 import { IconArrowBackUp, IconFilter } from "@tabler/icons";
 import Link from "next/link";
@@ -86,7 +87,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
     }, []);
 
     useEffect(() => {
-        fetch(`/api/boards/${id}`, {
+        fetch(ApiRoutes.Board(id), {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -96,7 +97,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
 
             if (error) {
                 toast.error(error.message);
-                return router.push("/app");
+                return router.push(Routes.App);
             }
 
             setIsLoading(false);
@@ -123,7 +124,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
                         </>
                     ) : (
                         <>
-                            <Link href={`/app/project/${projectId}`}>
+                            <Link href={Routes.Project(projectId)}>
                                 <Button.Small icon={IconArrowBackUp} fit>
                                     Back
                                 </Button.Small>

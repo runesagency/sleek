@@ -16,8 +16,29 @@ export const DefaultRolesIds = {
     BOARD_ADMIN: "board-admin",
     BOARD_MEMBER: "board-member",
     BOARD_GUEST: "board-guest",
-};
+} as const;
 
 export const DefaultStorageIds = {
     LOCAL: "local",
-};
+} as const;
+
+export const Routes = {
+    Home: "/",
+    Pricing: "/pricing",
+    Contact: "/contact",
+    App: "/app",
+    Organization: (id: string) => `/app/organization/${id}`,
+    Project: (id: string) => `/app/project/${id}`,
+    Board: (id: string) => `/app/board/${id}`,
+} as const;
+
+export const ApiRoutes = {
+    CurrentUser: "/api/@me",
+    Auth: "/api/auth",
+    Organizations: "/api/organizations",
+    Organization: (id: string) => `/api/organization/${id}`,
+    Projects: "/api/projects",
+    Project: (id: string) => `/api/project/${id}`,
+    Boards: "/api/boards",
+    Board: (id: string) => `/api/board/${id}`,
+} as const;

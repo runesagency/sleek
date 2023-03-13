@@ -6,6 +6,7 @@ import type { ApiMethod, ApiResult } from "@/lib/types";
 import { ProjectLayoutContext } from "@/app/app/project/[id]/layout";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
+import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuAnchor, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -37,7 +38,7 @@ export default function ProjectBoardListPage() {
 
             setBoardOnCreate(name);
 
-            fetch("/api/boards", {
+            fetch(ApiRoutes.Boards, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -122,7 +123,7 @@ export default function ProjectBoardListPage() {
                         )}
 
                         {boards.map(({ id, name, description }, index) => (
-                            <Link key={index} href={`/app/board/${id}`} className="flex flex-col overflow-hidden rounded-lg">
+                            <Link key={index} href={Routes.Board(id)} className="flex flex-col overflow-hidden rounded-lg">
                                 <div className="relative h-40 w-full">
                                     <img src="https://picsum.photos/500" alt="bg" className="z-10 h-full w-full object-cover object-center" />
                                     <div className="absolute inset-0 z-20 bg-gradient-to-b from-transparent to-dark-600" />

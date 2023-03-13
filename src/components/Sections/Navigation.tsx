@@ -5,6 +5,7 @@ import type { TypeOptions } from "react-toastify";
 
 import { Button, Input } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
+import { Routes } from "@/lib/constants";
 
 import { useClickOutside, useHash } from "@mantine/hooks";
 import { IconDoorEnter, IconLogin, IconMail } from "@tabler/icons";
@@ -261,11 +262,11 @@ const Navigation = ({ className }: NavigationProps) => {
                     <img src="/assets/images/logo.svg" alt="Logo" className="h-8" />
                 </Link>
 
-                <Link href="/pricing" className="hidden md:block">
+                <Link href={Routes.Pricing} className="hidden md:block">
                     Pricing
                 </Link>
 
-                <Link href="/contact" className="hidden md:block">
+                <Link href={Routes.Contact} className="hidden md:block">
                     Contact
                 </Link>
             </div>
@@ -277,7 +278,7 @@ const Navigation = ({ className }: NavigationProps) => {
                             Log Out
                         </p>
 
-                        <Link href="/app">
+                        <Link href={Routes.App}>
                             <Button.Large icon={IconDoorEnter}>Go to Application</Button.Large>
                         </Link>
                     </>
