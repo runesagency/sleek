@@ -1,7 +1,6 @@
 "use client";
 
 import type { ApiResult, ApiMethod } from "@/lib/types";
-import type { Organization } from "@prisma/client";
 
 import { Button, Input } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
