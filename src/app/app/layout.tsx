@@ -14,12 +14,13 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState, createContext } from "react";
+import { useCallback, useEffect, useState, createContext, useContext } from "react";
 import { toast } from "react-toastify";
 
 type DashboardLayoutContextProps = {
     isLoading: boolean;
     data: ApiMethod.CurrentUser.GetResult;
+    setData: (data: ApiMethod.CurrentUser.GetResult) => void;
 };
 
 const defaultContextValue: DashboardLayoutContextProps = {
@@ -41,6 +42,9 @@ const defaultContextValue: DashboardLayoutContextProps = {
         phone: "",
         verifiedAt: new Date(),
     },
+    setData: () => {
+        throw new Error("setData is not defined");
+    },
 };
 
 export const DashboardLayoutContext = createContext<DashboardLayoutContextProps>(defaultContextValue);
@@ -50,10 +54,11 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ isOpen }: SidebarProps) => {
-    const [organizations, setOrganizations] = useState<Organization[]>([]);
+    const { isLoading, data, setData } = useContext(DashboardLayoutContext);
     const [organizationOnCreate, setOrganizationOnCreate] = useState<string | null>(null);
     const [autoAnimateRef] = useAutoAnimate();
     const { toggleMenu } = useMenu();
+    const { organizations } = data;
 
     const links = [
         { name: "All Projects", path: Routes.App, icon: IconCards },
@@ -89,28 +94,18 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                         const { result, error }: ApiResult<ApiMethod.OrganizationList.PostResult> = await res.json();
                         if (error) return;
 
-                        setOrganizations((prev) => [...prev, result]);
+                        setData({
+                            ...data,
+                            organizations: [...data.organizations, result],
+                        });
+
                         setOrganizationOnCreate(null);
                     });
                 },
             });
         },
-        [toggleMenu]
+        [data, setData, toggleMenu]
     );
-
-    useEffect(() => {
-        fetch(ApiRoutes.OrganizationList, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.OrganizationList.GetResult> = await res.json();
-            if (error) return;
-
-            setOrganizations(result);
-        });
-    }, []);
 
     return (
         <aside className={clsx("fixed flex h-full shrink-0 flex-col gap-10 overflow-x-hidden border-r border-r-dark-600 bg-dark-800 py-10 lg:relative lg:w-72", isOpen ? "w-72" : "w-0")}>
@@ -130,13 +125,15 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
             <div ref={autoAnimateRef} className="flex flex-col gap-6 px-5">
                 <span className="text-xs font-medium opacity-50">Organization</span>
 
-                {organizations.map(({ name, id }, index) => (
-                    <Link key={index} href={Routes.Organization(id)} className="flex items-center gap-3 duration-200 hover:opacity-75">
-                        <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
+                {isLoading
+                    ? [...Array(3)].map((_, index) => <div key={index} className="animate-shimmer h-5 w-full rounded-full bg-dark-700" />)
+                    : organizations.map(({ name, id }, index) => (
+                          <Link key={index} href={Routes.Organization(id)} className="flex items-center gap-3 duration-200 hover:opacity-75">
+                              <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
 
-                        <p className="text-sm">{name}</p>
-                    </Link>
-                ))}
+                              <p className="text-sm">{name}</p>
+                          </Link>
+                      ))}
 
                 {organizationOnCreate && (
                     <button className="flex items-center gap-3">
@@ -186,7 +183,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 return router.push(Routes.Home);
             }
 
-            setContextValue({ isLoading: false, data: result });
+            setContextValue({
+                isLoading: false,
+                data: result,
+                setData: (data) => setContextValue((prev) => ({ ...prev, data })),
+            });
         });
     }, [data, router]);
 

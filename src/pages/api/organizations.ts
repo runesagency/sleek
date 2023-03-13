@@ -1,5 +1,5 @@
 import type { ApiRequest, ApiResponse } from "@/lib/types";
-import type { Organization } from "@prisma/client";
+import type { Organization, Project, User } from "@prisma/client";
 
 import { DefaultRolesIds } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
@@ -73,7 +73,17 @@ router.get(async (req, res) => {
     });
 });
 
-export type PostResult = Organization;
+export type PostResult = Organization & {
+    _count: {
+        users: number;
+    };
+    projects: (Project & {
+        _count: {
+            boards: number;
+        };
+    })[];
+    users: User[];
+};
 
 const PostSchema = z.object({
     name: z.string(),
@@ -115,7 +125,14 @@ router.post(async (req, res) => {
     });
 
     return res.status(200).json({
-        result: organization as PostResult,
+        result: {
+            ...organization,
+            projects: [],
+            users: [user],
+            _count: {
+                users: 1,
+            },
+        } as PostResult,
     });
 });
 
