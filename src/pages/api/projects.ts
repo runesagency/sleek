@@ -3,45 +3,18 @@ import type { Project } from "@prisma/client";
 
 import { DefaultRolesIds } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authorizationMiddleware } from "@/lib/utils/api-middlewares";
+import { getUserPermissionsForOrganization } from "@/lib/utils/get-user-permission";
 
 import { ActivityAction, ActivityObject } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
 import { createRouter } from "next-connect";
 import { z } from "zod";
 
 const router = createRouter<ApiRequest, ApiResponse>();
 
-router.use(async (req, res, next) => {
-    const session = await getServerSession(req, res, authOptions);
+router.use(authorizationMiddleware);
 
-    if (session && session.user && session.user.email) {
-        const user = await prisma.user.findUnique({
-            where: {
-                email: session.user.email,
-            },
-        });
-
-        if (user) {
-            req.user = user;
-            return next();
-        }
-    } else {
-        // get bearer token from header
-        const authHeader = req.headers.authorization;
-
-        if (authHeader) {
-            const [tokenType, tokenCode] = authHeader.split(" ");
-
-            if (tokenType === "Bearer" && tokenCode) {
-                console.log(tokenCode);
-                // WIP: get user from token
-            }
-        }
-    }
-
-    return res.status(401).end();
-});
+// ------------------ GET /api/projects ------------------
 
 export type PostResult = Project & {
     _count: {
@@ -66,6 +39,23 @@ router.post(async (req, res) => {
 
     const { name, description, organizationId } = parsedBody.data;
     const user = req.user;
+
+    const { permissions, error: permissionError } = await getUserPermissionsForOrganization(user.id, organizationId);
+
+    if (permissionError) {
+        return res.status(403).json({
+            error: permissionError,
+        });
+    }
+
+    if (!permissions.CREATE_PROJECT) {
+        return res.status(403).json({
+            error: {
+                message: "You don't have permission to create a project",
+                name: "ClientError",
+            },
+        });
+    }
 
     const project = await prisma.project.create({
         data: {
@@ -100,9 +90,9 @@ router.post(async (req, res) => {
         },
     });
 
-    return res.status(200).json({
-        result: project,
-    });
+    const result: PostResult = project;
+
+    return res.status(200).json({ result });
 });
 
 export default router.handler();

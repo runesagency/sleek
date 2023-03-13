@@ -1,12 +1,9 @@
+import type { Permission } from "@/lib/types";
 import type { Role } from "@prisma/client";
 
-export type Permissions = {
-    [K in keyof Role as K extends `${Uppercase<string>}_${Uppercase<string>}` ? K : never]: Role[K];
-};
-
-export const parseRoleToPermissions = (role: Role): Permissions => {
+export const parseRoleToPermissions = (role: Role): Permission => {
     return Object.keys(role).reduce((acc, rawKey) => {
-        const key = rawKey as keyof Permissions;
+        const key = rawKey as keyof Permission;
 
         const isKeyPermission = key.match(/^[A-Z]+_[A-Z]+$/);
 
@@ -15,5 +12,5 @@ export const parseRoleToPermissions = (role: Role): Permissions => {
         }
 
         return acc;
-    }, {} as Permissions);
+    }, {} as Permission);
 };

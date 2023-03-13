@@ -1,9 +1,9 @@
-import type { Permissions } from "@/lib/utils/parse-role-to-permissions";
+import type { Permission, PermissionResult } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
 import { parseRoleToPermissions } from "@/lib/utils/parse-role-to-permissions";
 
-export const getUserPermissions = async (userId: string) => {
+export const getUserPermissions = async (userId: string): Promise<PermissionResult> => {
     const user = await prisma.user.findUnique({
         where: {
             id: userId,
@@ -14,13 +14,20 @@ export const getUserPermissions = async (userId: string) => {
     });
 
     if (!user) {
-        throw new Error("User not found");
+        return {
+            error: {
+                message: "User not found",
+                name: "ClientError",
+            },
+        };
     }
 
-    return parseRoleToPermissions(user.role);
+    return {
+        permissions: parseRoleToPermissions(user.role),
+    };
 };
 
-export const getUserPermissionsForOrganization = async (userId: string, organizationId: string) => {
+export const getUserPermissionsForOrganization = async (userId: string, organizationId: string): Promise<PermissionResult> => {
     const organization = await prisma.organization.findUnique({
         where: {
             id: organizationId,
@@ -28,20 +35,26 @@ export const getUserPermissionsForOrganization = async (userId: string, organiza
     });
 
     if (!organization) {
-        throw new Error("Organization not found");
+        return {
+            error: {
+                message: "Organization not found",
+                name: "ClientError",
+            },
+        };
     }
 
-    let inheritedPermissions = await getUserPermissions(userId);
+    const { error, permissions } = await getUserPermissions(userId);
+
+    if (error) {
+        return { error };
+    }
 
     if (organization.ownerId === userId) {
-        inheritedPermissions = {
-            ...inheritedPermissions,
-            EDIT_ORGANIZATION: true,
-            DELETE_ORGANIZATION: true,
-            ADD_USER_TO_ORGANIZATION: true,
-            REMOVE_USER_FROM_ORGANIZATION: true,
-            CREATE_PROJECT: true,
-        };
+        permissions.EDIT_ORGANIZATION = true;
+        permissions.DELETE_ORGANIZATION = true;
+        permissions.ADD_USER_TO_ORGANIZATION = true;
+        permissions.REMOVE_USER_FROM_ORGANIZATION = true;
+        permissions.CREATE_PROJECT = true;
     } else {
         const organizationUser = await prisma.organizationUser.findFirst({
             where: {
@@ -54,19 +67,24 @@ export const getUserPermissionsForOrganization = async (userId: string, organiza
         });
 
         if (!organizationUser) {
-            throw new Error("User is not a member of the organization");
+            return {
+                error: {
+                    message: "User is not a member of the organization",
+                    name: "ClientError",
+                },
+            };
         }
 
-        for (const rawKey in inheritedPermissions) {
-            const key = rawKey as keyof Permissions;
-            inheritedPermissions[key] = inheritedPermissions[key] || organizationUser.role[key];
+        for (const rawKey in permissions) {
+            const key = rawKey as keyof Permission;
+            permissions[key] = permissions[key] || organizationUser.role[key];
         }
     }
 
-    return inheritedPermissions;
+    return { permissions };
 };
 
-export const getUserPermissionsForProject = async (userId: string, projectId: string) => {
+export const getUserPermissionsForProject = async (userId: string, projectId: string): Promise<PermissionResult> => {
     const project = await prisma.project.findUnique({
         where: {
             id: projectId,
@@ -74,10 +92,19 @@ export const getUserPermissionsForProject = async (userId: string, projectId: st
     });
 
     if (!project) {
-        throw new Error("Project not found");
+        return {
+            error: {
+                message: "Project not found",
+                name: "ClientError",
+            },
+        };
     }
 
-    const inheritedPermissions = await getUserPermissionsForOrganization(userId, project.organizationId);
+    const { permissions, error } = await getUserPermissionsForOrganization(userId, project.organizationId);
+
+    if (error) {
+        return { error };
+    }
 
     const projectUser = await prisma.projectUser.findFirst({
         where: {
@@ -90,18 +117,23 @@ export const getUserPermissionsForProject = async (userId: string, projectId: st
     });
 
     if (!projectUser) {
-        throw new Error("User is not a member of the project");
+        return {
+            error: {
+                message: "User is not a member of the project",
+                name: "ClientError",
+            },
+        };
     }
 
-    for (const rawKey in inheritedPermissions) {
-        const key = rawKey as keyof Permissions;
-        inheritedPermissions[key] = inheritedPermissions[key] || projectUser.role[key];
+    for (const rawKey in permissions) {
+        const key = rawKey as keyof Permission;
+        permissions[key] = permissions[key] || projectUser.role[key];
     }
 
-    return inheritedPermissions;
+    return { permissions };
 };
 
-export const getUserPermissionsForBoard = async (userId: string, boardId: string) => {
+export const getUserPermissionsForBoard = async (userId: string, boardId: string): Promise<PermissionResult> => {
     const board = await prisma.board.findUnique({
         where: {
             id: boardId,
@@ -109,10 +141,19 @@ export const getUserPermissionsForBoard = async (userId: string, boardId: string
     });
 
     if (!board) {
-        throw new Error("Board not found");
+        return {
+            error: {
+                message: "Board not found",
+                name: "ClientError",
+            },
+        };
     }
 
-    const inheritedPermissions = await getUserPermissionsForProject(userId, board.projectId);
+    const { permissions, error } = await getUserPermissionsForProject(userId, board.projectId);
+
+    if (error) {
+        return { error };
+    }
 
     const boardUser = await prisma.boardUser.findFirst({
         where: {
@@ -125,13 +166,18 @@ export const getUserPermissionsForBoard = async (userId: string, boardId: string
     });
 
     if (!boardUser) {
-        throw new Error("User is not a member of the board");
+        return {
+            error: {
+                message: "User is not a member of the board",
+                name: "ClientError",
+            },
+        };
     }
 
-    for (const rawKey in inheritedPermissions) {
-        const key = rawKey as keyof Permissions;
-        inheritedPermissions[key] = inheritedPermissions[key] || boardUser.role[key];
+    for (const rawKey in permissions) {
+        const key = rawKey as keyof Permission;
+        permissions[key] = permissions[key] || boardUser.role[key];
     }
 
-    return inheritedPermissions;
+    return { permissions };
 };

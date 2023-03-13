@@ -2,32 +2,17 @@ import type { ApiRequest, ApiResponse } from "@/lib/types";
 import type { Board, Project, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authorizationMiddleware } from "@/lib/utils/api-middlewares";
+import { getUserPermissionsForProject } from "@/lib/utils/get-user-permission";
 
-import { getServerSession } from "next-auth/next";
 import { createRouter } from "next-connect";
 import { z } from "zod";
 
 const router = createRouter<ApiRequest, ApiResponse>();
 
-router.use(async (req, res, next) => {
-    const session = await getServerSession(req, res, authOptions);
+router.use(authorizationMiddleware);
 
-    if (session && session.user && session.user.email) {
-        const user = await prisma.user.findUnique({
-            where: {
-                email: session.user.email,
-            },
-        });
-
-        if (user) {
-            req.user = user;
-            return next();
-        }
-    }
-
-    return res.status(401).end();
-});
+// ------------------ GET /api/project/[id] ------------------
 
 export type GetResult = Project & {
     users: User[];
@@ -35,7 +20,25 @@ export type GetResult = Project & {
 };
 
 router.get(async (req, res) => {
+    const user = req.user;
     const projectId = req.query.id as string;
+
+    const { permissions, error: permissionError } = await getUserPermissionsForProject(user.id, projectId);
+
+    if (permissionError) {
+        return res.status(403).json({
+            error: permissionError,
+        });
+    }
+
+    if (!permissions.VIEW_PROJECT) {
+        return res.status(403).json({
+            error: {
+                message: "You don't have permission to view this project",
+                name: "ClientError",
+            },
+        });
+    }
 
     const project = await prisma.project.findUnique({
         where: {
@@ -60,14 +63,15 @@ router.get(async (req, res) => {
         });
     }
 
-    const users = project.users.map(({ user }) => user);
+    const result: GetResult = {
+        ...project,
+        users: project.users.map(({ user, roleId }) => ({
+            ...user,
+            roleId,
+        })),
+    };
 
-    return res.status(200).json({
-        result: {
-            ...project,
-            users,
-        } as GetResult,
-    });
+    return res.status(200).json({ result });
 });
 
 export default router.handler();

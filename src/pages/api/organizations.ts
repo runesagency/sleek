@@ -3,45 +3,17 @@ import type { Organization, Project, User } from "@prisma/client";
 
 import { DefaultRolesIds } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authorizationMiddleware } from "@/lib/utils/api-middlewares";
 
 import { ActivityAction, ActivityObject } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
 import { createRouter } from "next-connect";
 import { z } from "zod";
 
 const router = createRouter<ApiRequest, ApiResponse>();
 
-router.use(async (req, res, next) => {
-    const session = await getServerSession(req, res, authOptions);
+router.use(authorizationMiddleware);
 
-    if (session && session.user && session.user.email) {
-        const user = await prisma.user.findUnique({
-            where: {
-                email: session.user.email,
-            },
-        });
-
-        if (user) {
-            req.user = user;
-            return next();
-        }
-    } else {
-        // get bearer token from header
-        const authHeader = req.headers.authorization;
-
-        if (authHeader) {
-            const [tokenType, tokenCode] = authHeader.split(" ");
-
-            if (tokenType === "Bearer" && tokenCode) {
-                console.log(tokenCode);
-                // WIP: get user from token
-            }
-        }
-    }
-
-    return res.status(401).end();
-});
+// ------------------ GET /api/organizations ------------------
 
 export type GetResult = Organization[];
 
@@ -68,10 +40,12 @@ router.get(async (req, res) => {
         });
     }
 
-    return res.status(200).json({
-        result: user.organizations.map(({ organization }) => organization) as GetResult,
-    });
+    const result: GetResult = user.organizations.map(({ organization }) => organization);
+
+    return res.status(200).json({ result });
 });
+
+// ------------------ POST /api/organizations ------------------
 
 export type PostResult = Organization & {
     _count: {
@@ -112,6 +86,13 @@ router.post(async (req, res) => {
                 },
             },
         },
+        include: {
+            users: {
+                include: {
+                    user: true,
+                },
+            },
+        },
     });
 
     await prisma.activity.create({
@@ -124,16 +105,19 @@ router.post(async (req, res) => {
         },
     });
 
-    return res.status(200).json({
-        result: {
-            ...organization,
-            projects: [],
-            users: [user],
-            _count: {
-                users: 1,
-            },
-        } as PostResult,
-    });
+    const result: PostResult = {
+        ...organization,
+        projects: [],
+        users: organization.users.map(({ user, roleId }) => ({
+            ...user,
+            roleId,
+        })),
+        _count: {
+            users: 1,
+        },
+    };
+
+    return res.status(200).json({ result });
 });
 
 export default router.handler();

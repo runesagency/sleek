@@ -3,33 +3,18 @@ import type { Board } from "@prisma/client";
 
 import { DefaultRolesIds } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authorizationMiddleware } from "@/lib/utils/api-middlewares";
+import { getUserPermissionsForProject } from "@/lib/utils/get-user-permission";
 
 import { ActivityAction, ActivityObject } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
 import { createRouter } from "next-connect";
 import { z } from "zod";
 
 const router = createRouter<ApiRequest, ApiResponse>();
 
-router.use(async (req, res, next) => {
-    const session = await getServerSession(req, res, authOptions);
+router.use(authorizationMiddleware);
 
-    if (session && session.user && session.user.email) {
-        const user = await prisma.user.findUnique({
-            where: {
-                email: session.user.email,
-            },
-        });
-
-        if (user) {
-            req.user = user;
-            return next();
-        }
-    }
-
-    return res.status(401).end();
-});
+// ------------------ POST /api/boards ------------------
 
 export type PostResult = Board;
 
@@ -49,6 +34,23 @@ router.post(async (req, res) => {
 
     const { name, projectId } = parsedBody.data;
     const user = req.user;
+
+    const { permissions, error: permissionError } = await getUserPermissionsForProject(user.id, projectId);
+
+    if (permissionError) {
+        return res.status(403).json({
+            error: permissionError,
+        });
+    }
+
+    if (!permissions.CREATE_BOARD) {
+        return res.status(403).json({
+            error: {
+                message: "You don't have permission to create a board",
+                name: "ClientError",
+            },
+        });
+    }
 
     const board = await prisma.board.create({
         data: {
@@ -74,9 +76,9 @@ router.post(async (req, res) => {
         },
     });
 
-    return res.status(200).json({
-        result: board as PostResult,
-    });
+    const result: PostResult = board;
+
+    return res.status(200).json({ result });
 });
 
 export default router.handler();

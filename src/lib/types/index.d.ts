@@ -1,4 +1,4 @@
-import type { User } from "@prisma/client";
+import type { User, Role } from "@prisma/client";
 import type { Server as NetServer, Socket } from "net";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { Server as SocketIOServer } from "socket.io";
@@ -27,3 +27,17 @@ export type ApiResponse<Result = unknown> = NextApiResponse<ApiResult<Result>> &
         };
     };
 };
+
+export type Permission = {
+    [K in keyof Role as K extends `${Uppercase<string>}_${Uppercase<string>}` ? K : never]: Role[K];
+};
+
+export type PermissionResult =
+    | {
+          permissions: Permission;
+          error?: never;
+      }
+    | {
+          permissions?: never;
+          error: Error;
+      };

@@ -2,32 +2,18 @@ import type { ApiRequest, ApiResponse } from "@/lib/types";
 import type { Activity, Attachment, Board, Card, CardAttachment, CardChecklist, CardChecklistTask, CardLabel, CardTimer, Label, List, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authorizationMiddleware } from "@/lib/utils/api-middlewares";
+import { getUserPermissionsForBoard } from "@/lib/utils/get-user-permission";
 
-import { getServerSession } from "next-auth/next";
+import { ActivityObject } from "@prisma/client";
 import { createRouter } from "next-connect";
 import { z } from "zod";
 
 const router = createRouter<ApiRequest, ApiResponse>();
 
-router.use(async (req, res, next) => {
-    const session = await getServerSession(req, res, authOptions);
+router.use(authorizationMiddleware);
 
-    if (session && session.user && session.user.email) {
-        const user = await prisma.user.findUnique({
-            where: {
-                email: session.user.email,
-            },
-        });
-
-        if (user) {
-            req.user = user;
-            return next();
-        }
-    }
-
-    return res.status(401).end();
-});
+// ------------------ GET /api/board/[id] ------------------
 
 export type GetResult = Board & {
     users: User[];
@@ -35,7 +21,7 @@ export type GetResult = Board & {
     cards: (Card & {
         users: User[];
         timers: CardTimer[];
-        creator: User;
+        creator: User | null;
         labels: (CardLabel & {
             label: Label;
         })[];
@@ -52,7 +38,25 @@ export type GetResult = Board & {
 };
 
 router.get(async (req, res) => {
+    const user = req.user;
     const boardId = req.query.id as string;
+
+    const { permissions, error: permissionError } = await getUserPermissionsForBoard(user.id, boardId);
+
+    if (permissionError) {
+        return res.status(403).json({
+            error: permissionError,
+        });
+    }
+
+    if (!permissions.VIEW_BOARD) {
+        return res.status(403).json({
+            error: {
+                message: "You don't have permission to view this board",
+                name: "ClientError",
+            },
+        });
+    }
 
     const board = await prisma.board.findUnique({
         where: {
@@ -103,18 +107,29 @@ router.get(async (req, res) => {
         });
     }
 
-    const users = board.users.map(({ user }) => user);
-
-    return res.status(200).json({
-        result: {
-            ...board,
-            users,
-            cards: board.cards.map((card) => ({
-                ...card,
-                users: card.users.map(({ user }) => user),
-            })),
-        } as GetResult,
+    const activities = await prisma.activity.findMany({
+        where: {
+            objectType: ActivityObject.CARD,
+            objectId: {
+                in: board.cards.map((card) => card.id),
+            },
+        },
+        include: {
+            user: true,
+        },
     });
+
+    const result: GetResult = {
+        ...board,
+        users: board.users.map(({ user }) => user),
+        cards: board.cards.map((card) => ({
+            ...card,
+            users: card.users.map(({ user }) => user),
+            activities: activities.filter((activity) => activity.objectId === card.id),
+        })),
+    };
+
+    return res.status(200).json({ result });
 });
 
 export default router.handler();

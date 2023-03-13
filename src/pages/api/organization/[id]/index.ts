@@ -2,46 +2,18 @@ import type { ApiRequest, ApiResponse } from "@/lib/types";
 import type { Organization, Project, Role, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { getOrganizationPermissionsForBoard, getOrganizationPermissionsForProject } from "@/lib/utils/get-organization-permission";
+import { authorizationMiddleware } from "@/lib/utils/api-middlewares";
+import { getOrganizationPermissionsForProject } from "@/lib/utils/get-organization-permission";
 import { getUserPermissionsForProject } from "@/lib/utils/get-user-permission";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
-import { getServerSession } from "next-auth/next";
 import { createRouter } from "next-connect";
 import { z } from "zod";
 
 const router = createRouter<ApiRequest, ApiResponse>();
 
-router.use(async (req, res, next) => {
-    const session = await getServerSession(req, res, authOptions);
+router.use(authorizationMiddleware);
 
-    if (session && session.user && session.user.email) {
-        const user = await prisma.user.findUnique({
-            where: {
-                email: session.user.email,
-            },
-        });
-
-        if (user) {
-            req.user = user;
-            return next();
-        }
-    } else {
-        // get bearer token from header
-        const authHeader = req.headers.authorization;
-
-        if (authHeader) {
-            const [tokenType, tokenCode] = authHeader.split(" ");
-
-            if (tokenType === "Bearer" && tokenCode) {
-                console.log(tokenCode);
-                // WIP: get user from token
-            }
-        }
-    }
-
-    return res.status(401).end();
-});
+// ------------------ GET /api/organization/[id] ------------------
 
 export type GetResult = Organization & {
     users: User[];
@@ -85,7 +57,16 @@ router.get(async (req, res) => {
         });
     }
 
-    let projects: Project[] = [];
+    if (organization.ownerId !== user.id && !organization.users.some(({ userId }) => userId === user.id)) {
+        return res.status(403).json({
+            error: {
+                message: "You are not authorized to access this resource",
+                name: "ClientError",
+            },
+        });
+    }
+
+    let projects: GetResult["projects"] = [];
 
     const allProjects = await prisma.project.findMany({
         where: {
@@ -101,14 +82,23 @@ router.get(async (req, res) => {
     });
 
     for (const project of allProjects) {
-        const permission = await getUserPermissionsForProject(user.id, project.id);
+        const { permissions, error } = await getUserPermissionsForProject(user.id, project.id);
 
-        if (permission.VIEW_PROJECT) {
+        if (error) {
+            return res.status(403).json({
+                error: {
+                    message: error.message,
+                    name: "ClientError",
+                },
+            });
+        }
+
+        if (permissions.VIEW_PROJECT) {
             projects.push(project);
         }
     }
 
-    let externalProjects: Project[] = [];
+    let externalProjects: GetResult["externalProjects"] = [];
 
     const allExternalProjects = await prisma.project.findMany({
         where: {
@@ -144,23 +134,32 @@ router.get(async (req, res) => {
     });
 
     for (const project of allExternalProjects) {
-        const permission = await getOrganizationPermissionsForProject(organizationId, project.id);
+        const { permissions, error } = await getOrganizationPermissionsForProject(organizationId, project.id);
 
-        if (permission.VIEW_PROJECT) {
+        if (error) {
+            return res.status(403).json({
+                error: {
+                    message: error.message,
+                    name: "ClientError",
+                },
+            });
+        }
+
+        if (permissions.VIEW_PROJECT) {
             externalProjects.push(project);
         }
     }
 
     const users = organization.users.map(({ user }) => user);
 
-    return res.status(200).json({
-        result: {
-            ...organization,
-            users,
-            projects: allProjects,
-            externalProjects: allExternalProjects,
-        } as GetResult,
-    });
+    const result: GetResult = {
+        ...organization,
+        users,
+        projects,
+        externalProjects,
+    };
+
+    return res.status(200).json({ result });
 });
 
 export default router.handler();
