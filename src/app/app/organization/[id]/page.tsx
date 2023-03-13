@@ -120,7 +120,7 @@ export default function OrganizationProjectListPage() {
 
             setProjectOnCreate(name);
 
-            fetch(ApiRoutes.Projects, {
+            fetch(ApiRoutes.ProjectList, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -130,7 +130,7 @@ export default function OrganizationProjectListPage() {
                     organizationId: id,
                 }),
             }).then(async (res) => {
-                const { result, error }: ApiResult<ApiMethod.Projects.PostResult> = await res.json();
+                const { result, error }: ApiResult<ApiMethod.ProjectList.PostResult> = await res.json();
 
                 if (error) {
                     return toast.error(error.message);

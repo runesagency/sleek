@@ -38,7 +38,7 @@ export default function ProjectBoardListPage() {
 
             setBoardOnCreate(name);
 
-            fetch(ApiRoutes.Boards, {
+            fetch(ApiRoutes.BoardList, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export default function ProjectBoardListPage() {
                     projectId: id,
                 }),
             }).then(async (res) => {
-                const { result, error }: ApiResult<ApiMethod.Boards.PostResult> = await res.json();
+                const { result, error }: ApiResult<ApiMethod.BoardList.PostResult> = await res.json();
 
                 if (error) {
                     return toast.error(error.message);

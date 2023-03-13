@@ -78,7 +78,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 onSubmit({ name }: { name: string }) {
                     setOrganizationOnCreate(name);
 
-                    fetch(ApiRoutes.Organizations, {
+                    fetch(ApiRoutes.OrganizationList, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                             name,
                         }),
                     }).then(async (res) => {
-                        const { result, error }: ApiResult<ApiMethod.Organizations.PostResult> = await res.json();
+                        const { result, error }: ApiResult<ApiMethod.OrganizationList.PostResult> = await res.json();
                         if (error) return;
 
                         setOrganizations((prev) => [...prev, result]);
@@ -100,13 +100,13 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
     );
 
     useEffect(() => {
-        fetch(ApiRoutes.Organizations, {
+        fetch(ApiRoutes.OrganizationList, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
         }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.Organizations.GetResult> = await res.json();
+            const { result, error }: ApiResult<ApiMethod.OrganizationList.GetResult> = await res.json();
             if (error) return;
 
             setOrganizations(result);

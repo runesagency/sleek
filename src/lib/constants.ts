@@ -35,10 +35,13 @@ export const Routes = {
 export const ApiRoutes = {
     CurrentUser: "/api/@me",
     Auth: "/api/auth",
-    Organizations: "/api/organizations",
+
+    OrganizationList: "/api/organizations",
     Organization: (id: string) => `/api/organization/${id}`,
-    Projects: "/api/projects",
+
+    ProjectList: "/api/projects",
     Project: (id: string) => `/api/project/${id}`,
-    Boards: "/api/boards",
+
+    BoardList: "/api/boards",
     Board: (id: string) => `/api/board/${id}`,
 } as const;
