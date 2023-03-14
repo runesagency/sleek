@@ -56,14 +56,14 @@ export default function KanbanLayoutPage() {
             const otherCards = cards.filter((card) => card.listId !== listId);
             const listCards = cards.filter((card) => card.listId === listId);
 
-            const newCard: Partial<BoardCard> = {
+            const newCard: ApiMethod.Card.PostSchemaType = {
                 title: parsedName,
                 listId: listId,
                 boardId: list.boardId,
                 order: location === NewCardLocation.UP ? 0 : listCards.length,
             };
 
-            const res = await fetch("/api/cards", {
+            const res = await fetch(ApiRoutes.Card, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -71,21 +71,25 @@ export default function KanbanLayoutPage() {
                 body: JSON.stringify(newCard),
             });
 
-            const card: BoardCard = await res.json();
+            const { result, error }: ApiResult<ApiMethod.Card.PostResult> = await res.json();
+
+            if (error) {
+                return toast.error(error.message);
+            }
 
             let updatedCards: BoardCard[] = [];
 
             if (location === NewCardLocation.UP) {
                 updatedCards = [
                     ...otherCards, //
-                    card,
+                    result,
                     ...listCards.map((card) => ({ ...card, order: card.order + 1 })),
                 ];
             } else {
                 updatedCards = [
                     ...otherCards, //
                     ...listCards,
-                    card,
+                    result,
                 ];
             }
 

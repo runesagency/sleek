@@ -1,5 +1,5 @@
 import type { ApiRequest, ApiResponse } from "@/lib/types";
-import type { Card } from "@prisma/client";
+import type { Activity, Attachment, Card, CardAttachment, CardChecklist, CardChecklistTask, CardLabel, CardTimer, Label, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { authorizationMiddleware } from "@/lib/utils/api-middlewares";
@@ -15,7 +15,23 @@ router.use(authorizationMiddleware);
 
 // ------------------ POST /api/board/card ------------------
 
-export type PostResult = Card;
+export type PostResult = Card & {
+    users: User[];
+    timers: CardTimer[];
+    creator: User | null;
+    labels: (CardLabel & {
+        label: Label;
+    })[];
+    checklists: (CardChecklist & {
+        tasks: CardChecklistTask[];
+    })[];
+    attachments: (CardAttachment & {
+        attachment: Attachment;
+    })[];
+    activities: (Activity & {
+        user: User;
+    })[];
+};
 
 export type PostSchemaType = z.infer<typeof PostSchema>;
 
@@ -55,26 +71,64 @@ router.post(async (req, res) => {
         });
     }
 
-    const list = await prisma.card.create({
+    const card = await prisma.card.create({
         data: {
             title,
             order,
             boardId,
             listId,
         },
+        include: {
+            timers: true,
+            creator: true,
+            users: {
+                include: {
+                    user: true,
+                },
+            },
+            labels: {
+                include: {
+                    label: true,
+                },
+            },
+            checklists: {
+                include: {
+                    tasks: true,
+                },
+            },
+            attachments: {
+                include: {
+                    attachment: true,
+                },
+            },
+        },
     });
 
     await prisma.activity.create({
         data: {
             action: ActivityAction.CREATE,
-            objectId: list.id,
-            objectType: ActivityObject.LIST,
+            objectId: card.id,
+            objectType: ActivityObject.CARD,
             userId: user.id,
             creatorId: user.id,
         },
     });
 
-    const result: PostResult = list;
+    const activities = await prisma.activity.findMany({
+        where: {
+            objectType: ActivityObject.CARD,
+            objectId: card.id,
+        },
+        include: {
+            user: true,
+        },
+    });
+
+    const result: PostResult = {
+        ...card,
+        activities,
+        users: card.users.map(({ user }) => user),
+    };
 
     return res.status(200).json({ result });
 });

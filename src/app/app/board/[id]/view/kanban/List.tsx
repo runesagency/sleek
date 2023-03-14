@@ -168,10 +168,9 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
             >
                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
-                {isDragging &&
-                    cards.map((card) => {
-                        return <Card key={card.id} {...card} />;
-                    })}
+                {cards.map((card) => {
+                    return <Card key={card.id} {...card} />;
+                })}
 
                 {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
             </div>
