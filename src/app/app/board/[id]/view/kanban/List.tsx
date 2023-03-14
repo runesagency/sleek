@@ -13,7 +13,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useClickOutside, useMergedRef } from "@mantine/hooks";
 import { IconDots, IconPlus } from "@tabler/icons";
 import clsx from "clsx";
-import { useEffect, useRef, useCallback, useState, memo } from "react";
+import { useRef, useCallback, useState, memo } from "react";
 
 export enum NewCardLocation {
     UP = "UP",
@@ -52,8 +52,6 @@ type ListProps = BoardList & {
 
 const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
-    const [isAnyCardDragging] = useState(false);
-    const [isOnView, setIsOnView] = useState(false);
     const [isOnHover, setIsOnHover] = useState(false);
 
     const {
@@ -104,26 +102,6 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     onDragLeave(() => {
         setIsOnHover(false);
     });
-
-    useEffect(() => {
-        const current = draggableRef.current;
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                setIsOnView(entry.isIntersecting);
-            });
-        });
-
-        if (current) {
-            observer.observe(current);
-        }
-
-        return () => {
-            if (current) {
-                observer.unobserve(current);
-            }
-        };
-    }, [draggableRef]);
 
     if (droppableRef.current) {
         autoAnimate(droppableRef.current, (element, action, oldCoords, newCoords) => {
@@ -185,12 +163,12 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
                 ref={dropAreaRef}
                 className={clsx(
                     "flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 delay-200 duration-500 will-change-auto",
-                    cards.length === 0 && !isAddingNewCard && !isAnyCardDragging && !isOnHover ? "py-0" : "py-5"
+                    cards.length === 0 && !isAddingNewCard && !isOnHover ? "py-0" : "py-5"
                 )}
             >
                 {isAddingNewCard === NewCardLocation.UP && addCardComponent}
 
-                {(isOnView || isAnyCardDragging || isDragging) &&
+                {isDragging &&
                     cards.map((card) => {
                         return <Card key={card.id} {...card} />;
                     })}

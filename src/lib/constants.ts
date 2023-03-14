@@ -44,4 +44,7 @@ export const ApiRoutes = {
 
     BoardList: "/api/boards",
     Board: (id: string) => `/api/board/${id}`,
+
+    List: (boardId: string) => `/api/board/${boardId}/list`,
+    Card: (boardId: string) => `/api/board/${boardId}/card`,
 } as const;
