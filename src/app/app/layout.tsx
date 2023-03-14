@@ -11,7 +11,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { IconBell, IconUsers, IconCards, IconPlus, IconSettings, IconMenu2, IconLoader2, IconSearch } from "@tabler/icons";
 import clsx from "clsx";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState, createContext, useContext } from "react";
 import { toast } from "react-toastify";
@@ -157,14 +157,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [contextValue, setContextValue] = useState<DashboardLayoutContextProps>(defaultContextValue);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const router = useRouter();
-    const pathname = usePathname();
+    const currentSegment = useSelectedLayoutSegment();
     const { data } = useSession();
 
-    const pathWithoutSidebar = [
-        "/board", //
-    ];
-
-    const isUsingSidebar = pathname && !pathWithoutSidebar.some((path) => pathname.includes(path));
+    const segmentWithoutSidebar = ["board"];
+    const isUsingSidebar = !segmentWithoutSidebar.find((segment) => currentSegment === segment);
 
     useEffect(() => {
         if (!data) return;

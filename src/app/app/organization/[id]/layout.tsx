@@ -6,7 +6,7 @@ import { ApiRoutes, Routes } from "@/lib/constants";
 
 import clsx from "clsx";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -56,15 +56,13 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
     } = contextValue;
 
     const router = useRouter();
-    const pathname = usePathname();
-    const page = pathname?.split("/").pop();
-    const pagePath = page === id ? "/" : `/${page}`;
+    const currentSegment = useSelectedLayoutSegment();
 
     const links = [
-        { name: "About", path: "/about" },
-        { name: "Projects", path: "/" },
-        { name: "Members", path: "/members" },
-        { name: "Settings", path: "/settings" },
+        { name: "About", segment: "about" },
+        { name: "Projects", segment: null },
+        { name: "Members", segment: "members" },
+        { name: "Settings", segment: "settings" },
     ];
 
     useEffect(() => {
@@ -119,11 +117,11 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                     </div>
 
                     <div className="flex">
-                        {links.map(({ name, path }, index) => (
+                        {links.map(({ name, segment }, index) => (
                             <Link
                                 key={index}
-                                href={Routes.Organization(id) + path}
-                                className={clsx("ts-sm border-b-2 px-4 py-2 duration-200 hover:border-b-dark-500", pagePath === path ? "border-b-dark-400" : "border-b-transparent")}
+                                href={Routes.Organization(id) + "/" + (segment ?? "")}
+                                className={clsx("ts-sm border-b-2 px-4 py-2 duration-200 hover:border-b-dark-500", segment === currentSegment ? "border-b-dark-400" : "border-b-transparent")}
                             >
                                 {name}
                             </Link>
