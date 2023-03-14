@@ -1,6 +1,8 @@
-import type { User } from "@prisma/client";
-
 import Avatar from "@/components/Miscellaneous/Avatar";
+
+type User = {
+    name: string;
+};
 
 type MemberListProps = {
     users: User[];
@@ -14,20 +16,27 @@ type MemberListProps = {
 
 const Small = ({ users, max, min }: MemberListProps) => {
     let shadowAvatarCount = 0;
+    let shownUsers = users;
 
     if (min && users.length < min) {
         shadowAvatarCount = min - users.length;
     }
 
+    if (max) {
+        if (users.length > max) {
+            shownUsers = users.slice(0, max - 1);
+
+            shownUsers.push({
+                name: `+${users.length - max}`,
+            });
+        }
+    }
+
     return (
         <div className="flex shrink-0 -space-x-1">
-            {users.map((user, i) => {
-                if (!user || (max && i > max)) return null;
-
-                const title = max ? (i !== max - 1 ? user.name : `+${users.length - max}`) : "";
-
-                return <Avatar key={i} className="h-6 w-6 rounded-full border border-dark-600 object-cover object-center" seed={title} />;
-            })}
+            {shownUsers.map(({ name }, i) => (
+                <Avatar key={i} className="h-6 w-6 rounded-full border border-dark-600 object-cover object-center" seed={name} />
+            ))}
 
             {[...Array(shadowAvatarCount)].map((_, i) => (
                 <div key={i} className="h-6 w-6 rounded-full border border-dark-600 bg-dark-700 object-cover object-center" />
@@ -38,20 +47,27 @@ const Small = ({ users, max, min }: MemberListProps) => {
 
 const Large = ({ users, max, min }: MemberListProps) => {
     let shadowAvatarCount = 0;
+    let shownUsers = users;
 
     if (min && users.length < min) {
         shadowAvatarCount = min - users.length;
     }
 
+    if (max) {
+        if (users.length > max) {
+            shownUsers = users.slice(0, max - 1);
+
+            shownUsers.push({
+                name: `+${users.length - max}`,
+            });
+        }
+    }
+
     return (
         <div className="flex shrink-0 -space-x-2">
-            {users.map((user, i) => {
-                if (!user || (max && i > max)) return null;
-
-                const title = max ? (i !== max - 1 ? user.name : `+${users.length - max}`) : "";
-
-                return <Avatar key={i} className="h-10 w-10 rounded-full border border-dark-600 object-cover object-center" seed={title} />;
-            })}
+            {users.map(({ name }, i) => (
+                <Avatar key={i} className="h-10 w-10 rounded-full border border-dark-600 object-cover object-center" seed={name} />
+            ))}
 
             {[...Array(shadowAvatarCount)].map((_, i) => (
                 <div key={i} className="h-10 w-10 rounded-full border border-dark-600 bg-dark-700 object-cover object-center" />

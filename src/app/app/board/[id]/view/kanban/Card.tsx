@@ -5,6 +5,7 @@ import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
 import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import Label from "@/components/DataDisplay/Label";
+import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
 import useDraggable from "@/lib/drag-and-drop/use-draggable";
 
@@ -157,29 +158,7 @@ const Card = ({ id, title, attachments, activities, coverAttachmentId, checklist
 
                     {users.length > 0 && (
                         <div className="box-border flex shrink-0 flex-wrap items-center -space-x-2">
-                            {users.map((user, i) => {
-                                if (!user || i > 5) return null;
-
-                                const title = i !== 5 ? user.name : `${users.length - 5} more...`;
-                                const initials =
-                                    i !== 5
-                                        ? user.name
-                                              .split(" ")
-                                              .map((name) => name[0])
-                                              .join("")
-                                        : `+${users.length - 5}`;
-
-                                return (
-                                    <img
-                                        key={i}
-                                        src={`https://ui-avatars.com/api/?background=random&name=${initials}`}
-                                        alt={title}
-                                        title={title}
-                                        loading="lazy"
-                                        className="box-border h-6 w-6 rounded-full border border-dark-600 object-cover object-center"
-                                    />
-                                );
-                            })}
+                            <MemberList.Small users={users} max={5} />
                         </div>
                     )}
                 </section>
