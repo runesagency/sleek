@@ -23,6 +23,7 @@ const PostSchema = z.object({
     title: z.string(),
     order: z.number(),
     listId: z.string(),
+    boardId: z.string(),
 });
 
 router.post(async (req, res) => {
@@ -34,9 +35,8 @@ router.post(async (req, res) => {
         });
     }
 
-    const { title, order, listId } = parsedBody.data;
+    const { title, order, listId, boardId } = parsedBody.data;
     const user = req.user;
-    const boardId = req.query.id as string;
 
     const { permissions, error: permissionError } = await getUserPermissionsForBoard(user.id, boardId);
 

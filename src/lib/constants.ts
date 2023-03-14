@@ -37,14 +37,14 @@ export const ApiRoutes = {
     Auth: "/api/auth",
 
     OrganizationList: "/api/organizations",
-    Organization: (id: string) => `/api/organization/${id}`,
+    Organization: (id: string) => `/api/organizations/${id}`,
 
     ProjectList: "/api/projects",
-    Project: (id: string) => `/api/project/${id}`,
+    Project: (id: string) => `/api/projects/${id}`,
 
     BoardList: "/api/boards",
-    Board: (id: string) => `/api/board/${id}`,
+    Board: (id: string) => `/api/boards/${id}`,
 
-    List: (boardId: string) => `/api/board/${boardId}/list`,
-    Card: (boardId: string) => `/api/board/${boardId}/card`,
+    List: "/api/lists",
+    Card: "/api/cards",
 } as const;

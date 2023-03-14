@@ -103,7 +103,7 @@ export default function KanbanLayoutPage() {
     );
 
     const onListAdded = useCallback(() => {
-        fetch(ApiRoutes.List(id), {
+        fetch(ApiRoutes.List, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -121,7 +121,7 @@ export default function KanbanLayoutPage() {
 
             setLists([...lists, result]);
         });
-    }, [id, lists, setLists]);
+    }, [lists, setLists]);
 
     onDragEnd(async ({ dragged, dropped }: DragEvent) => {
         // List to List
