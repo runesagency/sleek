@@ -22,6 +22,8 @@ export type PostResult = Project & {
     };
 };
 
+export type PostSchemaType = z.infer<typeof PostSchema>;
+
 const PostSchema = z.object({
     organizationId: z.string(),
     name: z.string(),

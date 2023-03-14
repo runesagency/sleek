@@ -59,6 +59,8 @@ export type PostResult = Organization & {
     users: User[];
 };
 
+export type PostSchemaType = z.infer<typeof PostSchema>;
+
 const PostSchema = z.object({
     name: z.string(),
 });

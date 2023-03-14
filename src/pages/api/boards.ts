@@ -18,6 +18,8 @@ router.use(authorizationMiddleware);
 
 export type PostResult = Board;
 
+export type PostSchemaType = z.infer<typeof PostSchema>;
+
 const PostSchema = z.object({
     name: z.string(),
     projectId: z.string(),
