@@ -1,6 +1,7 @@
 import type { Permission, PermissionResult } from "@/lib/types";
 
 import { prisma } from "@/lib/prisma";
+import { getOrganizationPermissionsForBoard, getOrganizationPermissionsForProject } from "@/lib/utils/get-organization-permission";
 import { parseRoleToPermissions } from "@/lib/utils/parse-role-to-permissions";
 
 export const getUserPermissions = async (userId: string): Promise<PermissionResult> => {
@@ -116,18 +117,48 @@ export const getUserPermissionsForProject = async (userId: string, projectId: st
         },
     });
 
-    if (!projectUser) {
+    if (projectUser) {
+        for (const rawKey in permissions) {
+            const key = rawKey as keyof Permission;
+            permissions[key] = permissions[key] || projectUser.role[key];
+        }
+    }
+
+    // In case the user is not a member of the project,
+    // check if the user is a member of the organization that added to the project
+    const projectOrganization = await prisma.projectOrganization.findMany({
+        where: {
+            projectId: project.id,
+            organization: {
+                users: {
+                    some: {
+                        userId: userId,
+                    },
+                },
+            },
+        },
+    });
+
+    for (const organization of projectOrganization) {
+        const { permissions, error } = await getOrganizationPermissionsForProject(organization.organizationId, project.id);
+
+        if (error) {
+            continue;
+        }
+
+        for (const rawKey in permissions) {
+            const key = rawKey as keyof Permission;
+            permissions[key] = permissions[key] || permissions[key];
+        }
+    }
+
+    if (!projectUser && projectOrganization.length === 0) {
         return {
             error: {
                 message: "User is not a member of the project",
                 name: "ClientError",
             },
         };
-    }
-
-    for (const rawKey in permissions) {
-        const key = rawKey as keyof Permission;
-        permissions[key] = permissions[key] || projectUser.role[key];
     }
 
     return { permissions };
@@ -165,18 +196,48 @@ export const getUserPermissionsForBoard = async (userId: string, boardId: string
         },
     });
 
-    if (!boardUser) {
+    if (boardUser) {
+        for (const rawKey in permissions) {
+            const key = rawKey as keyof Permission;
+            permissions[key] = permissions[key] || boardUser.role[key];
+        }
+    }
+
+    // In case the user is not a member of the board,
+    // check if the user is a member of the organization that added to the board
+    const boardOrganization = await prisma.boardOrganization.findMany({
+        where: {
+            boardId: board.id,
+            organization: {
+                users: {
+                    some: {
+                        userId: userId,
+                    },
+                },
+            },
+        },
+    });
+
+    for (const organization of boardOrganization) {
+        const { permissions, error } = await getOrganizationPermissionsForBoard(organization.organizationId, board.id);
+
+        if (error) {
+            continue;
+        }
+
+        for (const rawKey in permissions) {
+            const key = rawKey as keyof Permission;
+            permissions[key] = permissions[key] || permissions[key];
+        }
+    }
+
+    if (!boardUser && boardOrganization.length === 0) {
         return {
             error: {
                 message: "User is not a member of the board",
                 name: "ClientError",
             },
         };
-    }
-
-    for (const rawKey in permissions) {
-        const key = rawKey as keyof Permission;
-        permissions[key] = permissions[key] || boardUser.role[key];
     }
 
     return { permissions };
