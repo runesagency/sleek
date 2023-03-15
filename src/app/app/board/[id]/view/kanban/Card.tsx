@@ -3,6 +3,7 @@
 import type { BoardCard } from "@/app/app/board/[id]/layout";
 import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
+import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
 import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import Label from "@/components/DataDisplay/Label";
 import MemberList from "@/components/DataDisplay/MemberList";
@@ -11,7 +12,7 @@ import useDraggable from "@/lib/drag-and-drop/use-draggable";
 
 import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
 import clsx from "clsx";
-import { useCallback, useRef, useState, memo } from "react";
+import { useCallback, useRef, useState, memo, useContext } from "react";
 
 export type TasksProgressProps = {
     innerRef?: React.Ref<HTMLButtonElement>;
@@ -62,7 +63,10 @@ const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
     );
 };
 
-const Card = ({ id, title, attachments, activities, coverAttachmentId, checklists, labels, dueDate, users }: BoardCard) => {
+const Card = (data: BoardCard) => {
+    const { id, title, attachments, activities, coverAttachmentId, checklists, labels, dueDate, users } = data;
+    const { setActiveCard } = useContext(BoardLayoutContext);
+
     const {
         ref: cardRef,
         isDragging,
@@ -84,6 +88,8 @@ const Card = ({ id, title, attachments, activities, coverAttachmentId, checklist
         // if e.target is Menu or Task List button or its children, return
         if (menuButtonRef.current?.contains(e.target as Node)) return;
         if (taskButtonRef.current?.contains(e.target as Node)) return;
+
+        setActiveCard(data);
     });
 
     return (

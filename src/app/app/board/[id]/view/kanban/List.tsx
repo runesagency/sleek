@@ -1,7 +1,8 @@
 "use client";
 
-import type { BoardCard, BoardList } from "@/app/app/board/[id]/layout";
+import type { BoardList } from "@/app/app/board/[id]/layout";
 
+import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
 import Card from "@/app/app/board/[id]/view/kanban/Card";
 import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import { Button, Textarea } from "@/components/Forms";
@@ -13,7 +14,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useClickOutside, useMergedRef } from "@mantine/hooks";
 import { IconDots, IconPlus } from "@tabler/icons";
 import clsx from "clsx";
-import { useRef, useCallback, useState, memo } from "react";
+import { useRef, useCallback, useState, memo, useContext } from "react";
 
 export enum NewCardLocation {
     UP = "UP",
@@ -45,14 +46,18 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
     );
 };
 
-type ListProps = BoardList & {
-    cards: BoardCard[];
-    onCardAdded: (name: string, listId: string, location: NewCardLocation) => void;
-};
+type ListProps = BoardList;
 
-const List = ({ id, title, cards, onCardAdded }: ListProps) => {
+const List = ({ id, title }: ListProps) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
     const [isOnHover, setIsOnHover] = useState(false);
+
+    const {
+        onCreateNewCard,
+        data: { cards: allCards },
+    } = useContext(BoardLayoutContext);
+
+    const cards = allCards.filter((card) => card.listId === id);
 
     const {
         ref: draggableRef,
@@ -88,9 +93,9 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
     const onNewCardAdded = useCallback(
         (name: string) => {
             if (!isAddingNewCard) return;
-            onCardAdded(name, id, isAddingNewCard);
+            onCreateNewCard(name, id, isAddingNewCard === NewCardLocation.UP ? 0 : cards.length);
         },
-        [id, isAddingNewCard, onCardAdded]
+        [cards.length, id, isAddingNewCard, onCreateNewCard]
     );
 
     const addCardComponent = <AddNewCard listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
@@ -162,7 +167,7 @@ const List = ({ id, title, cards, onCardAdded }: ListProps) => {
             <div
                 ref={dropAreaRef}
                 className={clsx(
-                    "flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 delay-200 duration-500 will-change-auto",
+                    "flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 duration-500 will-change-auto",
                     cards.length === 0 && !isAddingNewCard && !isOnHover ? "py-0" : "py-5"
                 )}
             >

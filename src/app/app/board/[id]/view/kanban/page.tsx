@@ -1,22 +1,16 @@
 "use client";
 
-import type { BoardCard } from "@/app/app/board/[id]/layout";
 import type { DragEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
-import type { ApiMethod, ApiResult } from "@/lib/types";
 
 import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
-import List, { NewCardLocation } from "@/app/app/board/[id]/view/kanban/List";
-import { Button } from "@/components/Forms";
-import { ApiRoutes } from "@/lib/constants";
+import List from "@/app/app/board/[id]/view/kanban/List";
 import useDragDropContext from "@/lib/drag-and-drop/use-drag-drop-context";
 import useDroppable, { SortableDirection } from "@/lib/drag-and-drop/use-droppable";
 import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useMergedRef } from "@mantine/hooks";
-import { IconPlus } from "@tabler/icons";
-import { useCallback, useContext } from "react";
-import { toast } from "react-toastify";
+import { useContext } from "react";
 
 export enum SortableType {
     List = "list",
@@ -39,93 +33,8 @@ export default function KanbanLayoutPage() {
         sortableDirection: SortableDirection.Horizontal,
     });
 
-    const [autoAnimateRef] = useAutoAnimate<HTMLDivElement>({
-        duration: 100,
-    });
-
+    const [autoAnimateRef] = useAutoAnimate<HTMLDivElement>({ duration: 100 });
     const dropAreaRef = useMergedRef(droppableRef, autoAnimateRef);
-
-    const onCardAdded = useCallback(
-        async (name: string, listId: string, location: NewCardLocation) => {
-            const parsedName = name.trim();
-            if (parsedName === "") return;
-
-            const list = lists.find((list) => list.id === listId);
-            if (!list) return;
-
-            const otherCards = cards.filter((card) => card.listId !== listId);
-            const listCards = cards.filter((card) => card.listId === listId);
-
-            const newCard: ApiMethod.Card.PostSchemaType = {
-                title: parsedName,
-                listId: listId,
-                boardId: list.boardId,
-                order: location === NewCardLocation.UP ? 0 : listCards.length,
-            };
-
-            const res = await fetch(ApiRoutes.Card, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(newCard),
-            });
-
-            const { result, error }: ApiResult<ApiMethod.Card.PostResult> = await res.json();
-
-            if (error) {
-                return toast.error(error.message);
-            }
-
-            let updatedCards: BoardCard[] = [];
-
-            if (location === NewCardLocation.UP) {
-                updatedCards = [
-                    ...otherCards, //
-                    result,
-                    ...listCards.map((card) => ({ ...card, order: card.order + 1 })),
-                ];
-            } else {
-                updatedCards = [
-                    ...otherCards, //
-                    ...listCards,
-                    result,
-                ];
-            }
-
-            setCards(updatedCards);
-
-            await fetch("/api/cards", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(updatedCards),
-            });
-        },
-        [cards, lists, setCards]
-    );
-
-    const onListAdded = useCallback(() => {
-        fetch(ApiRoutes.List, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                title: "New List",
-                order: lists.length,
-            }),
-        }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.List.PostResult> = await res.json();
-
-            if (error) {
-                return toast.error(error.message);
-            }
-
-            setLists([...lists, result]);
-        });
-    }, [lists, setLists]);
 
     onDragEnd(async ({ dragged, dropped }: DragEvent) => {
         // List to List
@@ -237,12 +146,8 @@ export default function KanbanLayoutPage() {
                 {lists
                     .sort((a, b) => a.order - b.order)
                     .map((list) => {
-                        return <List key={list.id} {...list} cards={cards.filter((card) => card.listId === list.id)} onCardAdded={onCardAdded} />;
+                        return <List key={list.id} {...list} />;
                     })}
-
-                <Button.Large className="h-max !w-80 shrink-0 border border-dark-600 !bg-dark-700" icon={IconPlus} onClick={onListAdded}>
-                    Create New List
-                </Button.Large>
             </div>
         </section>
     );

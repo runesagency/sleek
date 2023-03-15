@@ -7,9 +7,9 @@ import { SwitchButton, Button } from "@/components/Forms";
 import TaskModal from "@/components/TaskModal";
 import { ApiRoutes, Routes } from "@/lib/constants";
 
-import { IconArrowBackUp, IconFilter } from "@tabler/icons";
+import { IconArrowBackUp, IconFilter, IconPlus } from "@tabler/icons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -24,6 +24,7 @@ type BoardLayoutContextProps = {
     setLists: (lists: BoardList[]) => void;
     setCards: (cards: BoardCard[]) => void;
     setActiveCard: (card: BoardCard | undefined) => void;
+    onCreateNewCard: (name: string, listId: string, order: number) => Promise<void>;
 };
 
 const defaultContextValue: BoardLayoutContextProps = {
@@ -53,6 +54,9 @@ const defaultContextValue: BoardLayoutContextProps = {
     setActiveCard: () => {
         throw new Error("setActiveCard is not defined");
     },
+    onCreateNewCard: () => {
+        throw new Error("onCreateNewCard is not defined");
+    },
 };
 
 export const BoardLayoutContext = createContext<BoardLayoutContextProps>(defaultContextValue);
@@ -70,7 +74,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
     const [activeCard, setActiveCard] = useState<BoardCard | undefined>(undefined);
 
     const router = useRouter();
-    const { projectId, name, users } = data;
+    const { projectId, name, users, lists, cards } = data;
 
     const setLists = useCallback((lists: BoardList[]) => {
         setData((prev) => ({
@@ -85,6 +89,92 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
             cards,
         }));
     }, []);
+
+    const onCreateNewList = useCallback(() => {
+        fetch(ApiRoutes.List, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                title: "New List",
+                order: lists.length,
+            }),
+        }).then(async (res) => {
+            const { result, error }: ApiResult<ApiMethod.List.PostResult> = await res.json();
+
+            if (error) {
+                return toast.error(error.message);
+            }
+
+            setLists([...lists, result]);
+        });
+    }, [lists, setLists]);
+
+    const onCreateNewCard = useCallback(
+        async (name: string, listId: string, order: number) => {
+            const parsedName = name.trim();
+            if (parsedName === "") return;
+
+            const list = lists.find((list) => list.id === listId);
+            if (!list) {
+                toast.error("List not found");
+                return;
+            }
+
+            const requestBody: ApiMethod.Card.PostSchemaType = {
+                title: parsedName,
+                boardId: id,
+                listId,
+                order,
+            };
+
+            const res = await fetch(ApiRoutes.Card, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            const { result, error }: ApiResult<ApiMethod.Card.PostResult> = await res.json();
+
+            if (error) {
+                toast.error(error.message);
+                return;
+            }
+
+            let updatedCards: BoardCard[] = [];
+            const otherCards = cards.filter((card) => card.listId !== listId);
+            const listCards = cards.filter((card) => card.listId === listId);
+
+            if (order === 0) {
+                updatedCards = [
+                    ...otherCards, //
+                    result,
+                    ...listCards.map((card) => ({ ...card, order: card.order + 1 })),
+                ];
+            } else {
+                updatedCards = [
+                    ...otherCards, //
+                    ...listCards,
+                    result,
+                ];
+            }
+
+            setCards(updatedCards);
+        },
+        [cards, id, lists, setCards]
+    );
+
+    const currentSegment = useSelectedLayoutSegment();
+
+    const links = [
+        { name: "About", segment: "about" },
+        { name: "View", segment: "view" },
+        { name: "Members", segment: "members" },
+        { name: "Settings", segment: "settings" },
+    ];
 
     useEffect(() => {
         fetch(ApiRoutes.Board(id), {
@@ -106,13 +196,14 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
     }, [id, router]);
 
     return (
-        <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, setLists, setCards, setActiveCard }}>
+        <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, setLists, setCards, setActiveCard, onCreateNewCard }}>
             <main className="box-border flex h-full w-full flex-col">
                 <div className="flex bg-dark-700 px-11">
-                    <SwitchButton>About</SwitchButton>
-                    <SwitchButton active>View</SwitchButton>
-                    <SwitchButton>Members</SwitchButton>
-                    <SwitchButton>Settings</SwitchButton>
+                    {links.map(({ name, segment }, index) => (
+                        <Link key={index} href={Routes.Board(id) + "/" + (segment ?? "")}>
+                            <SwitchButton active={currentSegment === segment}>{name}</SwitchButton>
+                        </Link>
+                    ))}
                 </div>
 
                 <div className="flex items-center gap-6 px-11 py-6">
@@ -136,6 +227,10 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
 
                             <Button.Large icon={IconFilter} fit>
                                 Filter
+                            </Button.Large>
+
+                            <Button.Large icon={IconPlus} fit onClick={onCreateNewList}>
+                                Create New List
                             </Button.Large>
                         </>
                     )}
