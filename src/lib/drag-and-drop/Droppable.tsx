@@ -40,7 +40,7 @@ export type DroppableProps<T> = {
       }
     | {
           sortable: false;
-          sortableDirection: never;
+          sortableDirection?: never;
       }
 );
 
