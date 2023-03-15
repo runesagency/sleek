@@ -4,7 +4,7 @@ const plugin = require("tailwindcss/plugin");
 const fs = typeof window === "undefined" ? require("fs") : null;
 const { fontFamily } = require("tailwindcss/defaultTheme");
 
-/** @satisfies {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */
 module.exports = {
     mode: "jit",
     content: [
