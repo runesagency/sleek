@@ -1,14 +1,31 @@
-import tailwindConfig from "tailwind.config";
-
+import clsx from "clsx";
 import { useCallback, useState } from "react";
-import RSwitch from "react-switch";
+import ReactSwitch from "react-switch";
 
-export default function Switch() {
-    const [checked, setChecked] = useState(false);
+export type SwitchProps = {
+    defaultChecked?: boolean;
+    disabled?: boolean;
+    onChange?: (checked: boolean) => void;
+};
+
+export default function Switch({ defaultChecked, onChange, disabled }: SwitchProps) {
+    const [checked, setChecked] = useState(defaultChecked ?? false);
 
     const onCheck = useCallback(() => {
+        onChange?.(!checked);
         setChecked((prev) => !prev);
-    }, []);
+    }, [checked, onChange]);
 
-    return <RSwitch checked={checked} onChange={onCheck} checkedIcon={false} uncheckedIcon={false} onColor={tailwindConfig.theme.extend.colors.dark[500]} />;
+    return (
+        <ReactSwitch
+            checked={checked}
+            disabled={disabled}
+            onChange={onCheck}
+            checkedIcon={false}
+            uncheckedIcon={false}
+            onColor="transparent"
+            offColor="transparent"
+            className={clsx("h-max border", checked ? "border-dark-300 bg-dark-400" : "border-dark-400 bg-dark-500")}
+        />
+    );
 }
