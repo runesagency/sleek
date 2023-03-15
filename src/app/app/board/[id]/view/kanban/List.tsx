@@ -6,8 +6,7 @@ import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
 import Card from "@/app/app/board/[id]/view/kanban/Card";
 import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import { Button, Textarea } from "@/components/Forms";
-import useDraggable from "@/lib/drag-and-drop/use-draggable";
-import useDroppable, { SortableDirection } from "@/lib/drag-and-drop/use-droppable";
+import { Draggable, Droppable, SortableDirection } from "@/lib/drag-and-drop";
 
 import autoAnimate, { getTransitionSizes } from "@formkit/auto-animate";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -46,70 +45,42 @@ const AddNewCard = ({ listId, onClose, onSave }: AddNewCardProps) => {
     );
 };
 
-type ListProps = BoardList;
+type CardDropZoneProps = {
+    innerRef: React.Ref<HTMLDivElement>;
+    isAddingNewCard: NewCardLocation | false;
+    setIsAddingNewCard: (value: NewCardLocation | false) => void;
+    listId: string;
+    isOnHover: boolean;
+};
 
-const List = ({ id, title }: ListProps) => {
-    const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
-    const [isOnHover, setIsOnHover] = useState(false);
-
+const CardDropZone = ({ innerRef, isAddingNewCard, setIsAddingNewCard, listId, isOnHover }: CardDropZoneProps) => {
     const {
-        onCreateNewCard,
         data: { cards: allCards },
+        onCreateNewCard,
     } = useContext(BoardLayoutContext);
 
-    const cards = allCards.filter((card) => card.listId === id);
-
-    const {
-        ref: draggableRef,
-        handleRef,
-        isDragging,
-    } = useDraggable<HTMLDivElement>({
-        id,
-        type: SortableType.List,
-    });
-
-    const {
-        ref: droppableRef,
-        onDragEnter,
-        onDragLeave,
-    } = useDroppable({
-        id,
-        accepts: [SortableType.Card],
-        sortable: true,
-        sortableDirection: SortableDirection.Vertical,
-    });
-
+    const elementRef = useRef<HTMLDivElement>(null);
     const [autoAnimateRef] = useAutoAnimate<HTMLDivElement>();
-    const dropAreaRef = useMergedRef(droppableRef, autoAnimateRef);
 
-    const onNewCardClick = (location: NewCardLocation) => {
-        setIsAddingNewCard(location);
-    };
+    const ref = useMergedRef(innerRef, autoAnimateRef, elementRef);
+    const cards = allCards.filter((card) => card.listId === listId);
 
     const onNewCardClose = useCallback(() => {
         setIsAddingNewCard(false);
-    }, []);
+    }, [setIsAddingNewCard]);
 
     const onNewCardAdded = useCallback(
         (name: string) => {
             if (!isAddingNewCard) return;
-            onCreateNewCard(name, id, isAddingNewCard === NewCardLocation.UP ? 0 : cards.length);
+            onCreateNewCard(name, listId, isAddingNewCard === NewCardLocation.UP ? 0 : cards.length);
         },
-        [cards.length, id, isAddingNewCard, onCreateNewCard]
+        [cards.length, listId, isAddingNewCard, onCreateNewCard]
     );
 
-    const addCardComponent = <AddNewCard listId={id} onClose={onNewCardClose} onSave={onNewCardAdded} />;
+    const addNewCardComponent = <AddNewCard listId={listId} onClose={onNewCardClose} onSave={onNewCardAdded} />;
 
-    onDragEnter(() => {
-        setIsOnHover(true);
-    });
-
-    onDragLeave(() => {
-        setIsOnHover(false);
-    });
-
-    if (droppableRef.current) {
-        autoAnimate(droppableRef.current, (element, action, oldCoords, newCoords) => {
+    if (elementRef.current) {
+        autoAnimate(elementRef.current, (element, action, oldCoords, newCoords) => {
             let keyframes: Keyframe[] = [];
 
             if (action === "remain" && oldCoords && newCoords) {
@@ -151,45 +122,76 @@ const List = ({ id, title }: ListProps) => {
 
     return (
         <div
-            ref={draggableRef}
-            className="group/list relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-sm text-dark-50"
-        >
-            <div ref={handleRef} className={clsx("flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600", isDragging ? "bg-dark-600" : "bg-dark-900")}>
-                <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{title}</span>
-
-                <div className="flex items-center gap-3">
-                    {!isAddingNewCard && <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={() => onNewCardClick(NewCardLocation.UP)} />}
-
-                    <IconDots height={20} className="duration-200 hover:opacity-75" />
-                </div>
-            </div>
-
-            <div
-                ref={dropAreaRef}
-                className={clsx(
-                    "flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 duration-500 will-change-auto",
-                    cards.length === 0 && !isAddingNewCard && !isOnHover ? "py-0" : "py-5"
-                )}
-            >
-                {isAddingNewCard === NewCardLocation.UP && addCardComponent}
-
-                {cards.map((card) => {
-                    return <Card key={card.id} {...card} />;
-                })}
-
-                {isAddingNewCard === NewCardLocation.DOWN && addCardComponent}
-            </div>
-
-            {!isAddingNewCard && (
-                <button
-                    className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center text-base duration-200 hover:opacity-75"
-                    onClick={() => onNewCardClick(NewCardLocation.DOWN)}
-                >
-                    <IconPlus height={15} />
-                    <p>Add Card</p>
-                </button>
+            ref={ref}
+            className={clsx(
+                "flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 duration-500 will-change-auto",
+                cards.length === 0 && !isAddingNewCard && !isOnHover ? "py-0" : "py-5"
             )}
+        >
+            {isAddingNewCard === NewCardLocation.UP && addNewCardComponent}
+
+            {cards.map((card) => {
+                return <Card key={card.id} {...card} />;
+            })}
+
+            {isAddingNewCard === NewCardLocation.DOWN && addNewCardComponent}
         </div>
+    );
+};
+
+const List = ({ id, title }: BoardList) => {
+    const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
+    const [isOnHover, setIsOnHover] = useState(false);
+
+    const onDragEnter = useCallback(() => {
+        setIsOnHover(true);
+    }, []);
+
+    const onDragLeave = useCallback(() => {
+        setIsOnHover(false);
+    }, []);
+
+    const onNewCardTopClick = useCallback(() => {
+        setIsAddingNewCard(NewCardLocation.UP);
+    }, []);
+
+    const onNewCardBottomClick = useCallback(() => {
+        setIsAddingNewCard(NewCardLocation.DOWN);
+    }, []);
+
+    return (
+        <Draggable<HTMLDivElement> id={id} type={SortableType.List}>
+            {({ ref, handleRef }, { isDragging }) => (
+                <div
+                    ref={ref}
+                    className="relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-sm text-dark-50"
+                >
+                    <div ref={handleRef} className={clsx("flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600", isDragging ? "bg-dark-600" : "bg-dark-900")}>
+                        <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{title}</span>
+
+                        <div className="flex items-center gap-3">
+                            {!isAddingNewCard && <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={onNewCardTopClick} />}
+
+                            <IconDots height={20} className="duration-200 hover:opacity-75" />
+                        </div>
+                    </div>
+
+                    <Droppable<HTMLDivElement> id={id} onDragEnter={onDragEnter} onDragLeave={onDragLeave} sortable sortableDirection={SortableDirection.Vertical} accepts={[SortableType.Card]}>
+                        {({ ref }) => <CardDropZone isAddingNewCard={isAddingNewCard} setIsAddingNewCard={setIsAddingNewCard} isOnHover={isOnHover} listId={id} innerRef={ref} />}
+                    </Droppable>
+
+                    {!isAddingNewCard && (
+                        <button
+                            className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center text-base duration-200 hover:opacity-75"
+                            onClick={onNewCardBottomClick}
+                        >
+                            <IconPlus height={15} />
+                            <p>Add Card</p>
+                        </button>
+                    )}
+                </div>
+            )}
+        </Draggable>
     );
 };
 

@@ -1,19 +1,10 @@
-import type { DragCancelEvent, DragEndEvent, DragEnterEvent, DragLeaveEvent, DragStartEvent } from "@/lib/drag-and-drop/use-drag-drop-context";
+import type { DragCancelEvent, DragEndEvent, DragEnterEvent, DragLeaveEvent, DragStartEvent } from "@/lib/drag-and-drop";
 
-import { constants as contextConstants } from "@/lib/drag-and-drop/use-drag-drop-context";
-import { SortableDirection, constants as droppableConstants } from "@/lib/drag-and-drop/use-droppable";
+import { SortableDirection, droppableConstants, contextConstants } from "@/lib/drag-and-drop";
 
 import { useCallback, useRef, useState, useEffect } from "react";
 
-export type useDraggableOptions = {
-    id: string;
-    type: string;
-    useClone?: boolean;
-    activatorDistance?: number;
-    visualizeCollision?: boolean;
-};
-
-export const constants = {
+export const draggableConstants = {
     dataAttribute: {
         draggable: "data-draggable",
         draggableId: "data-draggable-id",
@@ -21,40 +12,37 @@ export const constants = {
     },
 };
 
-export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ id, type, useClone = true, activatorDistance = 10, visualizeCollision }: useDraggableOptions) {
-    // The element that is being dragged
-    const ref = useRef<T>(null);
+export type DraggableProvided<T> = {
+    ref: React.RefObject<T>;
+    handleRef: React.RefObject<T>;
+};
 
-    // If specified, it was the element that started the drag
+export type DraggableSnapshot = {
+    isDragging: boolean;
+};
+
+export type DraggableProps<T> = {
+    id: string;
+    type: string;
+    useClone?: boolean;
+    activatorDistance?: number;
+    visualizeCollision?: boolean;
+    onClick?: (e: MouseEvent) => void;
+    onTouch?: (e: TouchEvent) => void;
+    onClickOrTouch?: (e: MouseEvent | TouchEvent) => void;
+    children: (provided: DraggableProvided<T>, snapshot: DraggableSnapshot) => JSX.Element;
+};
+
+export default function Draggable<T extends HTMLElement>({ id, type, useClone = true, activatorDistance = 10, visualizeCollision, onClick, onTouch, onClickOrTouch, children }: DraggableProps<T>) {
+    const ref = useRef<T>(null);
     const handleRef = useRef<T>(null);
+    const originalCursorPos = useRef<Record<"x" | "y", number>>({ x: 0, y: 0 });
 
     // Is the element being dragged?
     const [hasStartDragging, setHasStartDragging] = useState(false);
 
     // Is the element has been counted as a drag? (After it was moved X pixels)
     const [isDragging, setIsDragging] = useState(false);
-
-    // The original position of the cursor when the drag started
-    const originalCursorPos = useRef<Record<"x" | "y", number>>({ x: 0, y: 0 });
-
-    // Function that executed that will be called after the user is clicking on the element and not dragging it
-    const clickHandler = useRef<(e: MouseEvent) => void>((e) => e.preventDefault());
-
-    const onClick = useCallback((handler: (e: MouseEvent) => void) => {
-        clickHandler.current = handler;
-    }, []);
-
-    const touchHandler = useRef<(e: TouchEvent) => void>((e) => e.preventDefault());
-
-    const onTouch = useCallback((handler: (e: TouchEvent) => void) => {
-        touchHandler.current = handler;
-    }, []);
-
-    const clickOrTouchHandler = useRef<(e: MouseEvent | TouchEvent) => void>((e) => e.preventDefault());
-
-    const onClickOrTouch = useCallback((handler: (e: MouseEvent | TouchEvent) => void) => {
-        clickOrTouchHandler.current = handler;
-    }, []);
 
     /**
      * @description
@@ -93,18 +81,18 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
             // if the element is not being dragged, then it's a click/touch
             if (!isDragging) {
                 if (e instanceof MouseEvent) {
-                    clickHandler.current(e);
+                    onClick?.(e);
                 } else if (e instanceof TouchEvent) {
-                    touchHandler.current(e);
+                    onTouch?.(e);
                 }
 
-                clickOrTouchHandler.current(e);
+                onClickOrTouch?.(e);
             }
 
             setHasStartDragging(false);
             setIsDragging(false);
         },
-        [isDragging]
+        [isDragging, onClick, onTouch, onClickOrTouch]
     );
 
     /**
@@ -116,9 +104,9 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         const handleCurrent = handleRef.current;
 
         if (current) {
-            current.setAttribute(constants.dataAttribute.draggable, "true");
-            current.setAttribute(constants.dataAttribute.draggableId, id);
-            current.setAttribute(constants.dataAttribute.draggableType, type);
+            current.setAttribute(draggableConstants.dataAttribute.draggable, "true");
+            current.setAttribute(draggableConstants.dataAttribute.draggableId, id);
+            current.setAttribute(draggableConstants.dataAttribute.draggableType, type);
 
             current.addEventListener("mouseup", onDragEnd);
             current.addEventListener("touchend", onDragEnd);
@@ -134,9 +122,9 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
 
         return () => {
             if (current) {
-                current.removeAttribute(constants.dataAttribute.draggable);
-                current.removeAttribute(constants.dataAttribute.draggableId);
-                current.removeAttribute(constants.dataAttribute.draggableType);
+                current.removeAttribute(draggableConstants.dataAttribute.draggable);
+                current.removeAttribute(draggableConstants.dataAttribute.draggableId);
+                current.removeAttribute(draggableConstants.dataAttribute.draggableType);
 
                 current.removeEventListener("mouseup", onDragEnd);
                 current.removeEventListener("touchend", onDragEnd);
@@ -817,12 +805,5 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
         };
     }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging, visualizeCollision]);
 
-    return {
-        ref,
-        handleRef,
-        isDragging,
-        onClick,
-        onTouch,
-        onClickOrTouch,
-    };
+    return children({ ref, handleRef }, { isDragging });
 }
