@@ -1,3 +1,5 @@
+// @ts-check
+
 const plugin = require("tailwindcss/plugin");
 const fs = typeof window === "undefined" ? require("fs") : null;
 const { fontFamily } = require("tailwindcss/defaultTheme");
@@ -50,7 +52,8 @@ module.exports = {
         plugin(async ({ addComponents }) => {
             if (!fs) return;
 
-            const findAllCSSFiles = (path) => {
+            const findAllCSSFiles = (/** @type {string} */ path) => {
+                /** @type {any[]} */
                 let cssFiles = [];
 
                 if (fs.lstatSync(path).isDirectory()) {
@@ -80,6 +83,7 @@ module.exports = {
                 const classes = data.match(regex);
 
                 if (classes) {
+                    /** @type {string[]} */
                     let registeredClasses = [];
 
                     for (const rawClassName of classes) {
