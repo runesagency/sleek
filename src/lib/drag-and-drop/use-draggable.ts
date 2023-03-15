@@ -341,175 +341,31 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                         ctx.clearRect(0, 0, collisionVisualizerCanvas.width, collisionVisualizerCanvas.height);
                         console.clear();
 
-                        let i = 1;
-
+                        // create a line between center of the dragged element and the center of the hovered element
                         for (const element of elements) {
                             if (element.clientWidth === 0 && element.clientHeight === 0) continue;
 
-                            const { top, left, bottom, right } = element.getBoundingClientRect();
                             const { top: Ctop, bottom: Cbottom, left: Cleft, right: Cright } = clone.getBoundingClientRect();
+                            const { top, left, bottom, right } = element.getBoundingClientRect();
 
-                            ctx.strokeStyle = `red`;
-                            ctx.fillStyle = `white`;
-                            ctx.lineWidth = 2;
-                            ctx.font = "30px Arial";
+                            const acceptList = element.getAttribute(droppableConstants.dataAttribute.accepts);
+                            const isAccepted = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
 
-                            const createSplitLine = () => {
-                                if (!collisionVisualizerCanvas || !ctx) return;
-
-                                ctx.strokeStyle = `yellow`;
-                                // create a line that split the hovered element into 4 parts
+                            if (isAccepted) {
                                 ctx.beginPath();
-                                ctx.moveTo(left, top + (bottom - top) / 2);
-                                ctx.lineTo(right, top + (bottom - top) / 2);
+                                ctx.moveTo(Cleft + (Cright - Cleft) / 2, Ctop + (Cbottom - Ctop) / 2);
+                                ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
                                 ctx.stroke();
 
-                                ctx.beginPath();
-                                ctx.moveTo(left + (right - left) / 2, top);
-                                ctx.lineTo(left + (right - left) / 2, bottom);
-                                ctx.stroke();
-                            };
-
-                            const topLeftCornerToTopLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Ctop - top, 2));
-                            const topRightCornerToTopRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Ctop - top, 2));
-                            const bottomLeftCornerToBottomLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Cbottom - bottom, 2));
-                            const bottomRightCornerToBottomRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Cbottom - bottom, 2));
-
-                            const topLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
-                            const topRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
-                            const bottomLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
-                            const bottomRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
-
-                            // create a line between the edges of the hovered element and the dragged element
-                            ctx.beginPath();
-                            ctx.moveTo(Cleft, Ctop);
-                            ctx.lineTo(left, top);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(Cright, Ctop);
-                            ctx.lineTo(right, top);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(Cleft, Cbottom);
-                            ctx.lineTo(left, bottom);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(Cright, Cbottom);
-                            ctx.lineTo(right, bottom);
-                            ctx.stroke();
-
-                            // write a text contain length of the line
-                            // top left corner to top right corner
-                            ctx.fillText(`${Math.round(topLeftCornerToTopLeftCorner)}`, left, top);
-
-                            // top right corner to bottom right corner
-                            ctx.fillText(`${Math.round(topRightCornerToTopRightCorner)}`, right, top);
-
-                            // bottom left corner to bottom right corner
-                            ctx.fillText(`${Math.round(bottomLeftCornerToBottomLeftCorner)}`, left, bottom);
-
-                            // bottom right corner to top left corner
-                            ctx.fillText(`${Math.round(bottomRightCornerToBottomRightCorner)}`, right, bottom);
-
-                            // create a line between the corners of the dragged element into the center of the hovered element
-                            ctx.beginPath();
-                            ctx.moveTo(Cleft, Ctop);
-                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(Cright, Ctop);
-                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(Cleft, Cbottom);
-                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                            ctx.stroke();
-
-                            ctx.beginPath();
-                            ctx.moveTo(Cright, Cbottom);
-                            ctx.lineTo(left + (right - left) / 2, top + (bottom - top) / 2);
-                            ctx.stroke();
-
-                            // write a text contain length of the line
-                            // top left corner to center
-                            ctx.fillText(
-                                `${Math.round(topLeftCornerToCenter)}`, //
-                                left + (right - left) / 4,
-                                top + (bottom - top) / 4
-                            );
-
-                            // top right corner to center
-                            ctx.fillText(
-                                `${Math.round(topRightCornerToCenter)}`, //
-                                right - (right - left) / 3,
-                                top + (bottom - top) / 4
-                            );
-
-                            // bottom left corner to center
-                            ctx.fillText(
-                                `${Math.round(bottomLeftCornerToCenter)}`, //
-                                left + (right - left) / 4,
-                                bottom - (bottom - top) / 4
-                            );
-
-                            // bottom right corner to center
-                            ctx.fillText(
-                                `${Math.round(bottomRightCornerToCenter)}`, //
-                                right - (right - left) / 3,
-                                bottom - (bottom - top) / 4
-                            );
-
-                            // total length
-                            ctx.fillText(
-                                `${Math.round(
-                                    topLeftCornerToTopLeftCorner +
-                                        topRightCornerToTopRightCorner +
-                                        bottomLeftCornerToBottomLeftCorner +
-                                        bottomRightCornerToBottomRightCorner +
-                                        topLeftCornerToCenter +
-                                        topRightCornerToCenter +
-                                        bottomLeftCornerToCenter +
-                                        bottomRightCornerToCenter
-                                )}`,
-                                left + (right - left) / 2,
-                                top + (bottom - top) / 2
-                            );
-
-                            createSplitLine();
-
-                            console.log(`Element ${i} is hovered`);
-
-                            // log if the dragged element is on the right or left side of the hovered element
-                            if (Cleft < left + (right - left) / 2) {
-                                console.log(`Element ${i} is on the left side`);
-                            } else {
-                                console.log(`Element ${i} is on the right side`);
+                                // write a text contain length of the line
+                                ctx.fillText(
+                                    `${Math.round(
+                                        Math.sqrt(Math.pow(Cleft + (Cright - Cleft) / 2 - (left + (right - left) / 2), 2) + Math.pow(Ctop + (Cbottom - Ctop) / 2 - (top + (bottom - top) / 2), 2))
+                                    )}`,
+                                    left + (right - left) / 2,
+                                    top + (bottom - top) / 2
+                                );
                             }
-
-                            // log if the dragged element is on the top or bottom side of the hovered element
-                            if (Ctop < top + (bottom - top) / 2) {
-                                console.log(`Element ${i} is on the top side`);
-                            } else {
-                                console.log(`Element ${i} is on the bottom side`);
-                            }
-
-                            // log if the dragged element is on the top left, top right, bottom left or bottom right side of the hovered element
-                            if (Cleft < left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
-                                console.log(`Element ${i} is on the top left side`);
-                            } else if (Cleft > left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
-                                console.log(`Element ${i} is on the top right side`);
-                            } else if (Cleft < left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
-                                console.log(`Element ${i} is on the bottom left side`);
-                            } else if (Cleft > left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
-                                console.log(`Element ${i} is on the bottom right side`);
-                            }
-
-                            i++;
                         }
                     }
                 }
@@ -525,45 +381,33 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                     const isAccepted = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
 
                     if (isAccepted) {
-                        const topLeftCornerToTopLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Ctop - top, 2));
-                        const topRightCornerToTopRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Ctop - top, 2));
-                        const bottomLeftCornerToBottomLeftCorner = Math.sqrt(Math.pow(Cleft - left, 2) + Math.pow(Cbottom - bottom, 2));
-                        const bottomRightCornerToBottomRightCorner = Math.sqrt(Math.pow(Cright - right, 2) + Math.pow(Cbottom - bottom, 2));
+                        const cloneCenterX = Cleft + (Cright - Cleft) / 2;
+                        const hoveredCenterX = left + (right - left) / 2;
+                        const cloneCenterY = Ctop + (Cbottom - Ctop) / 2;
+                        const hoveredCenterY = top + (bottom - top) / 2;
 
-                        const topLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
-                        const topRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Ctop - (top + (bottom - top) / 2), 2));
-                        const bottomLeftCornerToCenter = Math.sqrt(Math.pow(Cleft - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
-                        const bottomRightCornerToCenter = Math.sqrt(Math.pow(Cright - (left + (right - left) / 2), 2) + Math.pow(Cbottom - (top + (bottom - top) / 2), 2));
+                        const centerToCenter = Math.sqrt(Math.pow(cloneCenterX - hoveredCenterX, 2) + Math.pow(cloneCenterY - hoveredCenterY, 2));
 
-                        const totalDistance =
-                            topLeftCornerToTopLeftCorner +
-                            topRightCornerToTopRightCorner +
-                            bottomLeftCornerToBottomLeftCorner +
-                            bottomRightCornerToBottomRightCorner +
-                            topLeftCornerToCenter +
-                            topRightCornerToCenter +
-                            bottomLeftCornerToCenter +
-                            bottomRightCornerToCenter;
-
-                        if (prevResult && prevResult.distance < totalDistance) {
+                        if (prevResult && prevResult.distance < centerToCenter) {
                             return prevResult;
                         }
 
                         let locations: HoveredLocation[] = [];
 
-                        if (Cleft < left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                        // find the closest location to the center of the dragged element
+                        if (cloneCenterX < hoveredCenterX && cloneCenterY < hoveredCenterY) {
                             locations.push(HoveredLocation.Top, HoveredLocation.Left);
-                        } else if (Cleft > left + (right - left) / 2 && Ctop < top + (bottom - top) / 2) {
+                        } else if (cloneCenterX > hoveredCenterX && cloneCenterY < hoveredCenterY) {
                             locations.push(HoveredLocation.Top, HoveredLocation.Right);
-                        } else if (Cleft < left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                        } else if (cloneCenterX < hoveredCenterX && cloneCenterY > hoveredCenterY) {
                             locations.push(HoveredLocation.Bottom, HoveredLocation.Left);
-                        } else if (Cleft > left + (right - left) / 2 && Ctop > top + (bottom - top) / 2) {
+                        } else if (cloneCenterX > hoveredCenterX && cloneCenterY > hoveredCenterY) {
                             locations.push(HoveredLocation.Bottom, HoveredLocation.Right);
                         }
 
                         return {
                             element,
-                            distance: totalDistance,
+                            distance: centerToCenter,
                             type: elementType,
                             locations,
                         };
@@ -788,36 +632,36 @@ export default function useDraggable<T extends HTMLElement = HTMLDivElement>({ i
                     const { top, left, width, height } = element.getBoundingClientRect();
 
                     // check if element has vertical scroll
-                    if (element.scrollHeight > element.clientHeight) {
-                        const partitionSizeToTop = height / 2;
+                    if (element.scrollHeight > element.clientHeight && clientY > top && clientY < top + height) {
+                        const partitionSize = height / 4;
+                        const cursorPos = clientY - top;
 
-                        if (clientY <= partitionSizeToTop && clientX > left && clientX < left + width) {
-                            const speed = Math.abs(clientY - partitionSizeToTop) / 10;
+                        if (cursorPos <= partitionSize && clientX > left && clientX < left + width) {
+                            const speed = Math.abs(cursorPos - partitionSize) / 10;
                             const actualSpeed = speed > 15 ? (clientY < 0 ? 25 : 15) : speed;
                             element.scrollTop -= actualSpeed;
                         }
 
-                        const partitionSizeToBottom = height / 4;
-
-                        if (height - clientY < partitionSizeToBottom && clientX > left && clientX < left + width) {
-                            const speed = Math.abs(height - clientY - partitionSizeToBottom) / 10;
+                        if (height - cursorPos < partitionSize && clientX > left && clientX < left + width) {
+                            const speed = Math.abs(height - cursorPos - partitionSize) / 10;
                             const actualSpeed = speed > 15 ? (clientY > height ? 25 : 15) : speed;
                             element.scrollTop += actualSpeed;
                         }
                     }
 
                     // check if element has horizontal scroll
-                    if (element.scrollWidth > element.clientWidth) {
+                    if (element.scrollWidth > element.clientWidth && clientX > left && clientX < left + width) {
                         const partitionSize = width / 4;
+                        const cursorPos = clientX - left;
 
-                        if (clientX <= partitionSize && clientY > top && clientY < top + height) {
-                            const speed = Math.abs(clientX - partitionSize) / 10;
+                        if (cursorPos <= partitionSize && clientY > top && clientY < top + height) {
+                            const speed = Math.abs(cursorPos - partitionSize) / 10;
                             const actualSpeed = speed > 15 ? (clientX < 0 ? 25 : 15) : speed;
                             element.scrollLeft -= actualSpeed;
                         }
 
-                        if (width - clientX < partitionSize && clientY > top && clientY < top + height) {
-                            const speed = Math.abs(width - clientX - partitionSize) / 10;
+                        if (width - cursorPos < partitionSize && clientY > top && clientY < top + height) {
+                            const speed = Math.abs(width - cursorPos - partitionSize) / 10;
                             const actualSpeed = speed > 15 ? (clientX > width ? 25 : 15) : speed;
                             element.scrollLeft += actualSpeed;
                         }
