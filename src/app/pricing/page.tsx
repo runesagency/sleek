@@ -1,5 +1,6 @@
 "use client";
 
+import { Switch } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 import FAQ from "@/components/Sections/FAQ";
 import Footer from "@/components/Sections/Footer";
@@ -105,12 +106,7 @@ export default function PricingPage() {
                         <div className="flex gap-5">
                             <p className="ts-2xl">Small Team</p>
 
-                            <div
-                                onClick={() => setIsEnterprise(!isEnterprise)}
-                                className={clsx("h-8 w-20 cursor-pointer rounded-2xl border-2 bg-dark-500", !isEnterprise ? "bg-dark-400" : "bg-dark-500")}
-                            >
-                                <div className={clsx("mt-1 flex h-5 w-5 flex-col justify-center rounded-full bg-dark-50 duration-150 ease-in-out", !isEnterprise ? "ml-1" : "ml-12")} />
-                            </div>
+                            <Switch />
 
                             <p className="ts-2xl">Enterprise</p>
                         </div>

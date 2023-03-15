@@ -40,6 +40,7 @@ specifiers:
   react-markdown: ^8.0.5
   react-nice-avatar: ^1.3.1
   react-simplemde-editor: ^5.2.0
+  react-switch: ^7.0.0
   react-toastify: ^9.1.1
   react-top-loading-bar: ^2.3.1
   socket.io: ^4.6.1
@@ -69,6 +70,7 @@ dependencies:
   react-markdown: 8.0.5_kzbn2opkn2327fwg5yzwzya5o4
   react-nice-avatar: 1.3.1_react@18.2.0
   react-simplemde-editor: 5.2.0_krhfp6bid7kgajqtgldm7tc45a
+  react-switch: 7.0.0_biqbaboplfbrettd7655fr4n2y
   react-toastify: 9.1.1_biqbaboplfbrettd7655fr4n2y
   react-top-loading-bar: 2.3.1_react@18.2.0
   socket.io: 4.6.1
@@ -4202,6 +4204,17 @@ packages:
     dependencies:
       '@types/codemirror': 5.60.7
       easymde: 2.18.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /react-switch/7.0.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-KkDeW+cozZXI6knDPyUt3KBN1rmhoVYgAdCJqAh7st7tk8YE6N0iR89zjCWO8T8dUTeJGTR0KU+5CHCRMRffiA==}
+    peerDependencies:
+      react: ^15.3.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^15.3.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
