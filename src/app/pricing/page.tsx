@@ -9,6 +9,7 @@ import Navigation from "@/components/Sections/Navigation";
 import { IconBuildingStore, IconCheck, IconX } from "@tabler/icons";
 import clsx from "clsx";
 import { useState } from "react";
+import ReactSlider from "react-slider";
 
 const ComparisonTable = () => {
     const comparisonDummyData = [
@@ -85,8 +86,6 @@ const ComparisonTable = () => {
 };
 
 export default function PricingPage() {
-    const [isEnterprise, setIsEnterprise] = useState<boolean>(false);
-
     return (
         <main className="box-border flex h-full w-full flex-col bg-dark-800 text-dark-50">
             <Navigation />
@@ -105,9 +104,7 @@ export default function PricingPage() {
                     <section className="flex flex-col gap-5">
                         <div className="flex gap-5">
                             <p className="ts-2xl">Small Team</p>
-
                             <Switch />
-
                             <p className="ts-2xl">Enterprise</p>
                         </div>
 
@@ -131,9 +128,16 @@ export default function PricingPage() {
                         </section>
 
                         <section className="flex flex-col gap-2">
-                            <div className="flex h-2 w-full items-center rounded-lg bg-dark-50">
-                                <div className="h-8 w-8 translate-x-2/3 cursor-pointer rounded-full bg-dark-50" />
-                            </div>
+                            <ReactSlider
+                                min={1}
+                                max={50}
+                                className="h-1.5 rounded-full bg-white"
+                                renderThumb={(props, state) => (
+                                    <div {...props} className="ts-base -mt-3 flex h-8 w-8 cursor-grab items-center justify-center rounded-full bg-white text-dark-900 focus:outline-none">
+                                        {state.valueNow}
+                                    </div>
+                                )}
+                            />
 
                             <div className="ts-sm flex items-center justify-between">
                                 <span>1</span>
@@ -156,7 +160,6 @@ export default function PricingPage() {
             {/* Comparison */}
             <Container className={["bg-dark-900", "flex flex-col gap-14 py-20"]}>
                 <h3 className="heading-3 text-center">Ipsum vs Wokwow: How Do They Compare?</h3>
-
                 <ComparisonTable />
             </Container>
 
