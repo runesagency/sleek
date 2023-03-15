@@ -1,5 +1,5 @@
 const plugin = require("tailwindcss/plugin");
-const fs = require("fs");
+const fs = typeof window === "undefined" ? require("fs") : null;
 const { fontFamily } = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
@@ -48,6 +48,8 @@ module.exports = {
          * or by using "Developer: Reload Window" or "Developer: Restart Extension Host" command in VSCode
          */
         plugin(async ({ addComponents }) => {
+            if (!fs) return;
+
             const findAllCSSFiles = (path) => {
                 let cssFiles = [];
 
