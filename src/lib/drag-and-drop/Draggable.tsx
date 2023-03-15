@@ -27,13 +27,17 @@ export type DraggableProps<T> = {
     useClone?: boolean;
     activatorDistance?: number;
     visualizeCollision?: boolean;
+    lockY?: boolean;
+    lockX?: boolean;
     onClick?: (e: MouseEvent) => void;
     onTouch?: (e: TouchEvent) => void;
     onClickOrTouch?: (e: MouseEvent | TouchEvent) => void;
     children: (provided: DraggableProvided<T>, snapshot: DraggableSnapshot) => JSX.Element;
 };
 
-export default function Draggable<T extends HTMLElement>({ id, type, useClone = true, activatorDistance = 10, visualizeCollision, onClick, onTouch, onClickOrTouch, children }: DraggableProps<T>) {
+export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch, onClickOrTouch, children, ...options }: DraggableProps<T>) {
+    const { type, useClone = true, activatorDistance = 10, visualizeCollision, lockX, lockY } = options;
+
     const ref = useRef<T>(null);
     const handleRef = useRef<T>(null);
     const originalCursorPos = useRef<Record<"x" | "y", number>>({ x: 0, y: 0 });
@@ -175,6 +179,9 @@ export default function Draggable<T extends HTMLElement>({ id, type, useClone = 
         // The canvas used to visualize the strategy of the collision detection (debugging purpose)
         let collisionVisualizerCanvas: HTMLCanvasElement | null = null;
 
+        // The original bounding of the element
+        const originalBounding = current.getBoundingClientRect();
+
         // The context of the drag and drop that the dragged element is in
         const findContext = (element: Element): Element | null => {
             const context = element.getAttribute(contextConstants.dataAttribute.dragDropContext);
@@ -211,6 +218,7 @@ export default function Draggable<T extends HTMLElement>({ id, type, useClone = 
             if (!current) return;
 
             const { top, left } = current.getBoundingClientRect();
+            const { top: originalTop, left: originalLeft, width: originalWidth, height: originalHeight } = originalBounding;
 
             if (e instanceof MouseEvent) {
                 clientX = e.clientX;
@@ -261,8 +269,26 @@ export default function Draggable<T extends HTMLElement>({ id, type, useClone = 
             if (!offsetX) offsetX = clientX - left;
             if (!offsetY) offsetY = clientY - top;
 
-            const transformX = clientX - offsetX;
-            const transformY = clientY - offsetY;
+            let transformX = lockX ? originalLeft : clientX - offsetX;
+            let transformY = lockY ? originalTop : clientY - offsetY;
+
+            const colliders = context.querySelectorAll(`[${droppableConstants.dataAttribute.collide}]`);
+
+            for (const collider of Array.from(colliders)) {
+                const { top, left, width, height } = collider.getBoundingClientRect();
+
+                if (transformX < left) {
+                    transformX = left;
+                } else if (transformX + originalWidth > left + width) {
+                    transformX = left + width - originalWidth;
+                }
+
+                if (transformY < top) {
+                    transformY = top;
+                } else if (transformY + originalHeight > top + height) {
+                    transformY = top + height - originalHeight;
+                }
+            }
 
             if (clone) {
                 clone.style.transform = `translate(${transformX}px, ${transformY}px)`;
@@ -803,7 +829,7 @@ export default function Draggable<T extends HTMLElement>({ id, type, useClone = 
                 context.dispatchEvent(cancelEvent);
             }
         };
-    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging, visualizeCollision]);
+    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging, visualizeCollision, lockX, lockY]);
 
     return children({ ref, handleRef }, { isDragging });
 }

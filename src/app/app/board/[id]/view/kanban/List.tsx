@@ -160,7 +160,7 @@ const List = ({ id, title }: BoardList) => {
     }, []);
 
     return (
-        <Draggable<HTMLDivElement> id={id} type={SortableType.List}>
+        <Draggable<HTMLDivElement> id={id} type={SortableType.List} lockY>
             {({ ref, handleRef }, { isDragging }) => (
                 <div
                     ref={ref}

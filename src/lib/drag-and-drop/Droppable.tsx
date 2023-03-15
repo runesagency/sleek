@@ -17,6 +17,7 @@ export const droppableConstants = {
         sortable: "data-sortable",
         sortableDirection: "data-sortable-direction",
         accepts: "data-accepts",
+        collide: "data-collide",
     },
 };
 
@@ -27,6 +28,7 @@ export type DroppableProvided<T> = {
 export type DroppableProps<T> = {
     id: string;
     accepts?: string[];
+    collide?: boolean;
     onDragEnter?: (event: DragEnterEvent) => void;
     onDragLeave?: (event: DragLeaveEvent) => void;
     onDragEnd?: (event: DragEndEvent) => void;
@@ -42,7 +44,9 @@ export type DroppableProps<T> = {
       }
 );
 
-export default function Droppable<T extends HTMLElement>({ id, accepts, sortable, sortableDirection, onDragEnter, onDragLeave, onDragEnd, children }: DroppableProps<T>) {
+export default function Droppable<T extends HTMLElement>({ id, onDragEnter, onDragLeave, onDragEnd, children, ...options }: DroppableProps<T>) {
+    const { sortable, sortableDirection, accepts, collide } = options;
+
     const ref = useRef<T>(null);
 
     useEffect(() => {
@@ -78,6 +82,12 @@ export default function Droppable<T extends HTMLElement>({ id, accepts, sortable
                 current.removeAttribute(droppableConstants.dataAttribute.accepts);
             }
 
+            if (collide) {
+                current.setAttribute(droppableConstants.dataAttribute.collide, "true");
+            } else {
+                current.removeAttribute(droppableConstants.dataAttribute.collide);
+            }
+
             current.addEventListener(contextConstants.events.dragEnter, onDragEnterEvent);
             current.addEventListener(contextConstants.events.dragLeave, onDragLeaveEvent);
             current.addEventListener(contextConstants.events.dragEnd, onDragEndEvent);
@@ -90,13 +100,14 @@ export default function Droppable<T extends HTMLElement>({ id, accepts, sortable
                 current.removeAttribute(droppableConstants.dataAttribute.sortable);
                 current.removeAttribute(droppableConstants.dataAttribute.sortableDirection);
                 current.removeAttribute(droppableConstants.dataAttribute.accepts);
+                current.removeAttribute(droppableConstants.dataAttribute.collide);
 
                 current.removeEventListener(contextConstants.events.dragEnter, onDragEnterEvent);
                 current.removeEventListener(contextConstants.events.dragLeave, onDragLeaveEvent);
                 current.removeEventListener(contextConstants.events.dragEnd, onDragEndEvent);
             }
         };
-    }, [accepts, id, onDragEnd, onDragEnter, onDragLeave, ref, sortable, sortableDirection]);
+    }, [accepts, collide, id, onDragEnd, onDragEnter, onDragLeave, ref, sortable, sortableDirection]);
 
     return children({ ref });
 }
