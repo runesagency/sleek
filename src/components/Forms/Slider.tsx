@@ -16,9 +16,9 @@ export default function Slider(options: SliderProps) {
     return (
         <ReactSlider
             {...options}
-            className="h-1.5 rounded-full bg-white"
+            className="h-1.5 rounded-full bg-dark-50"
             renderThumb={({ key, ...props }, state) => (
-                <div key={key} {...props} className="ts-base -mt-3 flex h-8 w-8 cursor-grab items-center justify-center rounded-full bg-white text-dark-900 focus:outline-none">
+                <div key={key} {...props} className="ts-base -mt-3 flex h-8 w-8 cursor-grab items-center justify-center rounded-full bg-dark-50 text-dark-900 focus:outline-none">
                     {state.valueNow}
                 </div>
             )}
