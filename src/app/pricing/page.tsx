@@ -1,84 +1,245 @@
 "use client";
 
-import { Switch } from "@/components/Forms";
+import { Slider, Switch } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 import FAQ from "@/components/Sections/FAQ";
 import Footer from "@/components/Sections/Footer";
 import Navigation from "@/components/Sections/Navigation";
+import { Routes } from "@/lib/constants";
+import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
-import { IconBuildingStore, IconCheck, IconX } from "@tabler/icons";
-import clsx from "clsx";
-import { useState } from "react";
-import ReactSlider from "react-slider";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { IconBuilding, IconBuildingStore, IconCheck, IconX } from "@tabler/icons";
+import Link from "next/link";
+import { useCallback, useMemo, useState } from "react";
 
-const ComparisonTable = () => {
-    const comparisonDummyData = [
+const Pricing = () => {
+    const { openMenu } = useMenu();
+
+    const [autoAnimateRef] = useAutoAnimate();
+    const [isEnterprise, setIsEnterprise] = useState(false);
+    const [pricePerMember, setPricePerMember] = useState(1);
+    const [quantity, setQuantity] = useState(1);
+
+    const priceOptions = useMemo(
+        () => ({
+            enterprise: {
+                icon: IconBuilding,
+                name: "Enterprise",
+                description: "For companies that have 50 members or more",
+                price: quantity * 3,
+                min: 50,
+                max: 300,
+                step: 300 / 12,
+            },
+            smallTeam: {
+                icon: IconBuildingStore,
+                name: "Small Team",
+                description: "A package dedicated to small teams with under 50 members.",
+                price: quantity * pricePerMember,
+                min: 1,
+                max: 49,
+                step: 1,
+            },
+        }),
+        [pricePerMember, quantity]
+    );
+
+    const { price, step, max, min, icon: Icon, name, description } = useMemo(() => (isEnterprise ? priceOptions.enterprise : priceOptions.smallTeam), [isEnterprise, priceOptions]);
+
+    const onPackageTypeChange = useCallback(
+        (isEnterprise: boolean) => {
+            setIsEnterprise(isEnterprise);
+
+            const { max: newMax, min: newMin } = isEnterprise ? priceOptions.enterprise : priceOptions.smallTeam;
+
+            if (quantity > newMax) {
+                setQuantity(newMax);
+            } else if (quantity < newMin) {
+                setQuantity(newMin);
+            }
+        },
+        [priceOptions.enterprise, priceOptions.smallTeam, quantity]
+    );
+
+    const onQuantityChange = useCallback((quantity: number) => {
+        setQuantity(quantity);
+    }, []);
+
+    const onPricingMenu = useCallback(
+        (e: React.MouseEvent) => {
+            openMenu(e, {
+                type: MenuVariant.Forms,
+                alignment: MenuAlignment.Center,
+                anchor: MenuAnchor.Element,
+                direction: MenuDirection.Bottom,
+                title: "Name your price",
+                submitButtonLabel: "Save",
+                lists: [
+                    {
+                        id: "price-per-member",
+                        type: MenuFormVariant.Input,
+                        label: "Price Per Member",
+                        props: {
+                            type: "number",
+                        },
+                    },
+                ],
+                onSubmit(values: { "price-per-member": string }) {
+                    const price = parseInt(values["price-per-member"]);
+
+                    if (price) {
+                        setPricePerMember(price);
+                    }
+                },
+            });
+        },
+        [openMenu]
+    );
+
+    return (
+        <Container className={["bg-dark-800", "flex flex-col gap-10 py-20 lg:flex-row lg:gap-4 xl:gap-20"]}>
+            {/* Description */}
+            <aside className="flex flex-col gap-14">
+                {/* Content */}
+                <section className="flex flex-col gap-7">
+                    <h1 className="heading-2">One Price for All Features, for Small Team or Enterprises.</h1>
+                    <h2 className="ts-xl lg:w-5/6">No more different plans with different features, at Sleek, you only need to subscribe to one plan, and get full access to our app.</h2>
+                </section>
+
+                {/* Company Type */}
+                <section className="flex flex-col gap-5">
+                    <div className="flex gap-5">
+                        <p className="ts-2xl">Small Team</p>
+                        <Switch onChange={onPackageTypeChange} />
+                        <p className="ts-2xl">Enterprise</p>
+                    </div>
+
+                    <p ref={autoAnimateRef} className="ts-base lg:w-4/5">
+                        {isEnterprise ? (
+                            "For companies with more than 50 users, you will be given a package for the number of members that can join."
+                        ) : (
+                            <>
+                                For teams with under 50 members, you will be charged for each member that joins.&nbsp;
+                                <span className="font-bold underline">You also name a fair price for each member that joins your team.</span>
+                            </>
+                        )}
+                    </p>
+                </section>
+            </aside>
+
+            {/* Package */}
+            <aside className="w-full xl:max-w-xl">
+                <div className="sticky top-8 flex h-max w-full flex-col justify-center gap-8 rounded-3xl bg-dark-700 py-8 px-10">
+                    <section className="flex flex-col gap-3">
+                        <div ref={autoAnimateRef} className="flex items-center gap-8">
+                            <Icon size={48} className="shrink-0" />
+                            <h4 className="heading-4 flex-1">{name}</h4>
+                        </div>
+
+                        <p className="ts-xl">{description}</p>
+                    </section>
+
+                    <section className="flex flex-col gap-2">
+                        <Slider min={min} max={max} step={step} value={quantity} onChange={onQuantityChange} />
+
+                        <div className="ts-sm flex items-center justify-between">
+                            <span>{min}</span>
+                            <span>{max}</span>
+                        </div>
+                    </section>
+
+                    <section className="flex flex-col">
+                        <p className="ts-base">Get full access for {quantity} team members at just:</p>
+
+                        <div className="flex flex-wrap items-baseline gap-1">
+                            <h3 className="heading-2 w-max">USD$ {price}</h3>
+                            <span className="ts-base w-max">/ Month</span>
+                        </div>
+
+                        {isEnterprise ? (
+                            <span className="ts-sm">
+                                Need more than {max} members?&nbsp;
+                                <Link href={Routes.Contact} className="underline">
+                                    Contact Us
+                                </Link>
+                            </span>
+                        ) : (
+                            <span className="ts-sm">
+                                *Assuming the price of 1 member is <b>${pricePerMember}</b>.&nbsp;
+                                <button className="cursor-pointer underline duration-200 hover:opacity-50" onClick={onPricingMenu}>
+                                    Name a Fair Price
+                                </button>
+                            </span>
+                        )}
+                    </section>
+                </div>
+            </aside>
+        </Container>
+    );
+};
+
+const Comparison = () => {
+    type ComparisonData = {
+        feature: string;
+        other: boolean | string;
+        own: boolean | string;
+    };
+
+    const comparisonData: ComparisonData[] = [
         {
-            featName: "Starting Price",
-            othrProduct: "$500/year for 10 People",
-            ourProduct: "$500/year for 10 People",
+            feature: "Starting Price",
+            other: "$3/user/month",
+            own: "$1/user/month",
         },
         {
-            featName: "Folder",
-            othrProduct: false,
-            ourProduct: true,
+            feature: "Folder",
+            other: false,
+            own: true,
         },
         {
-            featName: "Move Items Between Folders",
-            othrProduct: false,
-            ourProduct: true,
+            feature: "Kanban View",
+            other: false,
+            own: true,
         },
         {
-            featName: "Mover Folders Between Boards",
-            othrProduct: false,
-            ourProduct: true,
-        },
-        {
-            featName: "Checkbox",
-            othrProduct: true,
-            ourProduct: true,
-        },
-        {
-            featName: "Kanban View",
-            othrProduct: false,
-            ourProduct: true,
-        },
-        {
-            featName: "Kanban View",
-            othrProduct: false,
-            ourProduct: true,
-        },
-        {
-            featName: "Calendar View",
-            othrProduct: false,
-            ourProduct: true,
+            feature: "Calendar View",
+            other: false,
+            own: true,
         },
     ];
 
     return (
-        <div className="flex flex-col gap-0">
-            <div className="flex justify-between border-b border-dark-600 px-8 py-5">
-                <h3 className="shrink-0 basis-2/6 text-2xl">Feature</h3>
-                <h3 className="text-2xl">Other Products</h3>
-                <img src="/logoipsum-286.svg" className="text-dark-50" alt="logo_ipsum" width="174" height="32" />
+        <div className="flex flex-col">
+            <div className="grid grid-cols-3 border border-transparent border-b-dark-600 px-8 py-5 lg:grid-cols-4">
+                <h3 className="ts-2xl shrink-0 lg:col-span-2">Feature</h3>
+                <h3 className="ts-2xl text-center">Other Products</h3>
+                <img src="/assets/images/logo.svg" alt="Logo" className="mx-auto h-8" />
             </div>
 
-            {comparisonDummyData?.map((val, idx) => (
-                <div key={idx} className="flex justify-between px-8 py-5">
-                    <div className="shrink-0 basis-2/6">
-                        <h1 className="text-base">{val.featName}</h1>
-                    </div>
-                    {typeof val.othrProduct === "boolean" ? (
-                        <>
-                            <div className="w-44 min-w-max">{val.othrProduct ? <IconCheck className="mx-auto" /> : <IconX className="mx-auto opacity-50" />}</div>
-                            <div className="w-44 min-w-max">{val.ourProduct ? <IconCheck className="mx-auto" /> : <IconX className="mx-auto opacity-50" />}</div>
-                        </>
-                    ) : (
-                        <>
-                            <h1 className="text-base">{val.othrProduct}</h1>
-                            <h1 className="text-base">{val.ourProduct}</h1>
-                        </>
-                    )}
+            {comparisonData?.map(({ feature, other, own }, index) => (
+                <div key={index} className="grid grid-cols-3 px-8 py-5 lg:grid-cols-4">
+                    <p className="ts-base shrink-0 lg:col-span-2">{feature}</p>
+
+                    {[other, own].map((value, index) => {
+                        if (typeof value === "boolean") {
+                            return (
+                                <div key={index} className="mx-auto">
+                                    {value ? (
+                                        <IconCheck className="stroke-dark-50" /> //
+                                    ) : (
+                                        <IconX className="stroke-dark-400" />
+                                    )}
+                                </div>
+                            );
+                        } else {
+                            return (
+                                <p key={index} className="ts-base text-center">
+                                    {value}
+                                </p>
+                            );
+                        }
+                    })}
                 </div>
             ))}
         </div>
@@ -91,76 +252,12 @@ export default function PricingPage() {
             <Navigation />
 
             {/* Hero */}
-            <Container className={["bg-dark-800", "flex flex-col gap-10 py-20 lg:flex-row lg:gap-4 xl:gap-20"]}>
-                {/* Description */}
-                <aside className="flex flex-col gap-14">
-                    {/* Content */}
-                    <section className="flex flex-col gap-7">
-                        <h1 className="heading-2">One Price for All Features, for Small Team or Enterprises.</h1>
-                        <h2 className="ts-xl lg:w-5/6">No more different plans with different features, at Sleek, you only need to subscribe to one plan, and get full access to our app.</h2>
-                    </section>
-
-                    {/* Company Type */}
-                    <section className="flex flex-col gap-5">
-                        <div className="flex gap-5">
-                            <p className="ts-2xl">Small Team</p>
-                            <Switch />
-                            <p className="ts-2xl">Enterprise</p>
-                        </div>
-
-                        <p className="ts-base lg:w-4/5">
-                            For teams with under 50 members, you will be charged for each member that joins. Whereas for companies with more than 50 users, you will be given a package for the number
-                            of members that can join.
-                        </p>
-                    </section>
-                </aside>
-
-                {/* Package */}
-                <aside className="w-full xl:max-w-xl">
-                    <div className="sticky top-8 flex h-max w-full flex-col justify-center gap-8 rounded-3xl bg-dark-700 py-8 px-10">
-                        <section className="flex flex-col gap-3">
-                            <div className="flex items-center gap-8">
-                                <IconBuildingStore size={48} width={undefined} className="shrink-0" />
-                                <h2 className="heading-4">Small Team</h2>
-                            </div>
-
-                            <h1 className="ts-xl">A package dedicated to small teams with under 50 members.</h1>
-                        </section>
-
-                        <section className="flex flex-col gap-2">
-                            <ReactSlider
-                                min={1}
-                                max={50}
-                                className="h-1.5 rounded-full bg-white"
-                                renderThumb={(props, state) => (
-                                    <div {...props} className="ts-base -mt-3 flex h-8 w-8 cursor-grab items-center justify-center rounded-full bg-white text-dark-900 focus:outline-none">
-                                        {state.valueNow}
-                                    </div>
-                                )}
-                            />
-
-                            <div className="ts-sm flex items-center justify-between">
-                                <span>1</span>
-                                <span>50</span>
-                            </div>
-                        </section>
-
-                        <section className="flex flex-col">
-                            <p className="ts-base">Get full access for 15 team members at just:</p>
-
-                            <div className="flex flex-wrap items-baseline gap-1">
-                                <h3 className="heading-2 w-max">USD$ 49.99</h3>
-                                <span className="ts-base w-max">/ Month</span>
-                            </div>
-                        </section>
-                    </div>
-                </aside>
-            </Container>
+            <Pricing />
 
             {/* Comparison */}
-            <Container className={["bg-dark-900", "flex flex-col gap-14 py-20"]}>
-                <h3 className="heading-3 text-center">Ipsum vs Wokwow: How Do They Compare?</h3>
-                <ComparisonTable />
+            <Container className={["hidden bg-dark-900 md:block", "flex flex-col gap-14 py-20"]}>
+                <h3 className="heading-3 text-center">Others vs Sleek: How Do They Compare?</h3>
+                <Comparison />
             </Container>
 
             <FAQ
