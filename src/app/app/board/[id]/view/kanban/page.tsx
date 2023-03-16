@@ -10,7 +10,8 @@ import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useMergedRef } from "@mantine/hooks";
-import { useCallback, useContext } from "react";
+import clsx from "clsx";
+import { useCallback, useContext, useRef, useState } from "react";
 
 export enum SortableType {
     List = "list",
@@ -23,11 +24,68 @@ type ListDropZoneProps = {
 };
 
 const ListDropZone = ({ innerRef, lists }: ListDropZoneProps) => {
+    const [isGrabbing, setIsGrabbing] = useState(false);
+
     const [autoAnimateRef] = useAutoAnimate<HTMLDivElement>({ duration: 100 });
     const ref = useMergedRef(innerRef, autoAnimateRef);
 
+    const position = useRef({ top: 0, left: 0, x: 0, y: 0 });
+
+    const onMouseDown = useCallback(
+        (e: React.MouseEvent) => {
+            if (e.button !== 0) return;
+            if (e.target !== e.currentTarget) return;
+
+            const container = innerRef.current;
+            if (!container) return;
+
+            setIsGrabbing(true);
+
+            position.current = {
+                // The current scroll
+                left: container.scrollLeft,
+                top: container.scrollTop,
+
+                // Get the current mouse position
+                x: e.clientX,
+                y: e.clientY,
+            };
+        },
+        [innerRef]
+    );
+
+    const onMouseUp = useCallback(() => {
+        setIsGrabbing(false);
+    }, []);
+
+    const onMouseMove = useCallback(
+        (e: React.MouseEvent) => {
+            if (!isGrabbing) return;
+
+            const container = innerRef.current;
+            if (!container) return;
+
+            const pos = position.current;
+
+            // How far the mouse has been moved
+            const dx = e.clientX - pos.x;
+            const dy = e.clientY - pos.y;
+
+            // Scroll the element
+            container.scrollTop = pos.top - dy;
+            container.scrollLeft = pos.left - dx;
+        },
+        [innerRef, isGrabbing]
+    );
+
     return (
-        <div ref={ref} className="flex h-full max-h-full w-full flex-1 justify-start gap-7 overflow-auto px-11 pb-10">
+        <div
+            ref={ref}
+            onMouseDown={onMouseDown}
+            onMouseUp={onMouseUp}
+            onMouseMove={onMouseMove}
+            className={clsx("flex h-full max-h-full w-full flex-1 justify-start gap-7 overflow-auto px-11 pb-10", isGrabbing ? "cursor-grabbing select-none" : "cursor-grab select-auto")}
+        >
             {lists
                 .sort((a, b) => a.order - b.order)
                 .map((list) => {
