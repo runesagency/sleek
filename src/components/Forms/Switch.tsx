@@ -17,15 +17,21 @@ export default function Switch({ defaultChecked, onChange, disabled }: SwitchPro
     }, [checked, onChange]);
 
     return (
-        <ReactSwitch
-            checked={checked}
-            disabled={disabled}
-            onChange={onCheck}
-            checkedIcon={false}
-            uncheckedIcon={false}
-            onColor="transparent"
-            offColor="transparent"
-            className={clsx("h-max border", checked ? "border-dark-300 bg-dark-400" : "border-dark-400 bg-dark-500")}
-        />
+        <>
+            <style>{`
+                .react-switch-bg {
+                    background-color: transparent !important;
+                }
+            `}</style>
+
+            <ReactSwitch
+                checked={checked}
+                disabled={disabled}
+                onChange={onCheck}
+                checkedIcon={false}
+                uncheckedIcon={false}
+                className={clsx("h-max border", checked ? "border-dark-300 bg-dark-400" : "border-dark-400 bg-dark-500")}
+            />
+        </>
     );
 }
