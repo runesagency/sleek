@@ -5,7 +5,9 @@ type SliderProps = {
     max?: number;
     disabled?: boolean;
     defaultValue?: number;
+    value?: number;
     marks?: number[] | boolean | number;
+    step?: number;
     onChange?: (value: number) => void;
     onAfterChange?: (value: number) => void;
 };
