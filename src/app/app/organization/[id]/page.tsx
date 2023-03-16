@@ -82,13 +82,13 @@ export const Project = ({ id, name, description, coverAttachmentId, logoAttachme
             <div className="flex flex-col gap-4 overflow-hidden">
                 <div className="flex items-center gap-2">
                     {logoAttachmentId && <img src="https://picsum.photos/1080" alt="banner" className="h-6 w-6 shrink-0 rounded-full object-cover object-center" />}
-                    <h3 className="text-base font-bold">{name}</h3>
+                    <h3 className="ts-base font-bold">{name}</h3>
                 </div>
 
-                <p className="text-xs font-medium line-clamp-2">{description || "No description available"}</p>
+                <p className="ts-xs font-medium line-clamp-2">{description || "No description available"}</p>
 
                 <div className="flex flex-wrap gap-1">
-                    <Button.Small fit className="bg-dark-700 text-xs" icon={IconCards}>
+                    <Button.Small fit className="ts-xs bg-dark-700" icon={IconCards}>
                         {boardsCount} Boards
                     </Button.Small>
                 </div>
@@ -194,7 +194,7 @@ export default function OrganizationProjectListPage() {
                                 <div className="flex flex-col gap-4 overflow-hidden">
                                     <div className="flex items-center gap-2">
                                         <IconLoader2 className="h-5 w-5 shrink-0 animate-spin rounded-full object-cover object-center" />
-                                        <h3 className="text-base font-bold">Creating {projectOnCreate}...</h3>
+                                        <h3 className="ts-base font-bold">Creating {projectOnCreate}...</h3>
                                     </div>
                                 </div>
                             </button>

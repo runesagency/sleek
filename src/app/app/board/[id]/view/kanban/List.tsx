@@ -164,7 +164,7 @@ const List = ({ id, title }: BoardList) => {
             {({ ref, handleRef }, { isDragging }) => (
                 <div
                     ref={ref}
-                    className="relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-sm text-dark-50"
+                    className="ts-sm relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-dark-50"
                 >
                     <div ref={handleRef} className={clsx("flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600", isDragging ? "bg-dark-600" : "bg-dark-900")}>
                         <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{title}</span>
@@ -182,7 +182,7 @@ const List = ({ id, title }: BoardList) => {
 
                     {!isAddingNewCard && (
                         <button
-                            className="flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center text-base duration-200 hover:opacity-75"
+                            className="ts-base flex items-center justify-center gap-2 border border-dark-600 bg-dark-700 p-2 text-center duration-200 hover:opacity-75"
                             onClick={onNewCardBottomClick}
                         >
                             <IconPlus height={15} />

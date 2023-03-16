@@ -51,7 +51,7 @@ const Title = ({ defaultTitle, onUpdate }: TitleProps) => {
             onChange={onChange}
             onFocus={setFocusCursor}
             className={clsx(
-                "hide-scrollbar flex-1 resize-none border-b bg-transparent pb-3 text-left text-3xl font-bold focus:outline-none",
+                "ts-2xl hide-scrollbar flex-1 resize-none border-b bg-transparent pb-3 text-left focus:outline-none",
                 invalid ? "border-red-500 text-red-500" : "border-b-dark-600 text-dark-50"
             )}
         />

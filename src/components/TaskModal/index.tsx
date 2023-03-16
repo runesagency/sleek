@@ -178,7 +178,7 @@ const TaskModal = () => {
                     <Information label="Labels" alignStart>
                         <div className="flex flex-wrap items-center gap-3">
                             {card.labels.map(({ label }, i) => {
-                                return <Label key={i} name={label.name} color={label.color} className="!text-sm" />;
+                                return <Label key={i} name={label.name} color={label.color} className="!ts-sm" />;
                             })}
 
                             <button className="shrink-0 rounded-full bg-dark-50 p-2">

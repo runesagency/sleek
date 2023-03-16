@@ -111,7 +111,7 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
                         ) : (
                             <>
                                 <img src="https://picsum.photos/200" alt="logo" className="h-12 w-12 rounded-full object-cover object-center" />
-                                <h1 className="text-xl font-bold">{name}</h1>
+                                <h1 className="ts-xl font-bold">{name}</h1>
                             </>
                         )}
                     </div>

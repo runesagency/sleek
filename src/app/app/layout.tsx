@@ -109,12 +109,12 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
     return (
         <aside className={clsx("fixed flex h-full shrink-0 flex-col gap-10 overflow-x-hidden border-r border-r-dark-600 bg-dark-800 py-10 lg:relative lg:w-72", isOpen ? "w-72" : "w-0")}>
             <div className="flex flex-col gap-6 px-5">
-                <span className="text-xs font-medium opacity-50">Personal</span>
+                <span className="ts-xs font-medium opacity-50">Personal</span>
 
                 {links.map(({ name, path, icon: Icon }, index) => (
                     <Link key={index} href={path} className="flex items-center gap-3 duration-200 hover:opacity-75">
                         <Icon width={20} height={undefined} className="shrink-0" />
-                        <p className="text-sm">{name}</p>
+                        <p className="ts-sm">{name}</p>
                     </Link>
                 ))}
             </div>
@@ -122,22 +122,21 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
             <hr className="border-dark-600" />
 
             <div ref={autoAnimateRef} className="flex flex-col gap-6 px-5">
-                <span className="text-xs font-medium opacity-50">Organization</span>
+                <span className="ts-xs font-medium opacity-50">Organization</span>
 
                 {isLoading
                     ? [...Array(3)].map((_, index) => <div key={index} className="animate-shimmer h-5 w-full rounded-full bg-dark-700" />)
                     : organizations.map(({ name, id }, index) => (
                           <Link key={index} href={Routes.Organization(id)} className="flex items-center gap-3 duration-200 hover:opacity-75">
                               <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
-
-                              <p className="text-sm">{name}</p>
+                              <p className="ts-sm">{name}</p>
                           </Link>
                       ))}
 
                 {organizationOnCreate && (
                     <button className="flex items-center gap-3">
                         <IconLoader2 height={20} width={20} className="animate-spin" />
-                        <p className="text-sm">{organizationOnCreate}</p>
+                        <p className="ts-sm">{organizationOnCreate}</p>
                     </button>
                 )}
 

@@ -44,7 +44,7 @@ const TasksProgress = ({ checklists, innerRef }: TasksProgressProps) => {
                     <div className="h-full rounded-full bg-dark-50" style={{ width: `${percentage}%` }} />
                 </section>
 
-                <p className="text-xs">{percentage}%</p>
+                <p className="ts-xs">{percentage}%</p>
 
                 <IconChevronDown width={undefined} className={open ? "rotate-180" : "rotate-0"} />
             </button>
@@ -128,11 +128,11 @@ const Card = (data: BoardCard) => {
                         <section className="flex items-end justify-between gap-4">
                             {dueDate && (
                                 <Button.Small className="overflow-hidden !bg-dark-700" icon={IconCalendar} fit>
-                                    <p className="truncate text-xs">{dueDate.toString()}</p>
+                                    <p className="ts-xs truncate">{dueDate.toString()}</p>
                                 </Button.Small>
                             )}
 
-                            {/* <ButtonSmall className="!bg-dark-700 text-xs" icon={IconHourglass}>
+                            {/* <ButtonSmall className="!bg-dark-700 ts-xs" icon={IconHourglass}>
                                     <p>01:35:10</p>
                                 </ButtonSmall> */}
                         </section>
@@ -146,14 +146,14 @@ const Card = (data: BoardCard) => {
                                     {activities.length > 0 && (
                                         <div className="flex items-center gap-2">
                                             <IconMessageDots height={16} width={undefined} />
-                                            <p className="text-xs">{activities.length}</p>
+                                            <p className="ts-xs">{activities.length}</p>
                                         </div>
                                     )}
 
                                     {attachments.length > 0 && (
                                         <div className="flex items-center gap-2">
                                             <IconPaperclip height={16} width={undefined} />
-                                            <p className="text-xs">{attachments.length}</p>
+                                            <p className="ts-xs">{attachments.length}</p>
                                         </div>
                                     )}
                                 </div>

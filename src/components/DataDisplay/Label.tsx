@@ -9,7 +9,7 @@ type LabelProps = {
 const Label = ({ name, color, className }: LabelProps) => {
     return (
         <div
-            className={clsx("rounded-full bg-dark-800 px-2 py-1 text-xs", className)}
+            className={clsx("ts-xs rounded-full bg-dark-800 px-2 py-1", className)}
             style={{
                 backgroundColor: color || undefined,
             }}

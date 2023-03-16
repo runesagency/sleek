@@ -25,7 +25,7 @@ const Checklist = ({ data }: ChecklistProps) => {
     return (
         <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-                <h1 className="text-xl font-bold">{data.title}</h1>
+                <h1 className="ts-xl font-bold">{data.title}</h1>
 
                 <div className="flex items-center gap-5">
                     <IconPlus />
@@ -38,7 +38,7 @@ const Checklist = ({ data }: ChecklistProps) => {
                     <div className="h-full w-1/2 rounded-full bg-dark-50" />
                 </section>
 
-                <p className="text-xs">{percentage}%</p>
+                <p className="ts-xs">{percentage}%</p>
             </div>
 
             <div className="flex flex-col gap-3 pl-3">
