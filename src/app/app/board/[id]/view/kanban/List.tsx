@@ -141,15 +141,6 @@ const CardDropZone = ({ innerRef, isAddingNewCard, setIsAddingNewCard, listId, i
 
 const List = ({ id, title }: BoardList) => {
     const [isAddingNewCard, setIsAddingNewCard] = useState<NewCardLocation.UP | NewCardLocation.DOWN | false>(false);
-    const [isOnHover, setIsOnHover] = useState(false);
-
-    const onDragEnter = useCallback(() => {
-        setIsOnHover(true);
-    }, []);
-
-    const onDragLeave = useCallback(() => {
-        setIsOnHover(false);
-    }, []);
 
     const onNewCardTopClick = useCallback(() => {
         setIsAddingNewCard(NewCardLocation.UP);
@@ -176,8 +167,8 @@ const List = ({ id, title }: BoardList) => {
                         </div>
                     </div>
 
-                    <Droppable<HTMLDivElement> id={id} onDragEnter={onDragEnter} onDragLeave={onDragLeave} sortable sortableDirection={SortableDirection.Vertical} accepts={[SortableType.Card]}>
-                        {({ ref }) => <CardDropZone isAddingNewCard={isAddingNewCard} setIsAddingNewCard={setIsAddingNewCard} isOnHover={isOnHover} listId={id} innerRef={ref} />}
+                    <Droppable<HTMLDivElement> id={id} sortable sortableDirection={SortableDirection.Vertical} accepts={[SortableType.Card]}>
+                        {({ ref }, { isHovered }) => <CardDropZone isAddingNewCard={isAddingNewCard} setIsAddingNewCard={setIsAddingNewCard} isOnHover={isHovered} listId={id} innerRef={ref} />}
                     </Droppable>
 
                     {!isAddingNewCard && (

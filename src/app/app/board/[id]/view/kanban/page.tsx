@@ -5,7 +5,7 @@ import type { DragEvent } from "@/lib/drag-and-drop";
 
 import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
 import List from "@/app/app/board/[id]/view/kanban/List";
-import { DragDropContext, Droppable, SortableDirection } from "@/lib/drag-and-drop";
+import { DragDropProvider, Droppable, SortableDirection } from "@/lib/drag-and-drop";
 import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -211,14 +211,12 @@ export default function KanbanLayoutPage() {
     );
 
     return (
-        <DragDropContext<HTMLDivElement> onDragEnd={onDragEnd}>
-            {({ ref }) => (
-                <section ref={ref} className="h-full w-full flex-1 overflow-auto">
-                    <Droppable<HTMLDivElement> id={id} sortable sortableDirection={SortableDirection.Horizontal} accepts={[SortableType.List]}>
-                        {({ ref }) => <ListDropZone innerRef={ref} lists={lists} />}
-                    </Droppable>
-                </section>
-            )}
-        </DragDropContext>
+        <DragDropProvider onDragEnd={onDragEnd}>
+            <section className="h-full w-full flex-1 overflow-auto">
+                <Droppable<HTMLDivElement> id={id} sortable sortableDirection={SortableDirection.Horizontal} accepts={[SortableType.List]}>
+                    {({ ref }) => <ListDropZone innerRef={ref} lists={lists} />}
+                </Droppable>
+            </section>
+        </DragDropProvider>
     );
 }

@@ -1,15 +1,11 @@
-import type { DragCancelEvent, DragEndEvent, DragEnterEvent, DragLeaveEvent, DragStartEvent } from "@/lib/drag-and-drop";
+import { DragDropContext, DroppableContext, SortableDirection, droppableAttributes } from "@/lib/drag-and-drop";
 
-import { SortableDirection, droppableConstants, contextConstants } from "@/lib/drag-and-drop";
+import { useCallback, useRef, useState, useEffect, useContext } from "react";
 
-import { useCallback, useRef, useState, useEffect } from "react";
-
-export const draggableConstants = {
-    dataAttribute: {
-        draggable: "data-draggable",
-        draggableId: "data-draggable-id",
-        draggableType: "data-draggable-type",
-    },
+export const draggableAttributes = {
+    draggable: "data-draggable",
+    draggableId: "data-draggable-id",
+    draggableType: "data-draggable-type",
 };
 
 export type DraggableProvided<T> = {
@@ -41,6 +37,29 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
     const ref = useRef<T>(null);
     const handleRef = useRef<T>(null);
     const originalCursorPos = useRef<Record<"x" | "y", number>>({ x: 0, y: 0 });
+
+    const {
+        id: contextId,
+        onDragStart: onDragStartContext,
+        onDragCancel: onDragCancelContext,
+        onDragEnter: onDragEnterContext,
+        onDragLeave: onDragLeaveContext,
+        onDragEnd: onDragEndContext,
+    } = useContext(DragDropContext);
+
+    if (!contextId) {
+        throw new Error("Draggable must be a child of DragDropProvider");
+    }
+
+    const {
+        id: parentDroppableId, //
+        onDragStart: onDragStartParentDroppable,
+        onDragEnd: onDragEndParentDroppable,
+    } = useContext(DroppableContext);
+
+    if (!parentDroppableId) {
+        throw new Error("Draggable must be a child of Droppable");
+    }
 
     // Is the element being dragged?
     const [hasStartDragging, setHasStartDragging] = useState(false);
@@ -108,9 +127,9 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         const handleCurrent = handleRef.current;
 
         if (current) {
-            current.setAttribute(draggableConstants.dataAttribute.draggable, "true");
-            current.setAttribute(draggableConstants.dataAttribute.draggableId, id);
-            current.setAttribute(draggableConstants.dataAttribute.draggableType, type);
+            current.setAttribute(draggableAttributes.draggable, "true");
+            current.setAttribute(draggableAttributes.draggableId, id);
+            current.setAttribute(draggableAttributes.draggableType, type);
 
             current.addEventListener("mouseup", onDragEnd);
             current.addEventListener("touchend", onDragEnd);
@@ -126,9 +145,9 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
 
         return () => {
             if (current) {
-                current.removeAttribute(draggableConstants.dataAttribute.draggable);
-                current.removeAttribute(draggableConstants.dataAttribute.draggableId);
-                current.removeAttribute(draggableConstants.dataAttribute.draggableType);
+                current.removeAttribute(draggableAttributes.draggable);
+                current.removeAttribute(draggableAttributes.draggableId);
+                current.removeAttribute(draggableAttributes.draggableType);
 
                 current.removeEventListener("mouseup", onDragEnd);
                 current.removeEventListener("touchend", onDragEnd);
@@ -183,28 +202,26 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         const originalBounding = current.getBoundingClientRect();
 
         // The context of the drag and drop that the dragged element is in
-        const findContext = (element: Element): Element | null => {
-            const context = element.getAttribute(contextConstants.dataAttribute.dragDropContext);
+        const findHighestDroppable = (element: Element): Element | null => {
+            const attribute = element.getAttribute(droppableAttributes.highestDroppable);
 
-            if (context) {
+            if (attribute) {
                 return element;
             } else {
                 const parent = element.parentElement;
 
                 if (parent) {
-                    return findContext(parent);
+                    return findHighestDroppable(parent);
                 } else {
                     return null;
                 }
             }
         };
 
-        const context = findContext(current);
+        const highestDroppable = findHighestDroppable(current);
 
-        if (!context) {
-            return console.warn(
-                `Cannot find context for Draggable with ID: ${id} and type: ${type}. It could happen maybe because the Context is not mounted yet or that you forgot to add the Context component.`
-            );
+        if (!highestDroppable) {
+            return;
         }
 
         /**
@@ -254,16 +271,15 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                     document.body.appendChild(clone);
                 }
 
-                const startEvent = new CustomEvent<DragStartEvent>(contextConstants.events.dragStart, {
-                    detail: {
-                        dragged: {
-                            id,
-                            type,
-                        },
+                const startEvent = {
+                    dragged: {
+                        id,
+                        type,
                     },
-                });
+                };
 
-                context.dispatchEvent(startEvent);
+                onDragStartContext?.(startEvent);
+                onDragStartParentDroppable?.(startEvent);
             }
 
             if (!offsetX) offsetX = clientX - left;
@@ -272,7 +288,7 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
             let transformX = lockX ? originalLeft : clientX - offsetX;
             let transformY = lockY ? originalTop : clientY - offsetY;
 
-            const colliders = context.querySelectorAll(`[${droppableConstants.dataAttribute.collide}]`);
+            const colliders = highestDroppable.querySelectorAll(`[${droppableAttributes.collide}]`);
 
             for (const collider of Array.from(colliders)) {
                 const { top, left, width, height } = collider.getBoundingClientRect();
@@ -362,7 +378,7 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                             const { top: Ctop, bottom: Cbottom, left: Cleft, right: Cright } = clone.getBoundingClientRect();
                             const { top, left, bottom, right } = element.getBoundingClientRect();
 
-                            const acceptList = element.getAttribute(droppableConstants.dataAttribute.accepts);
+                            const acceptList = element.getAttribute(droppableAttributes.accepts);
                             const isAccepted = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
 
                             if (isAccepted) {
@@ -391,7 +407,7 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                     const { top: Ctop, bottom: Cbottom, left: Cleft, right: Cright } = clone.getBoundingClientRect();
                     const { top, left, bottom, right } = element.getBoundingClientRect();
 
-                    const acceptList = element.getAttribute(droppableConstants.dataAttribute.accepts);
+                    const acceptList = element.getAttribute(droppableAttributes.accepts);
                     const isAccepted = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
 
                     if (isAccepted) {
@@ -431,9 +447,9 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                 }, null as Hovered | null);
 
                 if (hovered) {
-                    const isSortable = !!hovered.element.getAttribute(droppableConstants.dataAttribute.sortable);
+                    const isSortable = !!hovered.element.getAttribute(droppableAttributes.sortable);
 
-                    const droppableChilds = hovered.element.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
+                    const droppableChilds = hovered.element.querySelectorAll(`[${droppableAttributes.droppable}]`);
 
                     if (droppableChilds.length > 0) {
                         const droppableInside = getHoveredElement(Array.from(droppableChilds), HoveredType.Droppable);
@@ -463,10 +479,11 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                 if (!hasMove || !current) return;
 
                 // Find all droppable elements inside the context
-                const allDroppableElements = context.querySelectorAll(`[${droppableConstants.dataAttribute.droppable}]`);
+                const allChildDroppableElements = highestDroppable.querySelectorAll(`[${droppableAttributes.droppable}]`);
+                const allDroppableElements = [highestDroppable, ...Array.from(allChildDroppableElements)];
 
                 // Get the hovered element
-                const hovered = getHoveredElement(Array.from(allDroppableElements), HoveredType.Droppable);
+                const hovered = getHoveredElement(allDroppableElements, HoveredType.Droppable);
 
                 if (hovered && hovered.element !== current && hovered.element !== clone && hovered.element !== placeholder) {
                     const isLastHoveredLocationSame = lastHovered && hovered.locations.every((location, index) => lastHovered && location === lastHovered.locations[index]);
@@ -476,24 +493,21 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                             const container = lastHovered.type === HoveredType.Droppable ? lastHovered.element : lastHovered.element.parentElement;
                             if (!container) return;
 
-                            const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
+                            const isContainerSortable = !!container.getAttribute(droppableAttributes.sortable);
 
-                            const leaveEvent = new CustomEvent<DragLeaveEvent>(contextConstants.events.dragLeave, {
-                                detail: {
-                                    dragged: {
-                                        id,
-                                        type,
-                                    },
-                                    dropped: {
-                                        id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
-                                        sortable: isContainerSortable,
-                                        index: -1,
-                                    },
+                            const leaveEvent = {
+                                dragged: {
+                                    id,
+                                    type,
                                 },
-                            });
+                                dropped: {
+                                    id: container.getAttribute(droppableAttributes.droppableId) as string,
+                                    sortable: isContainerSortable,
+                                    index: -1,
+                                },
+                            };
 
-                            context.dispatchEvent(leaveEvent);
-                            container.dispatchEvent(leaveEvent);
+                            onDragLeaveContext?.(leaveEvent);
                         }
 
                         lastHovered = hovered;
@@ -501,12 +515,12 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                         const container = hovered.type === HoveredType.Droppable ? hovered.element : hovered.element.parentElement;
                         if (!container) return;
 
-                        const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
+                        const isContainerSortable = !!container.getAttribute(droppableAttributes.sortable);
                         let newIndex = -1;
                         let isPrepend = false;
 
                         if (isContainerSortable) {
-                            const sortableDirection = container.getAttribute(droppableConstants.dataAttribute.sortableDirection) as SortableDirection;
+                            const sortableDirection = container.getAttribute(droppableAttributes.sortableDirection) as SortableDirection;
 
                             switch (sortableDirection) {
                                 case SortableDirection.Vertical:
@@ -553,48 +567,42 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                             }
                         }
 
-                        const enterEvent = new CustomEvent<DragEnterEvent>(contextConstants.events.dragEnter, {
-                            detail: {
-                                dragged: {
-                                    id,
-                                    type,
-                                },
-                                dropped: {
-                                    id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
-                                    sortable: isContainerSortable,
-                                    index: newIndex,
-                                },
+                        const enterEvent = {
+                            dragged: {
+                                id,
+                                type,
                             },
-                        });
+                            dropped: {
+                                id: container.getAttribute(droppableAttributes.droppableId) as string,
+                                sortable: isContainerSortable,
+                                index: newIndex,
+                            },
+                        };
 
-                        context.dispatchEvent(enterEvent);
-                        container.dispatchEvent(enterEvent);
+                        onDragEnterContext?.(enterEvent);
                     }
                 } else if (!hovered && lastHovered) {
                     const container = lastHovered.type === HoveredType.Droppable ? lastHovered.element : lastHovered.element.parentElement;
                     if (!container) return;
 
-                    const isContainerSortable = !!container.getAttribute(droppableConstants.dataAttribute.sortable);
+                    const isContainerSortable = !!container.getAttribute(droppableAttributes.sortable);
 
                     if (!isContainerSortable) {
                         lastHovered = null;
 
-                        const leaveEvent = new CustomEvent<DragLeaveEvent>(contextConstants.events.dragLeave, {
-                            detail: {
-                                dragged: {
-                                    id,
-                                    type,
-                                },
-                                dropped: {
-                                    id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
-                                    sortable: isContainerSortable,
-                                    index: -1,
-                                },
+                        const leaveEvent = {
+                            dragged: {
+                                id,
+                                type,
                             },
-                        });
+                            dropped: {
+                                id: container.getAttribute(droppableAttributes.droppableId) as string,
+                                sortable: isContainerSortable,
+                                index: -1,
+                            },
+                        };
 
-                        context.dispatchEvent(leaveEvent);
-                        container.dispatchEvent(leaveEvent);
+                        onDragLeaveContext?.(leaveEvent);
                     }
                 }
             }, 100);
@@ -759,7 +767,7 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                 const container = lastHovered.type === HoveredType.Children ? lastHovered.element.parentElement : lastHovered.element;
                 if (!container) return;
 
-                const sortableDirection = container.getAttribute(droppableConstants.dataAttribute.sortableDirection) as SortableDirection;
+                const sortableDirection = container.getAttribute(droppableAttributes.sortableDirection) as SortableDirection;
 
                 let newIndex = -1;
                 let isPrepend: boolean;
@@ -800,36 +808,50 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                     }
                 }
 
-                const endEvent = new CustomEvent<DragEndEvent>(contextConstants.events.dragEnd, {
-                    detail: {
-                        dragged: {
-                            id,
-                            type,
-                        },
-                        dropped: {
-                            id: container.getAttribute(droppableConstants.dataAttribute.droppableId) as string,
-                            sortable: !!container.getAttribute(droppableConstants.dataAttribute.sortable),
-                            index: newIndex,
-                        },
+                const endEvent = {
+                    dragged: {
+                        id,
+                        type,
                     },
-                });
+                    dropped: {
+                        id: container.getAttribute(droppableAttributes.droppableId) as string,
+                        sortable: !!container.getAttribute(droppableAttributes.sortable),
+                        index: newIndex,
+                    },
+                };
 
-                context.dispatchEvent(endEvent);
-                container.dispatchEvent(endEvent);
+                onDragEndContext?.(endEvent);
+                onDragEndParentDroppable?.(endEvent);
             } else {
-                const cancelEvent = new CustomEvent<DragCancelEvent>(contextConstants.events.dragCancel, {
-                    detail: {
-                        dragged: {
-                            id,
-                            type,
-                        },
+                const cancelEvent = {
+                    dragged: {
+                        id,
+                        type,
                     },
-                });
+                };
 
-                context.dispatchEvent(cancelEvent);
+                onDragCancelContext?.(cancelEvent);
             }
         };
-    }, [hasStartDragging, id, onDragEnd, type, useClone, activatorDistance, isDragging, visualizeCollision, lockX, lockY]);
+    }, [
+        id,
+        hasStartDragging,
+        type,
+        useClone,
+        activatorDistance,
+        isDragging,
+        visualizeCollision,
+        lockX,
+        lockY,
+        onDragEnd,
+        onDragStartContext,
+        onDragLeaveContext,
+        onDragEndContext,
+        onDragCancelContext,
+        onDragEnterContext,
+        onDragStartParentDroppable,
+        onDragEndParentDroppable,
+    ]);
 
     return children({ ref, handleRef }, { isDragging });
 }

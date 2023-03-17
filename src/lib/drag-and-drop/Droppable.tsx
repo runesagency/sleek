@@ -1,8 +1,8 @@
-import type { DragEndEvent, DragEnterEvent, DragLeaveEvent } from "@/lib/drag-and-drop";
+import type { DragEndEvent, DragStartEvent, DroppableContextProps } from "@/lib/drag-and-drop";
 
-import { contextConstants } from "@/lib/drag-and-drop";
+import { DragDropContext, DroppableContext } from "@/lib/drag-and-drop";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export enum SortableDirection {
     Vertical = "vertical",
@@ -10,15 +10,19 @@ export enum SortableDirection {
     Auto = "auto",
 }
 
-export const droppableConstants = {
-    dataAttribute: {
-        droppable: "data-droppable",
-        droppableId: "data-droppable-id",
-        sortable: "data-sortable",
-        sortableDirection: "data-sortable-direction",
-        accepts: "data-accepts",
-        collide: "data-collide",
-    },
+export const droppableAttributes = {
+    highestDroppable: "data-highest-droppable",
+    droppable: "data-droppable",
+    droppableId: "data-droppable-id",
+    sortable: "data-sortable",
+    sortableDirection: "data-sortable-direction",
+    accepts: "data-accepts",
+    collide: "data-collide",
+};
+
+export type DroppableSnapshot = {
+    isDraggingOver: boolean;
+    isHovered: boolean;
 };
 
 export type DroppableProvided<T> = {
@@ -29,10 +33,9 @@ export type DroppableProps<T> = {
     id: string;
     accepts?: string[];
     collide?: boolean;
-    onDragEnter?: (event: DragEnterEvent) => void;
-    onDragLeave?: (event: DragLeaveEvent) => void;
+    onDragStart?: (event: DragStartEvent) => void;
     onDragEnd?: (event: DragEndEvent) => void;
-    children: (provided: DroppableProvided<T>) => JSX.Element;
+    children: (provided: DroppableProvided<T>, snapshot: DroppableSnapshot) => JSX.Element;
 } & (
     | {
           sortable: true;
@@ -44,70 +47,110 @@ export type DroppableProps<T> = {
       }
 );
 
-export default function Droppable<T extends HTMLElement>({ id, onDragEnter, onDragLeave, onDragEnd, children, ...options }: DroppableProps<T>) {
-    const { sortable, sortableDirection, accepts, collide } = options;
+export default function Droppable<T extends HTMLElement>({ id, children, ...options }: DroppableProps<T>) {
+    const {
+        sortable, //
+        sortableDirection,
+        accepts,
+        collide,
+        onDragStart: onDragStartSource,
+        onDragEnd: onDragEndSource,
+    } = options;
+
+    const { id: contextId, hovered: contextHovered } = useContext(DragDropContext);
+
+    if (!contextId) {
+        throw new Error("Droppable must be a child of DragDropProvider");
+    }
 
     const ref = useRef<T>(null);
+    const { id: parentDroppableId } = useContext(DroppableContext);
+    const [isDraggingOver, setIsDraggingOver] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
+    const onDragStart = useCallback(
+        (event: DragStartEvent) => {
+            setIsDraggingOver(true);
+            onDragStartSource?.(event);
+        },
+        [onDragStartSource]
+    );
+
+    const onDragEnd = useCallback(
+        (event: DragEndEvent) => {
+            setIsDraggingOver(false);
+            onDragEndSource?.(event);
+        },
+        [onDragEndSource]
+    );
+
+    const contextValue: DroppableContextProps = useMemo(() => {
+        return {
+            id,
+            onDragStart,
+            onDragEnd,
+        };
+    }, [id, onDragEnd, onDragStart]);
+
+    const snapshot: DroppableSnapshot = useMemo(() => {
+        return {
+            isDraggingOver,
+            isHovered,
+        };
+    }, [isDraggingOver, isHovered]);
 
     useEffect(() => {
         const current = ref.current;
 
-        const onDragEnterEvent = ((event: CustomEvent<DragEnterEvent>) => {
-            onDragEnter?.(event.detail);
-        }) as EventListener;
-
-        const onDragLeaveEvent = ((event: CustomEvent<DragLeaveEvent>) => {
-            onDragLeave?.(event.detail);
-        }) as EventListener;
-
-        const onDragEndEvent = ((event: CustomEvent<DragEndEvent>) => {
-            onDragEnd?.(event.detail);
-        }) as EventListener;
-
         if (current) {
-            current.setAttribute(droppableConstants.dataAttribute.droppable, "true");
-            current.setAttribute(droppableConstants.dataAttribute.droppableId, id);
+            if (!parentDroppableId) {
+                current.setAttribute(droppableAttributes.highestDroppable, "true");
+            }
+
+            current.setAttribute(droppableAttributes.droppable, "true");
+            current.setAttribute(droppableAttributes.droppableId, id);
 
             if (sortable) {
-                current.setAttribute(droppableConstants.dataAttribute.sortable, "true");
-                current.setAttribute(droppableConstants.dataAttribute.sortableDirection, sortableDirection);
+                current.setAttribute(droppableAttributes.sortable, "true");
+                current.setAttribute(droppableAttributes.sortableDirection, sortableDirection);
             } else {
-                current.removeAttribute(droppableConstants.dataAttribute.sortable);
-                current.removeAttribute(droppableConstants.dataAttribute.sortableDirection);
+                current.removeAttribute(droppableAttributes.sortable);
+                current.removeAttribute(droppableAttributes.sortableDirection);
             }
 
             if (accepts) {
-                current.setAttribute(droppableConstants.dataAttribute.accepts, accepts.join(","));
+                current.setAttribute(droppableAttributes.accepts, accepts.join(","));
             } else {
-                current.removeAttribute(droppableConstants.dataAttribute.accepts);
+                current.removeAttribute(droppableAttributes.accepts);
             }
 
             if (collide) {
-                current.setAttribute(droppableConstants.dataAttribute.collide, "true");
+                current.setAttribute(droppableAttributes.collide, "true");
             } else {
-                current.removeAttribute(droppableConstants.dataAttribute.collide);
+                current.removeAttribute(droppableAttributes.collide);
             }
-
-            current.addEventListener(contextConstants.events.dragEnter, onDragEnterEvent);
-            current.addEventListener(contextConstants.events.dragLeave, onDragLeaveEvent);
-            current.addEventListener(contextConstants.events.dragEnd, onDragEndEvent);
         }
 
         return () => {
             if (current) {
-                current.removeAttribute(droppableConstants.dataAttribute.droppable);
-                current.removeAttribute(droppableConstants.dataAttribute.droppableId);
-                current.removeAttribute(droppableConstants.dataAttribute.sortable);
-                current.removeAttribute(droppableConstants.dataAttribute.sortableDirection);
-                current.removeAttribute(droppableConstants.dataAttribute.accepts);
-                current.removeAttribute(droppableConstants.dataAttribute.collide);
-
-                current.removeEventListener(contextConstants.events.dragEnter, onDragEnterEvent);
-                current.removeEventListener(contextConstants.events.dragLeave, onDragLeaveEvent);
-                current.removeEventListener(contextConstants.events.dragEnd, onDragEndEvent);
+                current.removeAttribute(droppableAttributes.highestDroppable);
+                current.removeAttribute(droppableAttributes.droppable);
+                current.removeAttribute(droppableAttributes.droppableId);
+                current.removeAttribute(droppableAttributes.sortable);
+                current.removeAttribute(droppableAttributes.sortableDirection);
+                current.removeAttribute(droppableAttributes.accepts);
+                current.removeAttribute(droppableAttributes.collide);
             }
         };
-    }, [accepts, collide, id, onDragEnd, onDragEnter, onDragLeave, ref, sortable, sortableDirection]);
+    }, [accepts, collide, parentDroppableId, id, ref, sortable, sortableDirection]);
 
-    return children({ ref });
+    useEffect(() => {
+        if (contextHovered?.id === id && !isHovered) {
+            setIsHovered(true);
+        } else if (contextHovered?.id !== id && isHovered) {
+            setIsHovered(false);
+        }
+    }, [contextHovered, id, isHovered]);
+
+    return <DroppableContext.Provider value={contextValue}>{children({ ref }, snapshot)}</DroppableContext.Provider>;
 }
