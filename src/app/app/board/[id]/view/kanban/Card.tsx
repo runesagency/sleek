@@ -1,5 +1,3 @@
-"use client";
-
 import type { BoardCard } from "@/app/app/board/[id]/layout";
 import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
@@ -14,7 +12,7 @@ import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip
 import clsx from "clsx";
 import { useCallback, useRef, useState, memo, useContext } from "react";
 
-export type TasksProgressProps = {
+type TasksProgressProps = {
     innerRef?: React.Ref<HTMLButtonElement>;
     checklists: (CardChecklist & {
         tasks: CardChecklistTask[];
@@ -93,8 +91,8 @@ const Card = (data: BoardCard) => {
                 <a
                     ref={ref}
                     className={clsx(
-                        "group/card relative flex max-w-full !cursor-pointer flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-dark-50 hover:border-dark-400",
-                        isDragging && "opacity-30"
+                        "group/card relative flex max-w-full flex-col gap-5 rounded-lg border border-dark-500 bg-dark-600 px-5 py-4 font-manrope text-dark-50 hover:border-dark-400",
+                        isDragging ? "cursor-grabbing opacity-30" : "cursor-pointer"
                     )}
                 >
                     {/* Cover Image */}

@@ -1,5 +1,3 @@
-"use client";
-
 import type { BoardList } from "@/app/app/board/[id]/layout";
 
 import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
@@ -15,7 +13,7 @@ import { IconDots, IconPlus } from "@tabler/icons";
 import clsx from "clsx";
 import { useRef, useCallback, useState, memo, useContext } from "react";
 
-export enum NewCardLocation {
+enum NewCardLocation {
     UP = "UP",
     DOWN = "DOWN",
 }
@@ -124,7 +122,7 @@ const CardDropZone = ({ innerRef, isAddingNewCard, setIsAddingNewCard, listId, i
         <div
             ref={ref}
             className={clsx(
-                "flex h-full max-h-full flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 duration-500 will-change-auto",
+                "flex h-full max-h-full cursor-default flex-col gap-4 overflow-y-auto overflow-x-hidden px-5 delay-200 duration-500 will-change-auto",
                 cards.length === 0 && !isAddingNewCard && !isOnHover ? "py-0" : "py-5"
             )}
         >
@@ -157,12 +155,17 @@ const List = ({ id, title }: BoardList) => {
                     ref={ref}
                     className="ts-sm relative flex h-max max-h-full w-full max-w-sm shrink-0 flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-800 font-manrope text-dark-50"
                 >
-                    <div ref={handleRef} className={clsx("flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600", isDragging ? "bg-dark-600" : "bg-dark-900")}>
-                        <span className="rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900">{title}</span>
+                    <div
+                        ref={handleRef}
+                        className={clsx(
+                            "flex w-full items-center justify-between gap-4 px-7 py-4 duration-200 hover:bg-dark-600",
+                            isDragging ? "cursor-grabbing bg-dark-600" : "cursor-grab bg-dark-900"
+                        )}
+                    >
+                        <span className={clsx("rounded-full bg-dark-50 px-3 py-1 font-bold text-dark-900", !isDragging && "cursor-pointer")}>{title}</span>
 
                         <div className="flex items-center gap-3">
                             {!isAddingNewCard && <IconPlus height={20} className="duration-200 hover:opacity-75" onClick={onNewCardTopClick} />}
-
                             <IconDots height={20} className="duration-200 hover:opacity-75" />
                         </div>
                     </div>
