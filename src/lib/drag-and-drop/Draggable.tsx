@@ -1,6 +1,6 @@
 import { DragDropContext, DroppableContext, SortableDirection, droppableAttributes } from "@/lib/drag-and-drop";
 
-import { useCallback, useRef, useState, useEffect, useContext } from "react";
+import { useCallback, useRef, useState, useEffect, useContext, useMemo } from "react";
 
 export const draggableAttributes = {
     draggable: "data-draggable",
@@ -67,12 +67,6 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
     // Is the element has been counted as a drag? (After it was moved X pixels)
     const [isDragging, setIsDragging] = useState(false);
 
-    /**
-     * @description
-     * Handle when user starts dragging an element
-     *
-     * @param e a mouse or touch event
-     */
     const onDragStart = useCallback((e: MouseEvent | TouchEvent) => {
         e.preventDefault();
 
@@ -91,12 +85,6 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         setHasStartDragging(true);
     }, []);
 
-    /**
-     * @description
-     * Handle when user stops dragging an element
-     *
-     * @param e a mouse or touch event
-     */
     const onDragEnd = useCallback(
         (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
@@ -118,10 +106,13 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         [isDragging, onClick, onTouch, onClickOrTouch]
     );
 
-    /**
-     * @description
-     * Handle component when mounted and unmounted
-     */
+    const snapshot: DraggableSnapshot = useMemo(() => {
+        return {
+            isDragging,
+        };
+    }, [isDragging]);
+
+    // Handle component when mounted and unmounted
     useEffect(() => {
         const current = ref.current;
         const handleCurrent = handleRef.current;
@@ -163,10 +154,7 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         };
     }, [onDragStart, onDragEnd, ref, id, type]);
 
-    /**
-     * @description
-     * Handle when user is dragging an element, most of the logic goes here
-     */
+    // Handle when user is dragging an element, most of the logic goes here
     useEffect(() => {
         // If the component is not mounted yet, don't go further
         const current = ref.current;
@@ -219,20 +207,11 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         };
 
         const highestDroppable = findHighestDroppable(current);
+        if (!highestDroppable) return;
 
-        if (!highestDroppable) {
-            return;
-        }
-
-        /**
-         * @description
-         * Handle when user is dragging an element
-         *
-         * @param e a mouse or touch event
-         */
+        // Handle when user is dragging an element
         const onDragMove = (e: MouseEvent | TouchEvent) => {
             e.preventDefault();
-            if (!current) return;
 
             const { top, left } = current.getBoundingClientRect();
             const { top: originalTop, left: originalLeft, width: originalWidth, height: originalHeight } = originalBounding;
@@ -250,14 +229,14 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                 hasMove = true;
                 setIsDragging(true);
 
-                if (useClone && ref.current) {
-                    const { width, height, left, top } = ref.current.getBoundingClientRect();
+                if (useClone) {
+                    const { width, height, left, top } = current.getBoundingClientRect();
 
                     const transformX = clientX - (clientX - left);
                     const transformY = clientY - (clientY - top);
 
                     // create a clone of the element (portal)
-                    clone = ref.current.cloneNode(true) as T;
+                    clone = current.cloneNode(true) as T;
 
                     clone.style.position = "fixed";
                     clone.style.top = `0px`;
@@ -334,17 +313,11 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
 
         // An interval to check if the cursor or touch is hovering over a droppable or its children (if it was a sortable)
         let hoverCheckInterval: NodeJS.Timeout | null = null;
-
-        // The element which is being hovered
         let lastHovered: Hovered | null = null;
 
-        /**
-         * @description
-         * Handle when the cursor is hovering over a droppable or its children (if it was a sortable) while dragging an element
-         */
+        // Handle when the cursor is hovering over a droppable
+        // or its children (if it was a sortable) while dragging an element
         const handleHoverCheck = () => {
-            if (!current) return;
-
             const getHoveredElement = (elements: Element[], elementType: HoveredType): Hovered | null => {
                 let ctx: CanvasRenderingContext2D | null = null;
 
@@ -407,8 +380,20 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
                     const { top: Ctop, bottom: Cbottom, left: Cleft, right: Cright } = clone.getBoundingClientRect();
                     const { top, left, bottom, right } = element.getBoundingClientRect();
 
-                    const acceptList = element.getAttribute(droppableAttributes.accepts);
-                    const isAccepted = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
+                    let isAccepted = false;
+
+                    if (elementType === HoveredType.Droppable) {
+                        const acceptList = element.getAttribute(droppableAttributes.accepts);
+                        isAccepted = !acceptList || acceptList === "" || acceptList.split(",").includes(type);
+                    } else if (elementType === HoveredType.Children) {
+                        // check if the element was a droppable or draggable
+                        const isDroppable = element.getAttribute(droppableAttributes.droppable) !== null;
+                        const isDraggable = element.getAttribute(draggableAttributes.draggable) !== null;
+
+                        if (isDroppable || isDraggable) {
+                            isAccepted = true;
+                        }
+                    }
 
                     if (isAccepted) {
                         const cloneCenterX = Cleft + (Cright - Cleft) / 2;
@@ -853,5 +838,5 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         onDragEndParentDroppable,
     ]);
 
-    return children({ ref, handleRef }, { isDragging });
+    return children({ ref, handleRef }, snapshot);
 }
