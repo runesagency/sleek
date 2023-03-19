@@ -98,7 +98,7 @@ export const Project = ({ id, name, description, coverAttachmentId, logoAttachme
 };
 
 export default function OrganizationProjectListPage() {
-    const { openMenu, toggleMenu } = useMenu();
+    const { openMenu, openSubMenu, toggleMenu } = useMenu();
     const [autoAnimateRef] = useAutoAnimate();
     const [projectOnCreate, setProjectOnCreate] = useState<string | null>(null);
 
@@ -155,7 +155,7 @@ export default function OrganizationProjectListPage() {
                     icon: IconPlus,
                     name: "Create New Project",
                     onClick: () => {
-                        openMenu(e, {
+                        openSubMenu({
                             ...newProjectMenuOptions,
                             anchor: MenuAnchor.Cursor,
                         });
