@@ -44,6 +44,35 @@ export default function useMenu() {
             event.preventDefault();
             if (!options) return;
 
+            /**
+             * This is some trick to prevent parent menu items from being opened if
+             * the current item that are targeting has its own menu.first-letter:
+             *
+             * Since HTML doesn't support getEventListeners, what i'm doing here is
+             * setting a data attribute to all target elements that have a menu.
+             *
+             * Then, when the event is triggered, i'm checking if the target element
+             * or its parents have the data attribute. If it does, then that menu
+             * will be opened, otherwise, the current menu will be opened.
+             */
+            const attributeName = "data-has-menu";
+            event.currentTarget.setAttribute(attributeName, "true");
+            if (event.target instanceof HTMLElement) {
+                const getParentWithMenuAttribute = (element: HTMLElement): HTMLElement | null => {
+                    if (element.hasAttribute(attributeName)) {
+                        return element;
+                    } else {
+                        if (element.parentElement) {
+                            return getParentWithMenuAttribute(element.parentElement);
+                        } else {
+                            return null;
+                        }
+                    }
+                };
+
+                const element = getParentWithMenuAttribute(event.target);
+                if (element && element !== event.currentTarget) return;
+            }
 
             const current = event.currentTarget as HTMLElement;
             lastAnchor.current = current;
