@@ -13,7 +13,9 @@ export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>
 };
 
 const Menu = () => {
-    const menuRef = useRef<HTMLDivElement>(null);
+    const contextMenuRef = useRef<HTMLDivElement>(null);
+    const formMenuRef = useRef<HTMLDivElement>(null);
+    const memberListMenuRef = useRef<HTMLDivElement>(null);
 
     const { offset, targetRef, anchor, alignment, direction, setOpen, clientCoordinates, ...data } = useContext(MenuContext);
 
@@ -26,7 +28,25 @@ const Menu = () => {
     }, [setOpen]);
 
     useEffect(() => {
-        const menuElement = menuRef.current;
+        let menuElement: HTMLDivElement | null = null;
+
+        switch (data.type) {
+            case MenuVariant.Context: {
+                menuElement = contextMenuRef.current;
+                break;
+            }
+
+            case MenuVariant.MemberList: {
+                menuElement = memberListMenuRef.current;
+                break;
+            }
+
+            case MenuVariant.Forms: {
+                menuElement = formMenuRef.current;
+                break;
+            }
+        }
+
         if (!menuElement) return;
 
         const targetElement = targetRef.current;
@@ -43,7 +63,7 @@ const Menu = () => {
         let colliderOffsetY = 0;
 
         const onBlur = (e: MouseEvent) => {
-            if (!menuElement.contains(e.target as Node)) {
+            if (menuElement && !menuElement.contains(e.target as Node)) {
                 setOpen(false);
             }
         };
@@ -65,6 +85,8 @@ const Menu = () => {
         };
 
         const setMenuCoordinates = () => {
+            if (!menuElement) return;
+
             const { x: posX, y: posY, width, height } = targetElement.getBoundingClientRect();
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
@@ -337,11 +359,10 @@ const Menu = () => {
                 element.removeEventListener("scroll", setMenuCoordinates);
             });
         };
-    }, [data.isOpen, targetRef, setOpen, clientX, clientY, anchor, offsetX, offsetY, direction, alignment]);
+    }, [data.isOpen, targetRef, setOpen, clientX, clientY, anchor, offsetX, offsetY, direction, alignment, data.type]);
 
     if (data.isOpen) {
-        const sharedProps: Omit<MenuSharedProps, "variant"> = {
-            innerRef: menuRef,
+        const sharedProps: Omit<MenuSharedProps, "variant" | "innerRef"> = {
             closeMenu,
             style: {
                 position: "fixed",
@@ -353,15 +374,25 @@ const Menu = () => {
 
         switch (data.type) {
             case MenuVariant.Context: {
-                return <MenuContextComponent {...sharedProps} lists={data.lists} />;
+                return <MenuContextComponent {...sharedProps} innerRef={contextMenuRef} lists={data.lists} />;
             }
 
             case MenuVariant.MemberList: {
-                return <MenuMemberListComponent {...sharedProps} lists={data.lists} onSelect={data.onSelect} onBack={data.onBack} title={data.title} />;
+                return <MenuMemberListComponent {...sharedProps} innerRef={memberListMenuRef} lists={data.lists} onSelect={data.onSelect} onBack={data.onBack} title={data.title} />;
             }
 
             case MenuVariant.Forms: {
-                return <MenuFormComponent {...sharedProps} lists={data.lists} onSubmit={data.onSubmit} onBack={data.onBack} title={data.title} submitButtonLabel={data.submitButtonLabel} />;
+                return (
+                    <MenuFormComponent
+                        {...sharedProps}
+                        innerRef={formMenuRef}
+                        lists={data.lists}
+                        onSubmit={data.onSubmit}
+                        onBack={data.onBack}
+                        title={data.title}
+                        submitButtonLabel={data.submitButtonLabel}
+                    />
+                );
             }
         }
     }
