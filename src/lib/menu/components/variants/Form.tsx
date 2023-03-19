@@ -67,7 +67,7 @@ const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, inner
 
             if (!onFormSubmit) return;
 
-            onFormSubmit(values);
+            onFormSubmit(values as never);
             closeMenu();
         },
         [closeMenu, onFormSubmit, values]
