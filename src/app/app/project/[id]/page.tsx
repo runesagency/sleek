@@ -16,7 +16,7 @@ import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function ProjectBoardListPage() {
-    const { openMenu, toggleMenu } = useMenu();
+    const { openMenu, openSubMenu, toggleMenu } = useMenu();
     const [autoAnimateRef] = useAutoAnimate();
     const [boardOnCreate, setBoardOnCreate] = useState<string | null>(null);
 
@@ -73,7 +73,7 @@ export default function ProjectBoardListPage() {
                     icon: IconPlus,
                     name: "Create New Board",
                     onClick: () => {
-                        openMenu(e, {
+                        openSubMenu({
                             ...newBoardMenuOptions,
                             anchor: MenuAnchor.Cursor,
                         });

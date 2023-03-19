@@ -18,6 +18,9 @@ export type MenuOptions = MenuVariantType & {
 export default function useMenu() {
     const currentInstanceId = useId();
     const lastAnchor = useRef<HTMLElement | null>(null);
+    const lastOptions = useRef<MenuOptions | null>(null);
+    const lastEvent = useRef<React.MouseEvent | null>(null);
+
     const {
         isOpen, //
         instanceId,
@@ -41,8 +44,18 @@ export default function useMenu() {
             event.preventDefault();
             if (!options) return;
 
-            targetRef.current = event.currentTarget as HTMLElement;
+
+            const current = event.currentTarget as HTMLElement;
             lastAnchor.current = current;
+            targetRef.current = current;
+
+            lastOptions.current = options;
+            lastEvent.current = {
+                ...event,
+                preventDefault: event.preventDefault,
+                currentTarget: current,
+            };
+
             anchor.current = options.anchor ?? MenuAnchor.Element;
             alignment.current = options.alignment ?? MenuAlignment.Start;
             direction.current = options.direction ?? MenuDirection.Right;
@@ -90,9 +103,32 @@ export default function useMenu() {
         [isOpen, instanceId, currentInstanceId, closeMenu, openMenu]
     );
 
+    const openSubMenu = useCallback(
+        (options: MenuOptions) => {
+            if (!options) return;
+
+            if (!lastEvent.current) {
+                throw new Error("Cannot open submenu without main menu being opened");
+            }
+
+            if (options.type !== MenuVariant.Context && !options.onBack) {
+                const menuOptions = lastOptions.current;
+                if (menuOptions) {
+                    options.onBack = () => {
+                        openSubMenu(menuOptions);
+                    };
+                }
+            }
+
+            openMenu(lastEvent.current, options);
+        },
+        [openMenu]
+    );
+
     return {
         openMenu,
         closeMenu,
         toggleMenu,
+        openSubMenu,
     };
 }
