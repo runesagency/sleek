@@ -1,9 +1,9 @@
 import type { MenuVariantType } from "@/lib/menu";
 
-import { MenuAnchor, MenuContext, MenuAlignment, MenuDirection } from "@/lib/menu";
+import { MenuVariant, MenuAnchor, MenuContext, MenuAlignment, MenuDirection } from "@/lib/menu";
 
 import { useId } from "@mantine/hooks";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useRef } from "react";
 
 export type MenuOptions = MenuVariantType & {
     anchor?: MenuAnchor;
@@ -17,6 +17,7 @@ export type MenuOptions = MenuVariantType & {
 
 export default function useMenu() {
     const currentInstanceId = useId();
+    const lastAnchor = useRef<HTMLElement | null>(null);
     const {
         isOpen, //
         instanceId,
@@ -41,6 +42,7 @@ export default function useMenu() {
             if (!options) return;
 
             targetRef.current = event.currentTarget as HTMLElement;
+            lastAnchor.current = current;
             anchor.current = options.anchor ?? MenuAnchor.Element;
             alignment.current = options.alignment ?? MenuAlignment.Start;
             direction.current = options.direction ?? MenuDirection.Right;
@@ -79,7 +81,7 @@ export default function useMenu() {
             event.preventDefault();
             if (!options) return;
 
-            if (isOpen && instanceId === currentInstanceId) {
+            if (isOpen && instanceId === currentInstanceId && lastAnchor.current === event.currentTarget) {
                 closeMenu();
             } else {
                 openMenu(event, options);
