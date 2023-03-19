@@ -51,8 +51,7 @@ const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, inner
     const onReturnBack = useCallback(() => {
         if (!onBack) return;
 
-        onBack();
-        closeMenu();
+        onBack(closeMenu);
     }, [closeMenu, onBack]);
 
     const onValueSet = useCallback((id: string, value: unknown) => {

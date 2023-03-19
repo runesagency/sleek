@@ -50,7 +50,7 @@ export type MenuVariantMemberList = {
     type: MenuVariant.MemberList;
     lists: User[];
     onSelect: (user: User) => void;
-    onBack?: () => void;
+    onBack?: (closeMenu: () => void) => void;
 };
 
 /**
@@ -64,7 +64,7 @@ export type MenuVariantLabelList = {
     type: MenuVariant.LabelList;
     lists: Label[];
     onSelect: (label: Label) => void;
-    onBack?: () => void;
+    onBack?: (closeMenu: () => void) => void;
 };
 
 /**
@@ -79,7 +79,7 @@ export type MenuVariantForm = {
     lists: MenuVariantFormItem[];
     submitButtonLabel?: string;
     onSubmit: (values: never) => void;
-    onBack?: () => void;
+    onBack?: (closeMenu: () => void) => void;
 };
 
 export type MenuVariantFormItem = MenuFormVariantType & {

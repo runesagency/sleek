@@ -56,8 +56,7 @@ const MenuMemberListComponent = ({ lists, onSelect: onClick, onBack, title, inne
     const onReturnBack = useCallback(() => {
         if (!onBack) return;
 
-        onBack();
-        closeMenu();
+        onBack(closeMenu);
     }, [closeMenu, onBack]);
 
     useEffect(() => {
