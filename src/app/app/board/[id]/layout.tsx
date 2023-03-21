@@ -33,28 +33,38 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
 
     const setLists = useCallback(
         (lists: BoardList[]) => {
-            setData((prev) => {
-                if (!prev) return prev;
+            setData(
+                (prev) => {
+                    if (!prev) return prev;
 
-                return {
-                    ...prev,
-                    lists,
-                };
-            });
+                    return {
+                        ...prev,
+                        lists,
+                    };
+                },
+                {
+                    revalidate: false,
+                }
+            );
         },
         [setData]
     );
 
     const setCards = useCallback(
         (cards: BoardCard[]) => {
-            setData((prev) => {
-                if (!prev) return prev;
+            setData(
+                (prev) => {
+                    if (!prev) return prev;
 
-                return {
-                    ...prev,
-                    cards,
-                };
-            });
+                    return {
+                        ...prev,
+                        cards,
+                    };
+                },
+                {
+                    revalidate: false,
+                }
+            );
         },
         [setData]
     );
