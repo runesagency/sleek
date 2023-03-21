@@ -2,7 +2,6 @@
 
 import type { MenuOptions } from "@/lib/menu/hooks/use-menu";
 import type { ApiMethod, ApiResult } from "@/lib/types";
-import type { Project as ProjectType } from "@prisma/client";
 
 import { OrganizationLayoutContext } from "@/app/app/organization/[id]/OrganizationLayoutContext";
 import { Button } from "@/components/Forms";
@@ -10,12 +9,13 @@ import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { Project } from "@prisma/client";
 import { IconCalendar, IconLoader2, IconPencil, IconPictureInPicture, IconPlus, IconTrash, IconCards } from "@tabler/icons";
 import Link from "next/link";
 import { useCallback, useContext, useState } from "react";
 import { toast } from "react-toastify";
 
-type ProjectProps = ProjectType & {
+type ProjectProps = Project & {
     _count: {
         boards: number;
     };
