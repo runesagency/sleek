@@ -31,7 +31,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
     const router = useRouter();
     const currentSegment = useSelectedLayoutSegment();
 
-    const { projectId, name, users, lists, cards } = data ?? {};
+    const { projectId, name, users, lists, cards } = data;
     const [activeCard, setActiveCard] = useState<BoardCard | undefined>(undefined);
 
     const setLists = useCallback(
