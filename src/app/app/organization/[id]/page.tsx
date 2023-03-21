@@ -21,7 +21,7 @@ type ProjectProps = ProjectType & {
     };
 };
 
-export const Project = ({ id, name, description, coverAttachmentId, logoAttachmentId, _count: { boards: boardsCount } }: ProjectProps) => {
+const Project = ({ id, name, description, coverAttachmentId, logoAttachmentId, _count: { boards: boardsCount } }: ProjectProps) => {
     const { openMenu } = useMenu();
 
     const onContextMenu = useCallback(

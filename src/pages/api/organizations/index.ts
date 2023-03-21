@@ -15,7 +15,9 @@ router.use(authorizationMiddleware);
 
 // ------------------ GET /api/organizations ------------------
 
-export type GetResult = Organization[];
+export type GetResult = (Organization & {
+    users: User[];
+})[];
 
 router.get(async (req, res) => {
     const user = await prisma.user.findUnique({
@@ -25,7 +27,15 @@ router.get(async (req, res) => {
         select: {
             organizations: {
                 select: {
-                    organization: true,
+                    organization: {
+                        include: {
+                            users: {
+                                include: {
+                                    user: true,
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -40,7 +50,10 @@ router.get(async (req, res) => {
         });
     }
 
-    const result: GetResult = user.organizations.map(({ organization }) => organization);
+    const result: GetResult = user.organizations.map(({ organization }) => ({
+        ...organization,
+        users: organization.users.map(({ user }) => user),
+    }));
 
     return res.status(200).json({ result });
 });

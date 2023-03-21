@@ -1,7 +1,6 @@
 "use client";
 
 import { DashboardLayoutContext } from "@/app/app/DashboardLayoutContext";
-import { Project } from "@/app/app/organization/[id]/page";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
 import { Routes } from "@/lib/constants";
@@ -13,10 +12,7 @@ import { useContext } from "react";
 export default function AppUserHomePage() {
     const [autoAnimateRef] = useAutoAnimate();
 
-    const {
-        isLoading,
-        data: { organizations },
-    } = useContext(DashboardLayoutContext);
+    const { isLoading, data } = useContext(DashboardLayoutContext);
 
     return (
         <main ref={autoAnimateRef} className="flex flex-col gap-10 p-10 md:px-20">
@@ -35,27 +31,18 @@ export default function AppUserHomePage() {
                           </div>
                       </section>
                   ))
-                : organizations.map(({ id, name, description, users, projects }, index) => (
-                      <section key={index} className="flex flex-col gap-5">
-                          <div className="flex flex-col gap-3">
+                : data.map(({ id, name, description, users }, index) => (
+                      <section key={index} className="flex flex-col gap-12 rounded-lg border border-dark-600 bg-dark-800 p-10">
+                          <div className="flex flex-col gap-4">
                               <h2 className="ts-2xl">{name}</h2>
-
                               <p className="ts-sm">{description || "No Description Available"}</p>
 
                               <MemberList.Large users={users} min={5} />
-
-                              <Link href={Routes.Organization(id)} className="w-max">
-                                  <Button.Large fit>See More</Button.Large>
-                              </Link>
                           </div>
 
-                          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                              {projects.length === 0 ? (
-                                  <div className="ts-base flex h-32 w-full items-center justify-center rounded-lg bg-dark-800 opacity-75">No Projects Available</div>
-                              ) : (
-                                  projects.map((project, index) => <Project key={index} {...project} />)
-                              )}
-                          </div>
+                          <Link href={Routes.Organization(id)} className="w-max">
+                              <Button.Large fit>See More</Button.Large>
+                          </Link>
                       </section>
                   ))}
         </main>

@@ -29,10 +29,8 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
     const [autoAnimateRef] = useAutoAnimate();
     const { toggleMenu } = useMenu();
 
-    const { organizations } = data;
-
     const links = [
-        { name: "All Projects", path: Routes.App, icon: IconCards },
+        { name: "All Organizations", path: Routes.App, icon: IconCards },
         { name: "Your Settings", path: "#", icon: IconSettings },
     ];
 
@@ -65,11 +63,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                         const { result, error }: ApiResult<ApiMethod.OrganizationList.PostResult> = await res.json();
                         if (error) return;
 
-                        setData({
-                            ...data,
-                            organizations: [...data.organizations, result],
-                        });
-
+                        setData([...data, result]);
                         setOrganizationOnCreate(null);
                     });
                 },
@@ -98,7 +92,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
 
                 {isLoading
                     ? [...Array(3)].map((_, index) => <div key={index} className="animate-shimmer h-5 w-full rounded-full bg-dark-700" />)
-                    : organizations.map(({ name, id }, index) => (
+                    : data.map(({ name, id }, index) => (
                           <Link key={index} href={Routes.Organization(id)} className="flex items-center gap-3 duration-200 hover:opacity-75">
                               <img src="https://picsum.photos/200" alt={name} className="h-5 w-5 rounded-full" />
                               <p className="ts-sm">{name}</p>
@@ -126,7 +120,7 @@ type DashboardLayoutProps = {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.CurrentUser.GetResult>(ApiRoutes.CurrentUser, defaultDashboardLayoutContextValue.data);
+    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.OrganizationList.GetResult>(ApiRoutes.OrganizationList, defaultDashboardLayoutContextValue.data);
     const { data: sessionData } = useSession();
     const router = useRouter();
     const currentSegment = useSelectedLayoutSegment();
