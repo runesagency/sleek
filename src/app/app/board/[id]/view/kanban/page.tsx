@@ -2,9 +2,11 @@
 
 import type { BoardList } from "@/app/app/board/[id]/BoardLayoutContext";
 import type { DragEvent } from "@/lib/drag-and-drop";
+import type { ApiMethod, ApiResult } from "@/lib/types";
 
 import { BoardLayoutContext } from "@/app/app/board/[id]/BoardLayoutContext";
 import List from "@/app/app/board/[id]/view/kanban/List";
+import { ApiRoutes } from "@/lib/constants";
 import { DragDropProvider, Droppable, SortableDirection } from "@/lib/drag-and-drop";
 import { arrayMoveImmutable } from "@/lib/utils/array-move";
 
@@ -12,6 +14,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useMergedRef } from "@mantine/hooks";
 import clsx from "clsx";
 import { useCallback, useContext, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 export enum SortableType {
     List = "list",
@@ -98,6 +101,7 @@ const ListDropZone = ({ innerRef, lists }: ListDropZoneProps) => {
 export default function KanbanLayoutPage() {
     const {
         data: { id, cards, lists },
+        refreshData,
         setCards,
         setLists,
     } = useContext(BoardLayoutContext);
@@ -115,6 +119,26 @@ export default function KanbanLayoutPage() {
                 }));
 
                 setLists(newList);
+
+                const listUpdateBody: ApiMethod.List.PatchSchemaType = {
+                    boardId: id,
+                    lists: newList.map((list) => ({ id: list.id, order: list.order })),
+                };
+
+                const res = await fetch(ApiRoutes.List, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(listUpdateBody),
+                });
+
+                const { error }: ApiResult<ApiMethod.List.PatchResult> = await res.json();
+
+                if (error) {
+                    toast.error(error.message);
+                    refreshData();
+                }
             }
 
             // Card to Card
@@ -191,23 +215,33 @@ export default function KanbanLayoutPage() {
 
                 setCards(updatedCards);
 
-                await fetch("/api/cards", {
+                const cardUpdateBody: ApiMethod.Card.PatchSchemaType = {
+                    boardId: id,
+                    cards: updatedCards.filter((card) => {
+                        const currentCard = cards.find((c) => c.id === card.id);
+                        if (!currentCard) return false;
+
+                        return currentCard.order !== card.order || currentCard.listId !== card.listId;
+                    }),
+                };
+
+                const res = await fetch(ApiRoutes.Card, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(
-                        updatedCards.filter((card) => {
-                            const currentCard = cards.find((c) => c.id === card.id);
-                            if (!currentCard) return false;
-
-                            return currentCard.order !== card.order || currentCard.listId !== card.listId;
-                        })
-                    ),
+                    body: JSON.stringify(cardUpdateBody),
                 });
+
+                const { error }: ApiResult<ApiMethod.Card.PatchResult> = await res.json();
+
+                if (error) {
+                    toast.error(error.message);
+                    refreshData();
+                }
             }
         },
-        [cards, id, lists, setCards, setLists]
+        [cards, id, lists, setCards, refreshData, setLists]
     );
 
     return (

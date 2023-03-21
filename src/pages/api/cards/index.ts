@@ -13,7 +13,7 @@ const router = createRouter<ApiRequest, ApiResponse>();
 
 router.use(authorizationMiddleware);
 
-// ------------------ POST /api/board/card ------------------
+// ------------------ POST /api/board/cards ------------------
 
 export type PostResult = Card & {
     users: User[];
@@ -128,6 +128,82 @@ router.post(async (req, res) => {
         ...card,
         activities,
         users: card.users.map(({ user }) => user),
+    };
+
+    return res.status(200).json({ result });
+});
+
+// ------------------ PATCH /api/board/cards ------------------
+
+export type PatchResult = {
+    success: boolean;
+};
+
+export type PatchSchemaType = z.infer<typeof PatchSchema>;
+
+const PatchSchema = z.object({
+    boardId: z.string(),
+    cards: z.array(
+        z.object({
+            id: z.string(),
+            listId: z.string(),
+            order: z.number(),
+        })
+    ),
+});
+
+router.patch(async (req, res) => {
+    const parsedBody = PatchSchema.safeParse(req.body);
+
+    if (!parsedBody.success) {
+        return res.status(400).json({
+            error: parsedBody.error,
+        });
+    }
+
+    const { cards, boardId } = parsedBody.data;
+    const user = req.user;
+
+    const { permissions, error: permissionError } = await getUserPermissionsForBoard(user.id, boardId);
+
+    if (permissionError) {
+        return res.status(403).json({
+            error: permissionError,
+        });
+    }
+
+    if (!permissions.CREATE_CARD) {
+        return res.status(403).json({
+            error: {
+                message: "You don't have permission to create a card",
+                name: "ClientError",
+            },
+        });
+    }
+
+    cards.map(async (card) => {
+        try {
+            await prisma.card.update({
+                where: {
+                    id: card.id,
+                },
+                data: {
+                    order: card.order,
+                    listId: card.listId,
+                },
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: {
+                    message: `Error updating card ${card.id}`,
+                    name: "ServerError",
+                },
+            });
+        }
+    });
+
+    const result: PatchResult = {
+        success: true,
     };
 
     return res.status(200).json({ result });

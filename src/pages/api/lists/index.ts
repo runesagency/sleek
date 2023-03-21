@@ -13,7 +13,7 @@ const router = createRouter<ApiRequest, ApiResponse>();
 
 router.use(authorizationMiddleware);
 
-// ------------------ POST /api/board/list ------------------
+// ------------------ POST /api/board/lists ------------------
 
 export type PostResult = List;
 
@@ -73,6 +73,80 @@ router.post(async (req, res) => {
     });
 
     const result: PostResult = list;
+
+    return res.status(200).json({ result });
+});
+
+// ------------------ PATCH /api/board/lists ------------------
+
+export type PatchResult = {
+    success: boolean;
+};
+
+export type PatchSchemaType = z.infer<typeof PatchSchema>;
+
+const PatchSchema = z.object({
+    boardId: z.string(),
+    lists: z.array(
+        z.object({
+            id: z.string(),
+            order: z.number(),
+        })
+    ),
+});
+
+router.patch(async (req, res) => {
+    const parsedBody = PatchSchema.safeParse(req.body);
+
+    if (!parsedBody.success) {
+        return res.status(400).json({
+            error: parsedBody.error,
+        });
+    }
+
+    const { lists, boardId } = parsedBody.data;
+    const user = req.user;
+
+    const { permissions, error: permissionError } = await getUserPermissionsForBoard(user.id, boardId);
+
+    if (permissionError) {
+        return res.status(403).json({
+            error: permissionError,
+        });
+    }
+
+    if (!permissions.CREATE_LIST) {
+        return res.status(403).json({
+            error: {
+                message: "You don't have permission to create a card",
+                name: "ClientError",
+            },
+        });
+    }
+
+    lists.map(async (list) => {
+        try {
+            await prisma.list.update({
+                where: {
+                    id: list.id,
+                },
+                data: {
+                    order: list.order,
+                },
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: {
+                    message: `Error updating list ${list.id}`,
+                    name: "ServerError",
+                },
+            });
+        }
+    });
+
+    const result: PatchResult = {
+        success: true,
+    };
 
     return res.status(200).json({ result });
 });
