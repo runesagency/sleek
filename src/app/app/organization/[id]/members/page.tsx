@@ -1,6 +1,6 @@
 "use client";
 
-import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
+import { OrganizationLayoutContext } from "@/app/app/organization/[id]/OrganizationLayoutContext";
 import { Button, Input } from "@/components/Forms";
 
 import { User } from "@prisma/client";

@@ -1,9 +1,9 @@
 "use client";
 
-import type { BoardCard } from "@/app/app/board/[id]/layout";
+import type { BoardCard } from "@/app/app/board/[id]/BoardLayoutContext";
 import type { ReactNode } from "react";
 
-import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
+import { BoardLayoutContext } from "@/app/app/board/[id]/BoardLayoutContext";
 import Label from "@/components/DataDisplay/Label";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button, Textarea } from "@/components/Forms";
