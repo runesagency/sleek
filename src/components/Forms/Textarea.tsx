@@ -1,7 +1,5 @@
 "use client";
 
-import type { DetailedHTMLProps, TextareaHTMLAttributes } from "react";
-
 import { useLocalStorage } from "@mantine/hooks";
 import { useCallback, useState, memo } from "react";
 
@@ -32,7 +30,7 @@ const useValueHandler = (active: boolean, key?: string, defaultValue = ""): UseV
     }
 };
 
-export type TextareaProps = Omit<DetailedHTMLProps<TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>, "defaultValue" | "ref"> & {
+export type TextareaProps = Omit<React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>, "defaultValue" | "ref"> & {
     innerRef?: React.Ref<HTMLTextAreaElement>;
     defaultValue?: string;
     saveOnEnter?: boolean;

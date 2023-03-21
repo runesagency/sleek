@@ -1,11 +1,10 @@
 "use client";
 
 import type { TablerIcon } from "@tabler/icons";
-import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 
 import clsx from "clsx";
 
-export type ButtonProps = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
+export type ButtonProps = React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     icon?: TablerIcon;
     fit?: boolean;
 };

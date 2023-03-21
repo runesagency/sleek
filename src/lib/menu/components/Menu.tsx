@@ -1,5 +1,3 @@
-import type { DetailedHTMLProps, HTMLAttributes } from "react";
-
 import { MenuContext, MenuVariant, MenuAnchor, MenuDirection, MenuAlignment } from "@/lib/menu";
 import MenuContextComponent from "@/lib/menu/components/variants/Context";
 import MenuFormComponent from "@/lib/menu/components/variants/Form";
@@ -7,7 +5,7 @@ import MenuMemberListComponent from "@/lib/menu/components/variants/MemberList";
 
 import { useCallback, useEffect, useState, memo, useContext, useRef } from "react";
 
-export type MenuSharedProps = Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, "ref" | "onClick" | "onSelect" | "onSubmit"> & {
+export type MenuSharedProps = Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>, "ref" | "onClick" | "onSelect" | "onSubmit"> & {
     innerRef: React.RefObject<HTMLDivElement>;
     closeMenu: () => void;
 };

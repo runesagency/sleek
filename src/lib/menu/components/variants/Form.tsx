@@ -1,6 +1,5 @@
 import type { MenuVariantForm, MenuVariantFormItem } from "@/lib/menu";
 import type { MenuSharedProps } from "@/lib/menu/components/Menu";
-import type { FormEvent } from "react";
 
 import { Button, Input, Checkbox, Textarea } from "@/components/Forms";
 import { MenuFormVariant as MenuFormVariantSelection } from "@/lib/menu";
@@ -14,7 +13,7 @@ type MenuFormComponentItemProps = MenuVariantFormItem & {
 
 const MenuFormComponentItem = ({ id, label, props, type, setValue }: MenuFormComponentItemProps) => {
     const onChange = useCallback(
-        (e: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        (e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
             const { value } = e.currentTarget;
 
             setValue(id, value);
@@ -62,7 +61,7 @@ const MenuFormComponent = ({ lists, onSubmit: onFormSubmit, onBack, title, inner
     }, []);
 
     const onSubmit = useCallback(
-        (e: FormEvent) => {
+        (e: React.FormEvent) => {
             e.preventDefault();
 
             if (!onFormSubmit) return;

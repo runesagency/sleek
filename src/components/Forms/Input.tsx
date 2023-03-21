@@ -1,7 +1,6 @@
 "use client";
 
 import type { TablerIcon } from "@tabler/icons";
-import type { DetailedHTMLProps, HTMLInputTypeAttribute, InputHTMLAttributes } from "react";
 
 import clsx from "clsx";
 import { useRef, memo, useCallback, useState } from "react";
@@ -52,9 +51,9 @@ const useInput = ({ defaultValue, onSave: onValueSaved, onClose, saveOnEnter }: 
     };
 };
 
-export type InputProps = Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref" | "className"> & {
+export type InputProps = Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "defaultValue" | "ref" | "className"> & {
     icon?: TablerIcon;
-    type?: HTMLInputTypeAttribute;
+    type?: React.HTMLInputTypeAttribute;
     innerRef?: React.RefObject<HTMLInputElement>;
     defaultValue?: string;
     saveOnEnter?: boolean;
