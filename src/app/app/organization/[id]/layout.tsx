@@ -4,7 +4,7 @@ import type { ApiMethod } from "@/lib/types";
 
 import { defaultOrganizationLayoutContextValue, OrganizationLayoutContext } from "@/app/app/organization/[id]/OrganizationLayoutContext";
 import { ApiRoutes, Routes } from "@/lib/constants";
-import { useRequest } from "@/lib/hooks/use-request";
+import { useRequest } from "@/lib/hooks";
 
 import clsx from "clsx";
 import Link from "next/link";

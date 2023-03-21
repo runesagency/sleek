@@ -6,7 +6,7 @@ import { defaultDashboardLayoutContextValue, DashboardLayoutContext } from "@/ap
 import { Button, Input } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
 import { ApiRoutes, Routes } from "@/lib/constants";
-import { useRequest } from "@/lib/hooks/use-request";
+import { useRequest } from "@/lib/hooks";
 import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";

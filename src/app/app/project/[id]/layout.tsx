@@ -5,7 +5,7 @@ import type { ApiMethod } from "@/lib/types";
 import { defaultProjectLayoutContextValue, ProjectLayoutContext } from "@/app/app/project/[id]/ProjectLayoutContext";
 import { Button } from "@/components/Forms";
 import { ApiRoutes, Routes } from "@/lib/constants";
-import { useRequest } from "@/lib/hooks/use-request";
+import { useRequest } from "@/lib/hooks";
 
 import { IconArrowBackUp } from "@tabler/icons";
 import Link from "next/link";

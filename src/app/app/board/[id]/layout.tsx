@@ -8,7 +8,7 @@ import MemberList from "@/components/DataDisplay/MemberList";
 import { SwitchButton, Button } from "@/components/Forms";
 import TaskModal from "@/components/TaskModal";
 import { ApiRoutes, Routes } from "@/lib/constants";
-import { useRequest } from "@/lib/hooks/use-request";
+import { useRequest } from "@/lib/hooks";
 
 import { IconArrowBackUp, IconFilter, IconPlus } from "@tabler/icons";
 import Link from "next/link";
