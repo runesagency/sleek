@@ -10,6 +10,7 @@ export type BoardLayoutContextProps = {
     isLoading: boolean;
     activeCard?: BoardCard;
     data: ApiMethod.Board.GetResult;
+    refreshData: () => void;
     setLists: (lists: BoardList[]) => void;
     setCards: (cards: BoardCard[]) => void;
     setActiveCard: (card: BoardCard | undefined) => void;
@@ -34,6 +35,9 @@ export const defaultBoardLayoutContextValue: BoardLayoutContextProps = {
         cards: [],
     },
     activeCard: undefined,
+    refreshData() {
+        throw new Error("refreshData is not defined");
+    },
     setLists: () => {
         throw new Error("setLists is not defined");
     },

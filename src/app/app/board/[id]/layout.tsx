@@ -150,7 +150,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
     }
 
     return (
-        <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, setLists, setCards, setActiveCard, onCreateNewCard }}>
+        <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, refreshData: setData, setLists, setCards, setActiveCard, onCreateNewCard }}>
             <main className="box-border flex h-full w-full flex-col">
                 <div className="flex bg-dark-700 px-11">
                     {links.map(({ name, segment }, index) => (
