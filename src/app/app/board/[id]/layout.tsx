@@ -1,6 +1,7 @@
 "use client";
 
 import type { BoardCard, BoardList } from "@/app/app/board/[id]/BoardLayoutContext";
+import type { MenuOptions } from "@/lib/menu/hooks/use-menu";
 import type { ApiMethod, ApiResult } from "@/lib/types";
 
 import { defaultBoardLayoutContextValue, BoardLayoutContext } from "@/app/app/board/[id]/BoardLayoutContext";
@@ -9,11 +10,12 @@ import { SwitchButton, Button } from "@/components/Forms";
 import TaskModal from "@/components/TaskModal";
 import { ApiRoutes, Routes } from "@/lib/constants";
 import { useRequest } from "@/lib/hooks";
+import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { IconArrowBackUp, IconFilter, IconPlus } from "@tabler/icons";
 import Link from "next/link";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
 type BoardPageLayoutProps = {
@@ -25,6 +27,7 @@ type BoardPageLayoutProps = {
 
 export default function BoardPageLayout({ children, params: { id } }: BoardPageLayoutProps) {
     const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.Board.GetResult>(ApiRoutes.Board(id), defaultBoardLayoutContextValue.data);
+    const { openMenu, toggleMenu, openSubMenu } = useMenu();
     const router = useRouter();
     const currentSegment = useSelectedLayoutSegment();
 
@@ -69,27 +72,56 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
         [setData]
     );
 
-    const onCreateNewList = useCallback(() => {
-        fetch(ApiRoutes.List, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+    const newListMenuOptions: MenuOptions = useMemo(() => {
+        return {
+            type: MenuVariant.Forms,
+            title: "Create New List",
+            submitButtonLabel: "Create",
+            lists: [
+                {
+                    id: "title",
+                    label: "Title",
+                    type: MenuFormVariant.Input,
+                    props: {
+                        autoFocus: true,
+                    },
+                },
+            ],
+            onSubmit: async ({ title }: { title: string }) => {
+                const res = await fetch(ApiRoutes.List, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        title,
+                        order: lists.length,
+                        boardId: id,
+                    }),
+                });
+
+                const { result, error }: ApiResult<ApiMethod.List.PostResult> = await res.json();
+
+                if (error) {
+                    return toast.error(error.message);
+                }
+
+                setLists([...lists, result]);
             },
-            body: JSON.stringify({
-                title: "New List",
-                order: lists.length,
-                boardId: id,
-            }),
-        }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.List.PostResult> = await res.json();
-
-            if (error) {
-                return toast.error(error.message);
-            }
-
-            setLists([...lists, result]);
-        });
+        };
     }, [id, lists, setLists]);
+
+    const onCreateNewList = useCallback(
+        (e: React.MouseEvent) => {
+            toggleMenu(e, {
+                alignment: MenuAlignment.Center,
+                direction: MenuDirection.Bottom,
+                anchor: MenuAnchor.Element,
+                ...newListMenuOptions,
+            });
+        },
+        [newListMenuOptions, toggleMenu]
+    );
 
     const onCreateNewCard = useCallback(
         async (name: string, listId: string, order: number) => {
@@ -147,6 +179,29 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
         [cards, id, lists, setCards]
     );
 
+    const onContextMenu = useCallback(
+        (e: React.MouseEvent) => {
+            openMenu(e, {
+                type: MenuVariant.Context,
+                anchor: MenuAnchor.Cursor,
+                direction: MenuDirection.Right,
+                lists: [
+                    {
+                        icon: IconPlus,
+                        name: "Create New List",
+                        onClick() {
+                            openSubMenu({
+                                ...newListMenuOptions,
+                                anchor: MenuAnchor.Cursor,
+                            });
+                        },
+                    },
+                ],
+            });
+        },
+        [newListMenuOptions, openMenu, openSubMenu]
+    );
+
     const links = [
         { name: "About", segment: "about" },
         { name: "View", segment: "view" },
@@ -161,7 +216,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
 
     return (
         <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, refreshData: setData, setLists, setCards, setActiveCard, onCreateNewCard }}>
-            <main className="box-border flex h-full w-full flex-col">
+            <main onContextMenu={onContextMenu} className="box-border flex h-full w-full flex-col">
                 <div className="flex bg-dark-700 px-11">
                     {links.map(({ name, segment }, index) => (
                         <Link key={index} href={Routes.Board(id) + "/" + (segment ?? "")}>
