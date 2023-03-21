@@ -48,10 +48,10 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                         type: MenuFormVariant.Input,
                     },
                 ],
-                onSubmit({ name }: { name: string }) {
+                onSubmit: async ({ name }: { name: string }) => {
                     setOrganizationOnCreate(name);
 
-                    fetch(ApiRoutes.OrganizationList, {
+                    const res = await fetch(ApiRoutes.OrganizationList, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -59,13 +59,16 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                         body: JSON.stringify({
                             name,
                         }),
-                    }).then(async (res) => {
-                        const { result, error }: ApiResult<ApiMethod.OrganizationList.PostResult> = await res.json();
-                        if (error) return;
-
-                        setData([...data, result]);
-                        setOrganizationOnCreate(null);
                     });
+
+                    const { result, error }: ApiResult<ApiMethod.OrganizationList.PostResult> = await res.json();
+
+                    if (error) {
+                        return toast.error(error.message);
+                    }
+
+                    setData([...data, result]);
+                    setOrganizationOnCreate(null);
                 },
             });
         },

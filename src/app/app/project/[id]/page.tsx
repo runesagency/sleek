@@ -33,12 +33,12 @@ export default function ProjectBoardListPage() {
                 type: MenuFormVariant.Input,
             },
         ],
-        onSubmit({ name }: { name: string }) {
+        onSubmit: async ({ name }: { name: string }) => {
             if (!name) return;
 
             setBoardOnCreate(name);
 
-            fetch(ApiRoutes.BoardList, {
+            const res = await fetch(ApiRoutes.BoardList, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -47,20 +47,20 @@ export default function ProjectBoardListPage() {
                     name,
                     projectId: id,
                 }),
-            }).then(async (res) => {
-                const { result, error }: ApiResult<ApiMethod.BoardList.PostResult> = await res.json();
-
-                if (error) {
-                    return toast.error(error.message);
-                }
-
-                setData({
-                    ...data,
-                    boards: [result, ...boards],
-                });
-
-                setBoardOnCreate(null);
             });
+
+            const { result, error }: ApiResult<ApiMethod.BoardList.PostResult> = await res.json();
+
+            if (error) {
+                return toast.error(error.message);
+            }
+
+            setData({
+                ...data,
+                boards: [result, ...boards],
+            });
+
+            setBoardOnCreate(null);
         },
     };
 
