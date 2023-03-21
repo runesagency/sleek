@@ -68,6 +68,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
             body: JSON.stringify({
                 title: "New List",
                 order: lists.length,
+                boardId: id,
             }),
         }).then(async (res) => {
             const { result, error }: ApiResult<ApiMethod.List.PostResult> = await res.json();
