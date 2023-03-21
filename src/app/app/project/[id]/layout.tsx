@@ -1,47 +1,16 @@
 "use client";
 
-import type { ApiMethod, ApiResult } from "@/lib/types";
+import type { ApiMethod } from "@/lib/types";
 
+import { defaultProjectLayoutContextValue, ProjectLayoutContext } from "@/app/app/project/[id]/ProjectLayoutContext";
 import { Button } from "@/components/Forms";
 import { ApiRoutes, Routes } from "@/lib/constants";
+import { useRequest } from "@/lib/hooks/use-request";
 
 import { IconArrowBackUp } from "@tabler/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
-type ProjectLayoutContextProps = {
-    isLoading: boolean;
-    data: ApiMethod.Project.GetResult;
-    setData: (data: ApiMethod.Project.GetResult) => void;
-};
-
-const defaultContextValue: ProjectLayoutContextProps = {
-    isLoading: true,
-    data: {
-        id: "",
-        boards: [],
-        coverAttachmentId: "",
-        createdAt: new Date(),
-        creatorId: "",
-        description: "",
-        dueDate: new Date(),
-        logoAttachmentId: "",
-        modifiedAt: new Date(),
-        modifierId: "",
-        name: "",
-        organizationId: "",
-        password: "",
-        startDate: new Date(),
-        users: [],
-    },
-    setData: () => {
-        throw new Error("setData is not defined");
-    },
-};
-
-export const ProjectLayoutContext = createContext<ProjectLayoutContextProps>(defaultContextValue);
 
 type ProjectPageLayoutProps = {
     children: React.ReactNode;
@@ -51,44 +20,18 @@ type ProjectPageLayoutProps = {
 };
 
 export default function ProjectPageLayout({ children, params: { id } }: ProjectPageLayoutProps) {
-    const [contextValue, setContextValue] = useState<ProjectLayoutContextProps>(defaultContextValue);
-
-    const {
-        isLoading,
-        data: { name, description, organizationId },
-    } = contextValue;
-
+    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.Project.GetResult>(ApiRoutes.Project(id), defaultProjectLayoutContextValue.data);
     const router = useRouter();
 
-    useEffect(() => {
-        fetch(ApiRoutes.Project(id), {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.Project.GetResult> = await res.json();
+    const { name, description, organizationId } = data;
 
-            if (error) {
-                toast.error(error.message);
-                return router.push(Routes.App);
-            }
-
-            setContextValue({
-                isLoading: false,
-                data: result,
-                setData: (data) => {
-                    setContextValue((prev) => ({
-                        ...prev,
-                        data,
-                    }));
-                },
-            });
-        });
-    }, [id, router]);
+    if (error) {
+        toast.error(error.message);
+        return router.push(Routes.App);
+    }
 
     return (
-        <ProjectLayoutContext.Provider value={contextValue}>
+        <ProjectLayoutContext.Provider value={{ isLoading, data, setData }}>
             <main className="flex h-full flex-col gap-6 py-9 px-16 3xl:px-36">
                 {!isLoading && (
                     <Link href={Routes.Organization(organizationId)}>

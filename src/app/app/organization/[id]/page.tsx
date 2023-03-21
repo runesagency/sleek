@@ -4,7 +4,7 @@ import type { MenuOptions } from "@/lib/menu/hooks/use-menu";
 import type { ApiMethod, ApiResult } from "@/lib/types";
 import type { Project as ProjectType } from "@prisma/client";
 
-import { OrganizationLayoutContext } from "@/app/app/organization/[id]/layout";
+import { OrganizationLayoutContext } from "@/app/app/organization/[id]/OrganizationLayoutContext";
 import { Button } from "@/components/Forms";
 import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";

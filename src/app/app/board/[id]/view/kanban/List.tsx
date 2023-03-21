@@ -1,6 +1,6 @@
-import type { BoardList } from "@/app/app/board/[id]/layout";
+import type { BoardList } from "@/app/app/board/[id]/BoardLayoutContext";
 
-import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
+import { BoardLayoutContext } from "@/app/app/board/[id]/BoardLayoutContext";
 import Card from "@/app/app/board/[id]/view/kanban/Card";
 import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import { Button, Textarea } from "@/components/Forms";

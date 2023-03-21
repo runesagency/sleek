@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardLayoutContext } from "@/app/app/layout";
+import { DashboardLayoutContext } from "@/app/app/DashboardLayoutContext";
 import { Project } from "@/app/app/organization/[id]/page";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";

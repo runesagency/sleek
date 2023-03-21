@@ -1,44 +1,15 @@
 "use client";
 
-import type { ApiResult, ApiMethod } from "@/lib/types";
+import type { ApiMethod } from "@/lib/types";
 
+import { defaultOrganizationLayoutContextValue, OrganizationLayoutContext } from "@/app/app/organization/[id]/OrganizationLayoutContext";
 import { ApiRoutes, Routes } from "@/lib/constants";
+import { useRequest } from "@/lib/hooks/use-request";
 
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
-import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
-type OrganizationLayoutContextProps = {
-    isLoading: boolean;
-    data: ApiMethod.Organization.GetResult;
-    setData: (data: ApiMethod.Organization.GetResult) => void;
-};
-
-const defaultContextValue: OrganizationLayoutContextProps = {
-    isLoading: true,
-    data: {
-        id: "",
-        createdAt: new Date(),
-        creatorId: "",
-        customRoles: [],
-        description: "",
-        externalProjects: [],
-        logoAttachmentId: "",
-        modifiedAt: new Date(),
-        modifierId: "",
-        name: "",
-        ownerId: "",
-        projects: [],
-        users: [],
-    },
-    setData: () => {
-        throw new Error("setData is not defined");
-    },
-};
-
-export const OrganizationLayoutContext = createContext<OrganizationLayoutContextProps>(defaultContextValue);
 
 type OrganizationPageLayoutProps = {
     children: React.ReactNode;
@@ -48,15 +19,11 @@ type OrganizationPageLayoutProps = {
 };
 
 export default function OrganizationPageLayout({ children, params: { id } }: OrganizationPageLayoutProps) {
-    const [contextValue, setContextValue] = useState<OrganizationLayoutContextProps>(defaultContextValue);
-
-    const {
-        isLoading,
-        data: { name },
-    } = contextValue;
-
+    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.Organization.GetResult>(ApiRoutes.Organization(id), defaultOrganizationLayoutContextValue.data);
     const router = useRouter();
     const currentSegment = useSelectedLayoutSegment();
+
+    const { name } = data;
 
     const links = [
         { name: "About", segment: "about" },
@@ -65,35 +32,13 @@ export default function OrganizationPageLayout({ children, params: { id } }: Org
         { name: "Settings", segment: "settings" },
     ];
 
-    useEffect(() => {
-        fetch(ApiRoutes.Organization(id), {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.Organization.GetResult> = await res.json();
-
-            if (error) {
-                toast.error(error.message);
-                return router.push(Routes.App);
-            }
-
-            setContextValue({
-                isLoading: false,
-                data: result,
-                setData: (data) => {
-                    setContextValue((prev) => ({
-                        ...prev,
-                        data,
-                    }));
-                },
-            });
-        });
-    }, [id, router]);
+    if (error) {
+        toast.error(error.message);
+        return router.push(Routes.App);
+    }
 
     return (
-        <OrganizationLayoutContext.Provider value={contextValue}>
+        <OrganizationLayoutContext.Provider value={{ isLoading, data, setData }}>
             <main className="flex h-full flex-col">
                 {isLoading ? (
                     <div className="animate-shimmer h-60 w-full shrink-0 bg-dark-700" /> //

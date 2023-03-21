@@ -1,9 +1,9 @@
 "use client";
 
-import type { BoardList } from "@/app/app/board/[id]/layout";
+import type { BoardList } from "@/app/app/board/[id]/BoardLayoutContext";
 import type { DragEvent } from "@/lib/drag-and-drop";
 
-import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
+import { BoardLayoutContext } from "@/app/app/board/[id]/BoardLayoutContext";
 import List from "@/app/app/board/[id]/view/kanban/List";
 import { DragDropProvider, Droppable, SortableDirection } from "@/lib/drag-and-drop";
 import { arrayMoveImmutable } from "@/lib/utils/array-move";

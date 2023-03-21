@@ -1,65 +1,20 @@
 "use client";
 
+import type { BoardCard, BoardList } from "@/app/app/board/[id]/BoardLayoutContext";
 import type { ApiMethod, ApiResult } from "@/lib/types";
 
+import { defaultBoardLayoutContextValue, BoardLayoutContext } from "@/app/app/board/[id]/BoardLayoutContext";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { SwitchButton, Button } from "@/components/Forms";
 import TaskModal from "@/components/TaskModal";
 import { ApiRoutes, Routes } from "@/lib/constants";
+import { useRequest } from "@/lib/hooks/use-request";
 
 import { IconArrowBackUp, IconFilter, IconPlus } from "@tabler/icons";
 import Link from "next/link";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
-import { createContext, useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
-
-export type BoardList = ApiMethod.Board.GetResult["lists"][0];
-
-export type BoardCard = ApiMethod.Board.GetResult["cards"][0];
-
-type BoardLayoutContextProps = {
-    isLoading: boolean;
-    activeCard?: BoardCard;
-    data: ApiMethod.Board.GetResult;
-    setLists: (lists: BoardList[]) => void;
-    setCards: (cards: BoardCard[]) => void;
-    setActiveCard: (card: BoardCard | undefined) => void;
-    onCreateNewCard: (name: string, listId: string, order: number) => Promise<void>;
-};
-
-const defaultContextValue: BoardLayoutContextProps = {
-    isLoading: true,
-    data: {
-        id: "",
-        createdAt: new Date(),
-        creatorId: "",
-        description: "",
-        locked: false,
-        modifiedAt: new Date(),
-        modifierId: "",
-        name: "",
-        password: "",
-        projectId: "",
-        users: [],
-        lists: [],
-        cards: [],
-    },
-    activeCard: undefined,
-    setLists: () => {
-        throw new Error("setLists is not defined");
-    },
-    setCards: () => {
-        throw new Error("setCards is not defined");
-    },
-    setActiveCard: () => {
-        throw new Error("setActiveCard is not defined");
-    },
-    onCreateNewCard: () => {
-        throw new Error("onCreateNewCard is not defined");
-    },
-};
-
-export const BoardLayoutContext = createContext<BoardLayoutContextProps>(defaultContextValue);
 
 type BoardPageLayoutProps = {
     children: React.ReactNode;
@@ -69,26 +24,40 @@ type BoardPageLayoutProps = {
 };
 
 export default function BoardPageLayout({ children, params: { id } }: BoardPageLayoutProps) {
-    const [isLoading, setIsLoading] = useState(true);
-    const [data, setData] = useState<BoardLayoutContextProps["data"]>(defaultContextValue.data);
+    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.Board.GetResult>(ApiRoutes.Board(id), defaultBoardLayoutContextValue.data);
+    const router = useRouter();
+    const currentSegment = useSelectedLayoutSegment();
+
+    const { projectId, name, users, lists, cards } = data ?? {};
     const [activeCard, setActiveCard] = useState<BoardCard | undefined>(undefined);
 
-    const router = useRouter();
-    const { projectId, name, users, lists, cards } = data;
+    const setLists = useCallback(
+        (lists: BoardList[]) => {
+            setData((prev) => {
+                if (!prev) return prev;
 
-    const setLists = useCallback((lists: BoardList[]) => {
-        setData((prev) => ({
-            ...prev,
-            lists,
-        }));
-    }, []);
+                return {
+                    ...prev,
+                    lists,
+                };
+            });
+        },
+        [setData]
+    );
 
-    const setCards = useCallback((cards: BoardCard[]) => {
-        setData((prev) => ({
-            ...prev,
-            cards,
-        }));
-    }, []);
+    const setCards = useCallback(
+        (cards: BoardCard[]) => {
+            setData((prev) => {
+                if (!prev) return prev;
+
+                return {
+                    ...prev,
+                    cards,
+                };
+            });
+        },
+        [setData]
+    );
 
     const onCreateNewList = useCallback(() => {
         fetch(ApiRoutes.List, {
@@ -109,7 +78,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
 
             setLists([...lists, result]);
         });
-    }, [lists, setLists]);
+    }, [id, lists, setLists]);
 
     const onCreateNewCard = useCallback(
         async (name: string, listId: string, order: number) => {
@@ -167,8 +136,6 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
         [cards, id, lists, setCards]
     );
 
-    const currentSegment = useSelectedLayoutSegment();
-
     const links = [
         { name: "About", segment: "about" },
         { name: "View", segment: "view" },
@@ -176,24 +143,10 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
         { name: "Settings", segment: "settings" },
     ];
 
-    useEffect(() => {
-        fetch(ApiRoutes.Board(id), {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.Board.GetResult> = await res.json();
-
-            if (error) {
-                toast.error(error.message);
-                return router.push(Routes.App);
-            }
-
-            setIsLoading(false);
-            setData(result);
-        });
-    }, [id, router]);
+    if (error) {
+        toast.error(error.message);
+        return router.push(Routes.App);
+    }
 
     return (
         <BoardLayoutContext.Provider value={{ isLoading, data, activeCard, setLists, setCards, setActiveCard, onCreateNewCard }}>

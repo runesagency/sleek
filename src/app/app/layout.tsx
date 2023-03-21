@@ -2,9 +2,11 @@
 
 import type { ApiResult, ApiMethod } from "@/lib/types";
 
+import { defaultDashboardLayoutContextValue, DashboardLayoutContext } from "@/app/app/DashboardLayoutContext";
 import { Button, Input } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
 import { ApiRoutes, Routes } from "@/lib/constants";
+import { useRequest } from "@/lib/hooks/use-request";
 import { MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -13,40 +15,9 @@ import clsx from "clsx";
 import Link from "next/link";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState, createContext, useContext } from "react";
+import { useCallback, useState, useContext } from "react";
 import { toast } from "react-toastify";
-
-type DashboardLayoutContextProps = {
-    isLoading: boolean;
-    data: ApiMethod.CurrentUser.GetResult;
-    setData: (data: ApiMethod.CurrentUser.GetResult) => void;
-};
-
-const defaultContextValue: DashboardLayoutContextProps = {
-    isLoading: true,
-    data: {
-        createdAt: new Date(),
-        email: "",
-        id: "",
-        language: "",
-        modifiedAt: new Date(),
-        name: "",
-        organizations: [],
-        roleId: "",
-        subscribeByDefault: false,
-        subscribeToEmail: false,
-        username: "",
-        coverAttachmentId: "",
-        imageAttachmentId: "",
-        phone: "",
-        verifiedAt: new Date(),
-    },
-    setData: () => {
-        throw new Error("setData is not defined");
-    },
-};
-
-export const DashboardLayoutContext = createContext<DashboardLayoutContextProps>(defaultContextValue);
+import { SWRConfig } from "swr";
 
 type SidebarProps = {
     isOpen: boolean;
@@ -57,6 +28,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
     const [organizationOnCreate, setOrganizationOnCreate] = useState<string | null>(null);
     const [autoAnimateRef] = useAutoAnimate();
     const { toggleMenu } = useMenu();
+
     const { organizations } = data;
 
     const links = [
@@ -153,85 +125,68 @@ type DashboardLayoutProps = {
 };
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-    const [contextValue, setContextValue] = useState<DashboardLayoutContextProps>(defaultContextValue);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.CurrentUser.GetResult>(ApiRoutes.CurrentUser, defaultDashboardLayoutContextValue.data);
+    const { data: sessionData } = useSession();
     const router = useRouter();
     const currentSegment = useSelectedLayoutSegment();
-    const { data } = useSession();
 
     const segmentWithoutSidebar = ["board"];
     const isUsingSidebar = !segmentWithoutSidebar.find((segment) => currentSegment === segment);
 
-    useEffect(() => {
-        if (!data) return;
-
-        fetch(ApiRoutes.CurrentUser, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }).then(async (res) => {
-            const { result, error }: ApiResult<ApiMethod.CurrentUser.GetResult> = await res.json();
-
-            if (error) {
-                toast.error(error.message);
-                return router.push(Routes.Home);
-            }
-
-            setContextValue({
-                isLoading: false,
-                data: result,
-                setData: (data) => setContextValue((prev) => ({ ...prev, data })),
-            });
-        });
-    }, [data, router]);
+    if (error) {
+        toast.error(error.message);
+        return router.push(Routes.Home);
+    }
 
     return (
-        <DashboardLayoutContext.Provider value={contextValue}>
-            <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
-                <nav className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-10 py-3 md:px-20">
-                    <div className="flex items-center gap-4">
-                        <IconMenu2 className="lg:hidden" height={20} onClick={() => setSidebarOpen(!sidebarOpen)} />
+        <SWRConfig value={{ revalidateOnFocus: true, revalidateOnReconnect: true }}>
+            <DashboardLayoutContext.Provider value={{ isLoading, data, setData }}>
+                <main className="relative flex h-screen max-h-screen min-h-screen flex-col items-center bg-dark-900 text-dark-50">
+                    <nav className="flex w-full items-center justify-between border-b border-b-dark-600 bg-dark-800 px-10 py-3 md:px-20">
+                        <div className="flex items-center gap-4">
+                            <IconMenu2 className="lg:hidden" height={20} onClick={() => setSidebarOpen(!sidebarOpen)} />
 
-                        <Link href={Routes.App}>
-                            <img src="/assets/images/logo.svg" alt="Logo" loading="lazy" className="h-6" />
-                        </Link>
-                    </div>
+                            <Link href={Routes.App}>
+                                <img src="/assets/images/logo.svg" alt="Logo" loading="lazy" className="h-6" />
+                            </Link>
+                        </div>
 
-                    <div className="flex items-stretch gap-7">
-                        <Input.Small
-                            icon={IconSearch}
-                            placeholder="Search"
-                            className={{
-                                icon: "!py-2",
-                                input: "!py-2",
-                            }}
-                        />
+                        <div className="flex items-stretch gap-7">
+                            <Input.Small
+                                icon={IconSearch}
+                                placeholder="Search"
+                                className={{
+                                    icon: "!py-2",
+                                    input: "!py-2",
+                                }}
+                            />
 
-                        <IconUsers className="my-auto h-5 shrink-0" />
+                            <IconUsers className="my-auto h-5 shrink-0" />
 
-                        <IconBell className="my-auto h-5 shrink-0" />
+                            <IconBell className="my-auto h-5 shrink-0" />
 
-                        {data && data.user ? (
-                            <Button.Large fit>
-                                <Avatar seed={data.user.name || ""} className="h-5 w-5" />
-                                <p className="ts-sm">{data.user.name || ""}</p>
-                            </Button.Large>
-                        ) : (
-                            <Button.Large fit className="animate-shimmer">
-                                <IconLoader2 height={20} width={20} className="animate-spin" />
-                                <p className="ts-sm">Loading...</p>
-                            </Button.Large>
-                        )}
-                    </div>
-                </nav>
+                            {sessionData && sessionData.user ? (
+                                <Button.Large fit>
+                                    <Avatar seed={sessionData.user.name || ""} className="h-5 w-5" />
+                                    <p className="ts-sm">{sessionData.user.name || ""}</p>
+                                </Button.Large>
+                            ) : (
+                                <Button.Large fit className="animate-shimmer">
+                                    <IconLoader2 height={20} width={20} className="animate-spin" />
+                                    <p className="ts-sm">Loading...</p>
+                                </Button.Large>
+                            )}
+                        </div>
+                    </nav>
 
-                <main className="flex h-full w-full items-start overflow-auto">
-                    {isUsingSidebar && <Sidebar isOpen={sidebarOpen} />}
+                    <main className="flex h-full w-full items-start overflow-auto">
+                        {isUsingSidebar && <Sidebar isOpen={sidebarOpen} />}
 
-                    <section className="h-full max-h-full w-full flex-1 overflow-auto">{children}</section>
+                        <section className="h-full max-h-full w-full flex-1 overflow-auto">{children}</section>
+                    </main>
                 </main>
-            </main>
-        </DashboardLayoutContext.Provider>
+            </DashboardLayoutContext.Provider>
+        </SWRConfig>
     );
 }

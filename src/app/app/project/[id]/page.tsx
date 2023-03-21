@@ -3,7 +3,7 @@
 import type { MenuOptions } from "@/lib/menu/hooks/use-menu";
 import type { ApiMethod, ApiResult } from "@/lib/types";
 
-import { ProjectLayoutContext } from "@/app/app/project/[id]/layout";
+import { ProjectLayoutContext } from "@/app/app/project/[id]/ProjectLayoutContext";
 import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
 import { ApiRoutes, Routes } from "@/lib/constants";

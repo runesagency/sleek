@@ -1,7 +1,7 @@
-import type { BoardCard } from "@/app/app/board/[id]/layout";
+import type { BoardCard } from "@/app/app/board/[id]/BoardLayoutContext";
 import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
-import { BoardLayoutContext } from "@/app/app/board/[id]/layout";
+import { BoardLayoutContext } from "@/app/app/board/[id]/BoardLayoutContext";
 import { SortableType } from "@/app/app/board/[id]/view/kanban/page";
 import Label from "@/components/DataDisplay/Label";
 import MemberList from "@/components/DataDisplay/MemberList";
