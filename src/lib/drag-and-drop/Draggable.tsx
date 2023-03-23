@@ -29,10 +29,21 @@ export type DraggableProps<T> = {
     onTouch?: (e: TouchEvent) => void;
     onClickOrTouch?: (e: MouseEvent | TouchEvent) => void;
     children: (provided: DraggableProvided<T>, snapshot: DraggableSnapshot) => JSX.Element;
-};
+} & (
+    | {
+          scrollSpeed?: number;
+          scrollSpeedX?: never;
+          scrollSpeedY?: never;
+      }
+    | {
+          scrollSpeed?: never;
+          scrollSpeedX?: number;
+          scrollSpeedY?: number;
+      }
+);
 
 export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch, onClickOrTouch, children, ...options }: DraggableProps<T>) {
-    const { type, useClone = true, activatorDistance = 10, visualizeCollision, lockX, lockY } = options;
+    const { type, useClone = true, activatorDistance = 10, visualizeCollision, lockX, lockY, scrollSpeed, scrollSpeedX, scrollSpeedY } = options;
 
     const ref = useRef<T>(null);
     const handleRef = useRef<T>(null);
@@ -636,41 +647,42 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
             autoContainerScrollIntervals = setInterval(() => {
                 scrollableElements.forEach((element) => {
                     if (!hasMove) return;
+
                     const { top, left, width, height } = element.getBoundingClientRect();
+                    const defaultSpeed = 25;
+
+                    // check if cursor is inside element, if not, skip
+                    if (!(clientX > left && clientX < left + width && clientY > top && clientY < top + height)) return;
 
                     // check if element has vertical scroll
-                    if (element.scrollHeight > element.clientHeight && clientY > top && clientY < top + height) {
+                    if (element.scrollHeight > element.clientHeight) {
                         const partitionSize = height / 4;
                         const cursorPos = clientY - top;
+                        const verticalSpeed = scrollSpeed ?? scrollSpeedY ?? defaultSpeed;
 
-                        if (cursorPos <= partitionSize && clientX > left && clientX < left + width) {
-                            const speed = Math.abs(cursorPos - partitionSize) / 10;
-                            const actualSpeed = speed > 15 ? (clientY < 0 ? 25 : 15) : speed;
-                            element.scrollTop -= actualSpeed;
+                        // near top
+                        if (cursorPos <= partitionSize) {
+                            element.scrollTop -= (1 - cursorPos / partitionSize) * verticalSpeed;
                         }
 
-                        if (height - cursorPos < partitionSize && clientX > left && clientX < left + width) {
-                            const speed = Math.abs(height - cursorPos - partitionSize) / 10;
-                            const actualSpeed = speed > 15 ? (clientY > height ? 25 : 15) : speed;
-                            element.scrollTop += actualSpeed;
+                        // near bottom
+                        if (height - cursorPos < partitionSize) {
+                            element.scrollTop += (1 - (height - cursorPos) / partitionSize) * verticalSpeed;
                         }
                     }
 
                     // check if element has horizontal scroll
-                    if (element.scrollWidth > element.clientWidth && clientX > left && clientX < left + width) {
+                    if (element.scrollWidth > element.clientWidth) {
                         const partitionSize = width / 4;
                         const cursorPos = clientX - left;
+                        const verticalSpeed = scrollSpeed ?? scrollSpeedX ?? defaultSpeed;
 
-                        if (cursorPos <= partitionSize && clientY > top && clientY < top + height) {
-                            const speed = Math.abs(cursorPos - partitionSize) / 10;
-                            const actualSpeed = speed > 15 ? (clientX < 0 ? 25 : 15) : speed;
-                            element.scrollLeft -= actualSpeed;
+                        if (cursorPos <= partitionSize) {
+                            element.scrollLeft -= (1 - cursorPos / partitionSize) * verticalSpeed;
                         }
 
-                        if (width - cursorPos < partitionSize && clientY > top && clientY < top + height) {
-                            const speed = Math.abs(width - cursorPos - partitionSize) / 10;
-                            const actualSpeed = speed > 15 ? (clientX > width ? 25 : 15) : speed;
-                            element.scrollLeft += actualSpeed;
+                        if (width - cursorPos < partitionSize) {
+                            element.scrollLeft += (1 - (width - cursorPos) / partitionSize) * verticalSpeed;
                         }
                     }
                 });
@@ -836,6 +848,9 @@ export default function Draggable<T extends HTMLElement>({ id, onClick, onTouch,
         onDragEnterContext,
         onDragStartParentDroppable,
         onDragEndParentDroppable,
+        scrollSpeed,
+        scrollSpeedY,
+        scrollSpeedX,
     ]);
 
     return children({ ref, handleRef }, snapshot);
