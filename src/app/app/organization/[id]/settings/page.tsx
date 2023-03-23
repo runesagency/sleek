@@ -16,19 +16,20 @@ export default function Settings() {
                 <h2 className="ts-2xl">General Settings</h2>
 
                 <div className="flex flex-col gap-7">
-                    <div>
+                    <div className="flex flex-col gap-2">
                         <h3 className="ts-base">Organization Title</h3>
                         <p className="ts-sm w-7/12">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam venenatis sapien vel erat ultricies vestibulum sed vitae nulla. </p>
-                        <p className="ts-sm w-7/12">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam venenatis sapien vel erat ultricies vestibulum sed vitae nulla. </p>
                     </div>
+
                     <Input.Large placeholder="Enter your tittle here ..." />
                 </div>
 
                 <div className="flex flex-col gap-7">
-                    <div>
+                    <div className="flex flex-col gap-2">
                         <h3 className="ts-base">Organization Description</h3>
                         <p className="ts-sm w-7/12">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam venenatis sapien vel erat ultricies vestibulum sed vitae nulla. </p>
                     </div>
+
                     <Textarea rows={5} placeholder="Enter your description here ..." />
                 </div>
             </div>
