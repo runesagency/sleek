@@ -2,7 +2,7 @@ import type { MenuVariantContext, MenuVariantContextItem } from "@/lib/menu";
 import type { MenuSharedProps } from "@/lib/menu/components/Menu";
 
 import clsx from "clsx";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useState } from "react";
 
 type MenuContextComponentItemProps = MenuVariantContextItem & {
@@ -13,13 +13,16 @@ type MenuContextComponentItemProps = MenuVariantContextItem & {
 };
 
 const MenuContextComponentItem = ({ icon: Icon, name, onClick: onItemClick, href, index, activeIndex, closeMenu, setActiveIndex }: MenuContextComponentItemProps) => {
-    const Component = href ? Link : "button";
+    const router = useRouter();
 
     const onClick = useCallback(() => {
         if (onItemClick) {
             onItemClick(closeMenu);
+        } else if (href) {
+            router.push(href);
+            closeMenu();
         }
-    }, [closeMenu, onItemClick]);
+    }, [closeMenu, href, onItemClick, router]);
 
     const onHover = useCallback(() => {
         setActiveIndex(index);
@@ -28,10 +31,10 @@ const MenuContextComponentItem = ({ icon: Icon, name, onClick: onItemClick, href
     if (!href && !onItemClick) return null;
 
     return (
-        <Component id={`item-${index}`} href={href ?? "#"} onClick={onClick} onMouseOver={onHover} className={clsx("flex items-center gap-3 px-5 py-3", activeIndex === index && "bg-dark-800")}>
+        <button onClick={onClick} onMouseOver={onHover} className={clsx("flex items-center gap-3 px-5 py-3", activeIndex === index && "bg-dark-800")}>
             <Icon height={16} width={undefined} />
             <span className="ts-sm">{name}</span>
-        </Component>
+        </button>
     );
 };
 
@@ -39,6 +42,7 @@ type MenuContextComponentProps = MenuSharedProps & Omit<MenuVariantContext, "typ
 
 const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuContextComponentProps) => {
     const [activeIndex, setActiveIndex] = useState(0);
+    const router = useRouter();
 
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
@@ -70,11 +74,8 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
                     if (list.onClick) {
                         list.onClick(closeMenu);
                     } else if (list.href) {
-                        const element = document.getElementById(`item-${activeIndex}`);
-
-                        if (element) {
-                            element.click();
-                        }
+                        router.push(list.href);
+                        closeMenu();
                     }
 
                     break;
@@ -87,7 +88,7 @@ const MenuContextComponent = ({ lists, innerRef, closeMenu, ...props }: MenuCont
         return () => {
             document.removeEventListener("keydown", onKeyDown);
         };
-    }, [activeIndex, closeMenu, lists, lists.length]);
+    }, [activeIndex, closeMenu, lists, lists.length, router]);
 
     return (
         <section ref={innerRef} {...props} className="flex flex-col overflow-hidden rounded-lg border border-dark-600 bg-dark-700 text-dark-50">
