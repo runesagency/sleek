@@ -4,8 +4,8 @@ import { createContext } from "react";
 
 export type DashboardLayoutContextProps = {
     isLoading: boolean;
-    data: ApiMethod.OrganizationList.GetResult;
-    setData: (data: ApiMethod.OrganizationList.GetResult) => void;
+    data: ApiMethod.OrganizationCollections.GetResult;
+    setData: (data: ApiMethod.OrganizationCollections.GetResult) => void;
 };
 
 export const defaultDashboardLayoutContextValue: DashboardLayoutContextProps = {

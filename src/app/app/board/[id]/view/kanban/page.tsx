@@ -120,12 +120,12 @@ export default function KanbanLayoutPage() {
 
                 setLists(newList);
 
-                const listUpdateBody: ApiMethod.List.PatchSchemaType = {
+                const listUpdateBody: ApiMethod.ListCollections.PatchSchemaType = {
                     boardId: id,
                     lists: newList.map((list) => ({ id: list.id, order: list.order })),
                 };
 
-                const res = await fetch(ApiRoutes.List, {
+                const res = await fetch(ApiRoutes.ListCollections, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
@@ -133,7 +133,7 @@ export default function KanbanLayoutPage() {
                     body: JSON.stringify(listUpdateBody),
                 });
 
-                const { error }: ApiResult<ApiMethod.List.PatchResult> = await res.json();
+                const { error }: ApiResult<ApiMethod.ListCollections.PatchResult> = await res.json();
 
                 if (error) {
                     toast.error(error.message);
@@ -215,7 +215,7 @@ export default function KanbanLayoutPage() {
 
                 setCards(updatedCards);
 
-                const cardUpdateBody: ApiMethod.Card.PatchSchemaType = {
+                const cardUpdateBody: ApiMethod.CardCollections.PatchSchemaType = {
                     boardId: id,
                     cards: updatedCards.filter((card) => {
                         const currentCard = cards.find((c) => c.id === card.id);
@@ -225,7 +225,7 @@ export default function KanbanLayoutPage() {
                     }),
                 };
 
-                const res = await fetch(ApiRoutes.Card, {
+                const res = await fetch(ApiRoutes.CardCollections, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
@@ -233,7 +233,7 @@ export default function KanbanLayoutPage() {
                     body: JSON.stringify(cardUpdateBody),
                 });
 
-                const { error }: ApiResult<ApiMethod.Card.PatchResult> = await res.json();
+                const { error }: ApiResult<ApiMethod.CardCollections.PatchResult> = await res.json();
 
                 if (error) {
                     toast.error(error.message);

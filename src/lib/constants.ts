@@ -33,18 +33,20 @@ export const Routes = {
 } as const;
 
 export const ApiRoutes = {
-    CurrentUser: "/api/@me",
     Auth: "/api/auth",
 
-    OrganizationList: "/api/organizations",
+    OrganizationCollections: "/api/organizations",
     Organization: (id: string) => `/api/organizations/${id}`,
 
-    ProjectList: "/api/projects",
+    ProjectCollections: "/api/projects",
     Project: (id: string) => `/api/projects/${id}`,
 
-    BoardList: "/api/boards",
+    BoardCollections: "/api/boards",
     Board: (id: string) => `/api/boards/${id}`,
 
-    List: "/api/lists",
-    Card: "/api/cards",
+    ListCollections: "/api/lists",
+    List: (id: string) => `/api/lists/${id}`,
+
+    CardCollections: "/api/cards",
+    Card: (id: string) => `/api/cards/${id}`,
 } as const;

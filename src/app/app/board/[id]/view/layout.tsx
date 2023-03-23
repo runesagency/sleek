@@ -44,7 +44,7 @@ export default function BoardViewPageLayout({ children }: BoardViewPageLayoutPro
                 },
             ],
             onSubmit: async ({ title }: { title: string }) => {
-                const res = await fetch(ApiRoutes.List, {
+                const res = await fetch(ApiRoutes.ListCollections, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function BoardViewPageLayout({ children }: BoardViewPageLayoutPro
                     }),
                 });
 
-                const { result, error }: ApiResult<ApiMethod.List.PostResult> = await res.json();
+                const { result, error }: ApiResult<ApiMethod.ListCollections.PostResult> = await res.json();
 
                 if (error) {
                     return toast.error(error.message);

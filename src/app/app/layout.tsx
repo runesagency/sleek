@@ -51,7 +51,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                 onSubmit: async ({ name }: { name: string }) => {
                     setOrganizationOnCreate(name);
 
-                    const res = await fetch(ApiRoutes.OrganizationList, {
+                    const res = await fetch(ApiRoutes.OrganizationCollections, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -61,7 +61,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
                         }),
                     });
 
-                    const { result, error }: ApiResult<ApiMethod.OrganizationList.PostResult> = await res.json();
+                    const { result, error }: ApiResult<ApiMethod.OrganizationCollections.PostResult> = await res.json();
 
                     if (error) {
                         return toast.error(error.message);
@@ -123,7 +123,7 @@ type DashboardLayoutProps = {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.OrganizationList.GetResult>(ApiRoutes.OrganizationList, defaultDashboardLayoutContextValue.data);
+    const { data, error, isLoading, mutate: setData } = useRequest<ApiMethod.OrganizationCollections.GetResult>(ApiRoutes.OrganizationCollections, defaultDashboardLayoutContextValue.data);
     const { data: sessionData } = useSession();
     const router = useRouter();
     const currentSegment = useSelectedLayoutSegment();

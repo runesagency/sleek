@@ -77,14 +77,14 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
                 return;
             }
 
-            const requestBody: ApiMethod.Card.PostSchemaType = {
+            const requestBody: ApiMethod.CardCollections.PostSchemaType = {
                 title: parsedName,
                 boardId: id,
                 listId,
                 order,
             };
 
-            const res = await fetch(ApiRoutes.Card, {
+            const res = await fetch(ApiRoutes.CardCollections, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export default function BoardPageLayout({ children, params: { id } }: BoardPageL
                 body: JSON.stringify(requestBody),
             });
 
-            const { result, error }: ApiResult<ApiMethod.Card.PostResult> = await res.json();
+            const { result, error }: ApiResult<ApiMethod.CardCollections.PostResult> = await res.json();
 
             if (error) {
                 toast.error(error.message);
