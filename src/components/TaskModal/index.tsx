@@ -109,9 +109,9 @@ const TaskModal = () => {
     }, 0);
 
     return (
-        <section className="fixed top-0 left-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto">
+        <section className="fixed left-0 top-0 flex h-full min-h-screen w-screen flex-col items-center justify-start overflow-auto">
             {/* Use this blocker instead useClickOutside hooks to prevent outside click bug when editing description using React SimpleMDE editor */}
-            <div className="fixed top-0 left-0 z-10 h-full w-full bg-dark-900/50" onClick={onModalClose} />
+            <div className="fixed left-0 top-0 z-10 h-full w-full bg-dark-900/50" onClick={onModalClose} />
 
             <br />
 

@@ -130,7 +130,7 @@ const Pricing = () => {
 
             {/* Package */}
             <aside className="w-full xl:max-w-xl">
-                <div className="sticky top-8 flex h-max w-full flex-col justify-center gap-8 rounded-3xl bg-dark-700 py-8 px-10">
+                <div className="sticky top-8 flex h-max w-full flex-col justify-center gap-8 rounded-3xl bg-dark-700 px-10 py-8">
                     <section className="flex flex-col gap-3">
                         <div ref={autoAnimateRef} className="flex items-center gap-8">
                             <Icon size={48} className="shrink-0" />

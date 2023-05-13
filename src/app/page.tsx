@@ -153,7 +153,7 @@ export default function HomePage() {
 
                 <div className="relative hidden w-full flex-1 md:block">
                     <img src="/assets/images/product-preview.png" alt="" className="relative z-20 h-full w-full rounded-l-lg border border-dark-600 object-cover object-left-top" />
-                    <img src="/assets/images/radial.png" alt="" className="absolute top-0 left-0 z-10 max-w-screen-xl -translate-y-1/3 -translate-x-1/3" />
+                    <img src="/assets/images/radial.png" alt="" className="absolute left-0 top-0 z-10 max-w-screen-xl -translate-x-1/3 -translate-y-1/3" />
                 </div>
             </Container>
 

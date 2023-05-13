@@ -32,7 +32,7 @@ export default function ProjectPageLayout({ children, params: { id } }: ProjectP
 
     return (
         <ProjectLayoutContext.Provider value={{ isLoading, data, setData }}>
-            <main className="flex h-full flex-col gap-6 py-9 px-16 3xl:px-36">
+            <main className="flex h-full flex-col gap-6 px-16 py-9 3xl:px-36">
                 {!isLoading && (
                     <Link href={Routes.Organization(organizationId)}>
                         <Button.Small icon={IconArrowBackUp} fit>
