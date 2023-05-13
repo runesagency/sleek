@@ -9,7 +9,7 @@ import Features from "@/components/Sections/Features";
 import Footer from "@/components/Sections/Footer";
 import Navigation from "@/components/Sections/Navigation";
 
-import { IconDoorEnter, IconFolder, IconLayout, IconMail, IconReload, IconSettings } from "@tabler/icons";
+import { IconDoorEnter, IconFolder, IconLayout, IconMail, IconReload, IconSettings } from "@tabler/icons-react";
 import clsx from "clsx";
 
 type Excellence = {

@@ -4,7 +4,7 @@ import { OrganizationLayoutContext } from "@/app/app/organization/[id]/Organizat
 import { Button, Input } from "@/components/Forms";
 
 import { User } from "@prisma/client";
-import { IconPlus, IconSearch } from "@tabler/icons";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useCallback, useContext } from "react";
 
 const User = ({ name, email, roleId }: User) => {

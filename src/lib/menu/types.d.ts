@@ -3,7 +3,7 @@ import type { CheckboxProps } from "@/components/Forms/Checkbox";
 import type { InputProps } from "@/components/Forms/Input";
 import type { TextareaProps } from "@/components/Forms/Textarea";
 import type { Label, User } from "@prisma/client";
-import type { TablerIcon } from "@tabler/icons";
+import type { TablerIcon } from "@tabler/icons-react";
 
 export enum MenuVariant {
     Context = "context",

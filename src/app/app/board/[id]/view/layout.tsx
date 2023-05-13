@@ -10,7 +10,7 @@ import TaskModal from "@/components/TaskModal";
 import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
-import { IconArrowBackUp, IconFilter, IconPlus } from "@tabler/icons";
+import { IconArrowBackUp, IconFilter, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useCallback, useContext, useMemo } from "react";
 import { toast } from "react-toastify";

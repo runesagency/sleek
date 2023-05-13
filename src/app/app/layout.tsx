@@ -9,7 +9,7 @@ import Avatar from "@/components/Miscellaneous/Avatar";
 import { ApiRoutes, Routes } from "@/lib/constants";
 import { useRequest } from "@/lib/hooks";
 
-import { IconBell, IconUsers, IconMenu2, IconLoader2, IconSearch } from "@tabler/icons";
+import { IconBell, IconUsers, IconMenu2, IconLoader2, IconSearch } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useSession } from "next-auth/react";

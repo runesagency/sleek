@@ -1,4 +1,5 @@
 import Avatar from "@/components/Miscellaneous/Avatar";
+import { IconPlus } from "@tabler/icons-react";
 
 type User = {
     name: string;

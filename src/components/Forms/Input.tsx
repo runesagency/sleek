@@ -1,6 +1,6 @@
 "use client";
 
-import type { TablerIcon } from "@tabler/icons";
+import type { TablerIcon } from "@tabler/icons-react";
 
 import clsx from "clsx";
 import { useRef, memo, useCallback, useState } from "react";

@@ -3,7 +3,7 @@
 import Container from "@/components/Sections/Container";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { IconChevronDown } from "@tabler/icons";
+import { IconChevronDown } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 

@@ -8,7 +8,7 @@ import MemberList from "@/components/DataDisplay/MemberList";
 import { Button } from "@/components/Forms";
 import { Draggable } from "@/lib/drag-and-drop";
 
-import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons";
+import { IconCalendar, IconChevronDown, IconDots, IconMessageDots, IconPaperclip } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useCallback, useRef, useState, memo, useContext } from "react";
 

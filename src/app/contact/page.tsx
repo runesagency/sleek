@@ -6,7 +6,7 @@ import FAQ from "@/components/Sections/FAQ";
 import Footer from "@/components/Sections/Footer";
 import Navigation from "@/components/Sections/Navigation";
 
-import { IconBuildingCommunity, IconMail, IconPhone } from "@tabler/icons";
+import { IconBuildingCommunity, IconMail, IconPhone } from "@tabler/icons-react";
 
 export default function ContactPage() {
     const contactInformation = [

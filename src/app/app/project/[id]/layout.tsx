@@ -7,7 +7,7 @@ import { Button } from "@/components/Forms";
 import { ApiRoutes, Routes } from "@/lib/constants";
 import { useRequest } from "@/lib/hooks";
 
-import { IconArrowBackUp } from "@tabler/icons";
+import { IconArrowBackUp } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";

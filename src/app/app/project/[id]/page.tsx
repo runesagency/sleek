@@ -10,7 +10,7 @@ import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuAnchor, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { IconFilter, IconPlus, IconShare } from "@tabler/icons";
+import { IconFilter, IconPlus, IconShare } from "@tabler/icons-react";
 import Link from "next/link";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";

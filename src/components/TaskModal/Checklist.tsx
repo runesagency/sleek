@@ -4,7 +4,7 @@ import type { CardChecklist, CardChecklistTask } from "@prisma/client";
 
 import { Button, Checkbox } from "@/components/Forms";
 
-import { IconDots, IconPlus } from "@tabler/icons";
+import { IconDots, IconPlus } from "@tabler/icons-react";
 import { memo, useMemo } from "react";
 
 type ChecklistProps = {

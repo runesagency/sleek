@@ -5,7 +5,7 @@ specifiers:
   '@formkit/auto-animate': 1.0.0-beta.6
   '@mantine/hooks': ^6.0.9
   '@prisma/client': ^4.13.0
-  '@tabler/icons': ^2.17.0
+  '@tabler/icons-react': ^2.18.0
   '@tailwindcss/line-clamp': ^0.4.4
   '@tailwindcss/typography': ^0.5.9
   '@types/node': 18.16.1
@@ -57,7 +57,7 @@ dependencies:
   '@formkit/auto-animate': 1.0.0-beta.6
   '@mantine/hooks': 6.0.9_react@18.2.0
   '@prisma/client': 4.13.0_prisma@4.13.0
-  '@tabler/icons': 2.17.0
+  '@tabler/icons-react': 2.18.0_react@18.2.0
   '@tailwindcss/line-clamp': 0.4.4_tailwindcss@3.3.2
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.3.2
   clsx: 1.2.1
@@ -606,8 +606,18 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@tabler/icons/2.17.0:
-    resolution: {integrity: sha512-UeJaylOGNRhQKyDlgZfrQ3UPSGlfVQuXcmCsTYeXioKKepibW6VZ3H36Lo1jvBTBkQD2e9m+k2NxwkztOTXwrA==}
+  /@tabler/icons-react/2.18.0_react@18.2.0:
+    resolution: {integrity: sha512-F4HyBIoC3DvIPmjP9ienurvSWhQOajDuTc3C5F7UfjhBkom3cAuJfDWH2tqGAfNrhjvG4X3ERR2dxOWLpegsiA==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@tabler/icons': 2.18.0
+      prop-types: 15.8.1
+      react: 18.2.0
+    dev: false
+
+  /@tabler/icons/2.18.0:
+    resolution: {integrity: sha512-N7a20mwbhrFXNqvd8Rxa0Btwu1Li5rQbqdIi3mzt5HRjP25PbyYuTU2BXbu8yMEnUk018Gi13gpS/jlMgXFuOw==}
     dev: false
 
   /@tailwindcss/line-clamp/0.4.4_tailwindcss@3.3.2:

@@ -8,7 +8,7 @@ import Container from "@/components/Sections/Container";
 import { Routes } from "@/lib/constants";
 
 import { useClickOutside, useHash } from "@mantine/hooks";
-import { IconDoorEnter, IconLogin, IconMail } from "@tabler/icons";
+import { IconDoorEnter, IconLogin, IconMail } from "@tabler/icons-react";
 import clsx from "clsx";
 import Link from "next/link";
 import { signOut, getProviders, signIn, useSession } from "next-auth/react";

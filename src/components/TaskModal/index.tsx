@@ -14,7 +14,7 @@ import Checklist from "@/components/TaskModal/Checklist";
 import Description from "@/components/TaskModal/Description";
 import Title from "@/components/TaskModal/Title";
 
-import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons";
+import { IconAt, IconBell, IconCalendar, IconHourglass, IconId, IconMoodSmile, IconPaperclip, IconPlus } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useContext, useCallback, memo } from "react";
 

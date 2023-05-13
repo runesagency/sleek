@@ -5,7 +5,7 @@ import type { User } from "@prisma/client";
 import { Input } from "@/components/Forms";
 import Avatar from "@/components/Miscellaneous/Avatar";
 
-import { IconChevronLeft } from "@tabler/icons";
+import { IconChevronLeft } from "@tabler/icons-react";
 import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
 

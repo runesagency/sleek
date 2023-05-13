@@ -1,6 +1,6 @@
 "use client";
 
-import { IconDots, IconMessageDots, IconPencil, IconTrash } from "@tabler/icons";
+import { IconDots, IconMessageDots, IconPencil, IconTrash } from "@tabler/icons-react";
 
 type AttachmentProps = {
     title: string;

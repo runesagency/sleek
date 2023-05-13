@@ -4,7 +4,7 @@ import type { MenuSharedProps } from "@/lib/menu/components/Menu";
 import { Button, Input, Checkbox, Textarea } from "@/components/Forms";
 import { MenuFormVariant as MenuFormVariantSelection } from "@/lib/menu";
 
-import { IconChevronLeft } from "@tabler/icons";
+import { IconChevronLeft } from "@tabler/icons-react";
 import { memo, useCallback, useState } from "react";
 
 type MenuFormComponentItemProps = MenuVariantFormItem & {

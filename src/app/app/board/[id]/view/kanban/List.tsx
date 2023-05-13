@@ -9,7 +9,7 @@ import { Draggable, Droppable, SortableDirection } from "@/lib/drag-and-drop";
 import autoAnimate, { getTransitionSizes } from "@formkit/auto-animate";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useClickOutside, useMergedRef } from "@mantine/hooks";
-import { IconDots, IconPlus } from "@tabler/icons";
+import { IconDots, IconPlus } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRef, useCallback, useState, memo, useContext } from "react";
 

@@ -10,7 +10,7 @@ import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant,
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Project } from "@prisma/client";
-import { IconCalendar, IconLoader2, IconPencil, IconPictureInPicture, IconPlus, IconTrash, IconCards } from "@tabler/icons";
+import { IconCalendar, IconLoader2, IconPencil, IconPictureInPicture, IconPlus, IconTrash, IconCards } from "@tabler/icons-react";
 import Link from "next/link";
 import { useCallback, useContext, useState } from "react";
 import { toast } from "react-toastify";

@@ -1,6 +1,6 @@
 "use client";
 
-import { IconArrowBackUp, IconDots, IconPencil, IconSquare, IconTrash } from "@tabler/icons";
+import { IconArrowBackUp, IconDots, IconPencil, IconSquare, IconTrash } from "@tabler/icons-react";
 import ReactMarkdown from "react-markdown";
 
 type ActivityProps = {

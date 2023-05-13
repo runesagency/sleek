@@ -150,7 +150,7 @@
         "@formkit/auto-animate": "1.0.0-beta.6",
         "@mantine/hooks": "^6.0.9",
         "@prisma/client": "^4.13.0",
-        "@tabler/icons": "^2.17.0",
+        "@tabler/icons-react": "^2.18.0",
         "@tailwindcss/line-clamp": "^0.4.4",
         "@tailwindcss/typography": "^0.5.9",
         "clsx": "^1.2.1",

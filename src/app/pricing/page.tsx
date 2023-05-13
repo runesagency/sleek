@@ -9,7 +9,7 @@ import { Routes } from "@/lib/constants";
 import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { IconBuilding, IconBuildingStore, IconCheck, IconX } from "@tabler/icons";
+import { IconBuilding, IconBuildingStore, IconCheck, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 

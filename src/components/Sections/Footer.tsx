@@ -2,7 +2,7 @@ import { Button, Input } from "@/components/Forms";
 import Container from "@/components/Sections/Container";
 import { Routes } from "@/lib/constants";
 
-import { IconBrandDiscord, IconBrandTwitter, IconMail } from "@tabler/icons";
+import { IconBrandDiscord, IconBrandTwitter, IconMail } from "@tabler/icons-react";
 import Link from "next/link";
 
 type FooterSectionProps = {

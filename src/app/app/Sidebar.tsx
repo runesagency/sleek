@@ -6,7 +6,7 @@ import { ApiRoutes, Routes } from "@/lib/constants";
 import { MenuAlignment, MenuAnchor, MenuDirection, MenuFormVariant, MenuVariant, useMenu } from "@/lib/menu";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { IconCards, IconLoader2, IconPlus, IconSettings, IconUsers } from "@tabler/icons";
+import { IconCards, IconLoader2, IconPlus, IconSettings, IconUsers } from "@tabler/icons-react";
 import clsx from "clsx";
 import Link from "next/link";
 import { useCallback, useContext, useState } from "react";
